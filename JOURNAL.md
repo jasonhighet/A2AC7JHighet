@@ -50,3 +50,18 @@ Output: prompts/5-admin-ui-plan.md
 - **Reflections**:
   - The agent correctly linked the memory files in the rule?
   - I am not sure if having a persistent `TECHNICAL.md` reduces the need for long repetitive prompts?  Does it help the AI to remember the constraints? Does it waste context?
+
+
+  ## Module 3: Reflections
+
+  1. Were you able to successfully get your assistant to pick up where you left off (with an empty context window) with just "what's the next step?" or "what is our status?"
+The memory files effectively managed the state. Upon starting a new session, the agent identified the Windows-native configuration and uv dependencies without prompting. The pointer logic in WORKFLOW_STATUS.md made the "what is our status?" recovery trivial, as it immediately directed the agent to the active story file.
+
+2. Were you able to get your assistant to behave properly during the transitions?
+Transitions through the four-stage loop—Planning, Building, Reflecting, and Done—were consistent. The protocol demonstrated its utility when make was found to be missing; the agent reverted to the documented uv run commands specified in the scripts file rather than improvising or failing. It maintained clean gates between planning and implementation.
+
+3. Did your assistant continue to adhere to your directives in other parts of its memory?
+Adherence was steady. The agent respected the "no Docker" and "uv" constraints consistently, even across long sessions. A sync-memory exercise identified a minor documentation gap where a rule was present in ENV_SCRIPTS.md but missing from TECHNICAL.md. This provided a practical test of the reflect-and-adapt stage and reinforced the need for a centralised source of truth.
+
+4. What was a behaviour that your assistant took a lot of work to get right?
+Establishing a clean separation of concerns within the memory bank required the most iteration. It took some effort to ensure WORKFLOW_STATUS.md governed the process while TECHNICAL.md governed the constraints. Initial versions suffered from state duplication between the work item files and the status dashboard, which caused ambiguity. Explicitly defining where the "authority" lives for each category was necessary to resolve the friction.

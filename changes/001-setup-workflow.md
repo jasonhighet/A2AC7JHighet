@@ -1,7 +1,7 @@
 # Story 001: Finalising the Module 3 Workflow Infrastructure
 
 ## Status
-`Reflecting`
+`Done`
 
 ## Goal
 As an engineering lead, I want the Module 3 workflow infrastructure verified and operational, so that every subsequent story can be planned, built, and assessed using a reliable, agent-executable toolchain.

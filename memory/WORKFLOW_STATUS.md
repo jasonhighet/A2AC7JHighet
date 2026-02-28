@@ -7,9 +7,9 @@
 
 ## Active Work Item
 
-> 📄 **[001-setup-workflow.md](../changes/001-setup-workflow.md)** — Finalising the Module 3 Workflow Infrastructure
+> 📄 **None** — pick the next item and update this pointer.
 >
-> Stage: `Task Planning`
+> Format: `changes/NNN-story_name.md` (e.g. `changes/001-first_story.md`)
 
 ---
 
