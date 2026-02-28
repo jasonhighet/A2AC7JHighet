@@ -8,5 +8,7 @@ At the start of every session or when beginning a new major task, the agent MUST
 - [ABOUT.md](file:///e:/Github/HyprCourse/Project/memory/ABOUT.md): Project overview and personas.
 - [TECHNICAL.md](file:///e:/Github/HyprCourse/Project/memory/TECHNICAL.md): Strict technical constraints (No ORM, Windows-native, etc.).
 - [ARCHITECTURE.md](file:///e:/Github/HyprCourse/Project/memory/ARCHITECTURE.md): Service boundaries and data management decisions.
+- [ENV_SCRIPTS.md](file:///e:/Github/HyprCourse/Project/memory/ENV_SCRIPTS.md): Environment variables, dev commands (`uv`, `pnpm`, Makefile targets).
+- [WORKFLOW_STATUS.md](file:///e:/Github/HyprCourse/Project/memory/WORKFLOW_STATUS.md): Collaboration contract — 4-stage workflow, active work item pointer, and build/test protocol.
 
-Do not proceed with implementation or architectural advice without first confirming the state of these documents.
+Do not proceed with implementation or architectural advice without first confirming the state of these documents. Always check WORKFLOW_STATUS.md to identify the active work item before starting any build work.
