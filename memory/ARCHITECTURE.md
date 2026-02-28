@@ -18,3 +18,7 @@ The Config Service is logically divided into two primary domains:
 ## Error Handling
 - **Domain Exceptions**: Custom exceptions defined in `app/exceptions.py`.
 - **Global Handlers**: Mapped to consistent JSON responses in `app/main.py` via FastAPI exception handlers.
+
+## Client Layer (UI)
+- **Abstraction Layer**: The `ui/packages/config-client` provides a type-safe wrapper around the REST API, preventing direct `fetch` calls in application code.
+- **Package Organization**: The `ui/packages/` directory is used for shared libraries and components, follow a monorepo-style structure.

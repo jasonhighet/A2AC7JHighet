@@ -4,7 +4,7 @@
 **HyprCourse: Config Service**
 
 ## Description
-A centralized configuration management system designed to provide dynamic, environment-specific settings to distributed applications. This project serves as a practical exploration of AI-assisted software engineering, focusing on high-quality REST API development using a "No-Shortcuts" architecture (Native Windows, Python 3.13, FastAPI, PostgreSQL via psycopg2, strictly no ORM).
+A centralized configuration management system designed to provide dynamic, environment-specific settings to distributed applications. This project serves as a practical exploration of AI-assisted software engineering, focusing on high-quality REST API development and **type-safe client-side integration** using a "No-Shortcuts" architecture (Native Windows, Python 3.13, FastAPI, PostgreSQL via psycopg2, strictly no ORM).
 
 ## Domain Context: Centralized Configuration
 In modern microservices architectures, managing configuration across multiple instances and environments (dev, staging, prod) is a common challenge. 
@@ -12,6 +12,7 @@ In modern microservices architectures, managing configuration across multiple in
 - **Dynamic Updates**: Allows changing configuration at runtime without redeploying services.
 - **Environment Awareness**: Scopes variables to specific environments or application instances.
 - **Security**: Centralizes secrets management and access control.
+- **Client Abstraction**: Simplifies service consumption for web-based frontends.
 
 ## Target Personas
 - **Application Developers**: Users who need to retrieve configuration values for their services via the REST API. They care about latency, reliability, and clear API contracts.

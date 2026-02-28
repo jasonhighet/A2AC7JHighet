@@ -18,3 +18,9 @@
 ## Utilities
 - **ULID**: Use Universally Unique Lexicographically Sortable Identifiers for primary keys (via `python-ulid`).
 - **Pydantic**: Use for request/response validation and configuration management (`pydantic-settings`).
+
+## UI & Client Libraries
+- **Vanilla TypeScript**: Shared libraries (like `config-client`) must be framework-agnostic.
+- **Native Fetch**: Use the browser's native `fetch` API; avoid `axios` or other wrappers to keep dependencies minimal.
+- **Bundling**: Use `tsup` for high-performance library bundling (CJS/ESM/DTS).
+- **Testing**: Standardize on `vitest` for all TypeScript/UI-related unit testing.
