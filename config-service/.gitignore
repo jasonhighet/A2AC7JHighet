@@ -1,10 +1,22 @@
-.env
-.venv/
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.venv/
 .pytest_cache/
 .coverage
 htmlcov/
-dist/
 *.egg-info/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

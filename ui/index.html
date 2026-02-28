@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Config Service Admin</title>
+    <meta name="description" content="Admin interface for managing Config Service applications and configurations." />
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Global design tokens (CSS custom properties) -->
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <!-- Root reset & base styles -->
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        height: 100%;
+        background-color: var(--color-bg-base);
+        color: var(--color-text-primary);
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-base);
+        -webkit-font-smoothing: antialiased;
+      }
+      #app { height: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <app-shell></app-shell>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

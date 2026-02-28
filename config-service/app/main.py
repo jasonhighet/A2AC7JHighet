@@ -5,6 +5,7 @@ FastAPI application factory.
 """
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.exceptions import DuplicateNameError, NotFoundError
@@ -15,6 +16,19 @@ app = FastAPI(
     title="Config Service",
     description="Centralized configuration management REST API",
     version="1.0.0",
+)
+
+# ---------------------------------------------------------------------------
+# CORS
+# Allow the Admin UI dev server to call the API cross-origin.
+# In production, replace with the deployed UI origin.
+# ---------------------------------------------------------------------------
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ---------------------------------------------------------------------------
