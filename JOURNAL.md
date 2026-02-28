@@ -40,3 +40,13 @@ Context: Clean
 Model: Claude 4.6 Sonnet
 Input: prompts/4-admin-ui-prompt.md
 Output: prompts/5-admin-ui-plan.md
+
+
+## Module 2: Context Framework Setup
+- **Prompt**: Initialize memory/ and .agent/rules/
+- **Tool**: Antigravity (Windows Native)
+- **Model**: Gemini Flash 3
+- **Cost**: free
+- **Reflections**:
+  - The agent correctly linked the memory files in the rule?
+  - I am not sure if having a persistent `TECHNICAL.md` reduces the need for long repetitive prompts?  Does it help the AI to remember the constraints? Does it waste context?
