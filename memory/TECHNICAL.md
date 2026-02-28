@@ -6,6 +6,7 @@
   - **No Docker**: Do not use Docker or Docker Compose.
   - **No WSL/Linux**: Do not assume Linux-specific tools or paths.
 - **Package Management**: Use `uv` for all dependency management and virtual environment handling.
+- **Python Invocation**: Always use `uv run python -m <module>` syntax (e.g., `uv run python -m pytest`). Never call `python`, `pytest`, or `pip` directly — `uv run` ensures the correct virtual environment is always used.
 
 ## Language and Framework
 - **Python 3.13.5+**: High-standard Python code using the latest features (type hints, f-strings, etc.).
@@ -27,3 +28,4 @@
 
 ## See Also
 - [`memory/ENV_SCRIPTS.md`](./ENV_SCRIPTS.md) — Environment variables, `uv` commands, Makefile targets, and `pnpm` scripts for all services.
+- [`memory/WORKFLOW_STATUS.md`](./WORKFLOW_STATUS.md) — The 4-stage collaboration contract (Task Planning → Build & Assess → Reflect & Adapt → Commit & Pick Next). All work follows this process.

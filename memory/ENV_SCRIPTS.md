@@ -77,7 +77,7 @@ uv run pytest --cov=app --cov-report=term-missing
 
 ### Makefile Targets
 
-A `Makefile` is provided as a convenience wrapper. Requires `make` to be available on Windows (e.g., via [GnuWin32](http://gnuwin32.sourceforge.net/) or `choco install make`).
+A `Makefile` is provided as a convenience wrapper. Optional: if `make` is available on Windows (e.g., via [GnuWin32](http://gnuwin32.sourceforge.net/) or `choco install make`), these targets can be used as shorthand. If not, the raw `uv run` commands below are always sufficient.
 
 | Target | Equivalent `uv` Command | Description |
 |---|---|---|

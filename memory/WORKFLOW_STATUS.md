@@ -7,9 +7,9 @@
 
 ## Active Work Item
 
-> 📄 **None** — pick the next item and update this pointer.
+> 📄 **[001-setup-workflow.md](../changes/001-setup-workflow.md)** — Finalising the Module 3 Workflow Infrastructure
 >
-> Format: `changes/NNN-story_name.md` (e.g. `changes/001-first_story.md`)
+> Stage: `Task Planning`
 
 ---
 
@@ -174,7 +174,7 @@ See [`changes/TEMPLATE.md`](../changes/TEMPLATE.md) for the blank template to co
 
 | Layer | Command | Must Pass |
 |---|---|---|
-| Python (config-service) | `uv run pytest` | All tests, zero failures |
+| Python (config-service) | `uv run python -m pytest` | All tests, zero failures |
 | TypeScript (ui) | `pnpm test` | All tests, zero failures |
 
 ---
