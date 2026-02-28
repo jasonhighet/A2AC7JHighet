@@ -24,3 +24,6 @@
 - **Native Fetch**: Use the browser's native `fetch` API; avoid `axios` or other wrappers to keep dependencies minimal.
 - **Bundling**: Use `tsup` for high-performance library bundling (CJS/ESM/DTS).
 - **Testing**: Standardize on `vitest` for all TypeScript/UI-related unit testing.
+
+## See Also
+- [`memory/ENV_SCRIPTS.md`](./ENV_SCRIPTS.md) — Environment variables, `uv` commands, Makefile targets, and `pnpm` scripts for all services.
