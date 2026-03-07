@@ -65,3 +65,23 @@ Adherence was steady. The agent respected the "no Docker" and "uv" constraints c
 
 4. What was a behaviour that your assistant took a lot of work to get right?
 Establishing a clean separation of concerns within the memory bank required the most iteration. It took some effort to ensure WORKFLOW_STATUS.md governed the process while TECHNICAL.md governed the constraints. Initial versions suffered from state duplication between the work item files and the status dashboard, which caused ambiguity. Explicitly defining where the "authority" lives for each category was necessary to resolve the friction.
+
+
+## Module 4: Reflections
+
+
+### Which MCP servers did you attempt to use? Were you unsuccessful with any of them? Why?
+
+I successfully implemented three different types of MCP servers: Context7 for real-time documentation, Postgres-mcp-pro for database introspection, and a Trello server for backlog management. While all three were eventually successful, the Trello integration was significantly more difficult to configure. Navigating the Trello developer portal to generate a Power-Up, API key, and manual token involved a level of administrative friction that felt disproportionate to the task, though the resulting connectivity to the backlog was worth the effort.
+
+### Did you install any local servers? Docker or on the metal? What are your reflections between the two?
+I installed the Postgres-mcp-pro server "on the metal" using uv. In my Windows-native environment, avoiding Docker for local developer tools reduces significant overhead and potential filesystem performance issues. Running these tools directly on the host OS feels more aligned with a lightweight, high-flow developer experience. The "metal" approach is easier to maintain for local databases, whereas Docker's value seems more evident for complex, multi-dependency services that I don't want to pollute my primary machine with.  (Basically I am, I can't be bothered with docker.)
+
+### Which MCP servers do you suspect would be useful to run locally? What about remotely and/or team shared?
+Local execution is ideal for Postgres or filesystem tools where the agent needs direct, low-latency access to private data and local architectural context. Conversely, Context7 is a perfect candidate for a remote service; documentation is a global resource that doesn't need to live on my machine and benefits from being centralised and updated by a third party. For team-shared environments, SaaS integrations like Trello or internal API browsers provide a shared source of truth that keeps the entire squad's agentic workflows synchronised.
+
+### Are there any obvious candidates for useful MCP servers in your organisation? Is this supporting an existing need, or a new opportunity?
+
+In my organisation, we already have established MCPs for Jira, Confluence, GitHub, Office, Teams, and many others, which support our current operational needs. For my personal projects, I would like to implement integration with Google Workspace (Tasks, Calendar, Docs) to better support my individual requirements.
+
+Beyond these standard integrations, there is a significant new opportunity to develop custom MCP servers for our centralised architectural standards and engineering practice playbooks. Instead of engineers manually searching through internal wikis, an MCP could provide our agents with real-time "compliance-as-context," ensuring that new service designs automatically align with our specific engineering practices as they are being written.
