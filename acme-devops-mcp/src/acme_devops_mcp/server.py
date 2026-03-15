@@ -4,12 +4,76 @@ import json
 import mcp.types as types
 from mcp.server.lowlevel import Server
 from mcp.server.stdio import stdio_server
+import subprocess
+import os
+from pathlib import Path
 
-# Import DevOps CLI business logic
+# Import DevOps CLI business logic (for direct tools)
 from acme_devops_cli.commands.deployment_status import get_deployment_status
 from acme_devops_cli.commands.environment_health import check_environment_health
 from acme_devops_cli.commands.recent_releases import list_recent_releases
 from acme_devops_cli.commands.promote_release import promote_release
+
+async def _run_cli_command(args: list[str]) -> dict:
+    """
+    Run the devops-cli tool as a subprocess and return the JSON results.
+    """
+    try:
+        # Construct the command using current python interpreter to avoid uv overhead
+        # Click global options must come before the command
+        full_cmd = [sys.executable, "-m", "acme_devops_cli.main", "--format", "json"] + args
+        
+        # Execute the process with a timeout and explicit environment
+        env = os.environ.copy()
+        # Remove problematic environment variables to avoid conflicts with parent environment
+        if "PYTHONPATH" in env:
+            del env["PYTHONPATH"]
+        if "VIRTUAL_ENV" in env:
+            del env["VIRTUAL_ENV"]
+        # Ensure utf-8 encoding
+        env["PYTHONIOENCODING"] = "utf-8"
+        
+        proc = await asyncio.create_subprocess_exec(
+            *full_cmd,
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=env
+        )
+        
+        try:
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=30)
+        except asyncio.TimeoutError:
+            try:
+                proc.kill()
+            except:
+                pass
+            return {"status": "error", "error": "CLI command timed out"}
+
+        exit_code = proc.returncode
+        
+        if exit_code != 0:
+            err_msg = stderr.decode().strip()
+            return {
+                "status": "error",
+                "error": f"CLI command failed with exit code {exit_code}",
+                "stderr": err_msg
+            }
+            
+        try:
+            return json.loads(stdout.decode())
+        except json.JSONDecodeError:
+            return {
+                "status": "error",
+                "error": "Failed to parse CLI output as JSON",
+                "stdout": stdout.decode().strip()
+            }
+            
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": f"Unexpected error running CLI command: {str(e)}"
+        }
 
 async def _main():
     """
@@ -17,7 +81,6 @@ async def _main():
     """
     # Set data directory for acme-devops-cli
     import os
-    from pathlib import Path
     project_root = Path(__file__).resolve().parent.parent.parent.parent
     os.environ["ACME_DATA_DIR"] = str(project_root / "acme-devops-cli" / "data")
 
@@ -86,6 +149,28 @@ async def _main():
                     },
                     "required": ["applicationId", "version", "fromEnvironment", "toEnvironment"],
                 },
+            }),
+            # Subprocess-based tools as requested
+            types.Tool.model_validate({
+                "name": "list-releases",
+                "description": "List releases via subprocess call to devops-cli.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {"type": "integer", "description": "Limit results."},
+                        "app": {"type": "string", "description": "Filter by app ID."}
+                    }
+                }
+            }),
+            types.Tool.model_validate({
+                "name": "check-health",
+                "description": "Check health via subprocess call to devops-cli.",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "env": {"type": "string", "description": "Filter by environment."}
+                    }
+                }
             })
         ]
 
@@ -129,6 +214,23 @@ async def _main():
                 fromEnvironment=args.get("fromEnvironment"),
                 toEnvironment=args.get("toEnvironment")
             )
+            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+
+        # Subprocess-based implementations
+        elif name == "list-releases":
+            cmd_args = ["releases"]
+            if "limit" in args:
+                cmd_args += ["--limit", str(args["limit"])]
+            if "app" in args:
+                cmd_args += ["--app", args["app"]]
+            result = await _run_cli_command(cmd_args)
+            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+
+        elif name == "check-health":
+            cmd_args = ["health"]
+            if "env" in args:
+                cmd_args += ["--env", args["env"]]
+            result = await _run_cli_command(cmd_args)
             return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
             
         raise ValueError(f"Unknown tool: {name}")

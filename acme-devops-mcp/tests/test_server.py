@@ -137,6 +137,34 @@ async def test_ping():
         promote_response = read_message()
         print(f"Promote Response: {json.dumps(promote_response, indent=2)}")
 
+        # Step 8: Call list-releases (subprocess)
+        print("\nCalling list-releases...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "list-releases",
+                "arguments": {"limit": 1}
+            }
+        })
+        list_releases_response = read_message()
+        print(f"List Releases (Subprocess) Response: {json.dumps(list_releases_response, indent=2)}")
+
+        # Step 9: Call check-health (subprocess)
+        print("\nCalling check-health...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 9,
+            "method": "tools/call",
+            "params": {
+                "name": "check-health",
+                "arguments": {"env": "prod"}
+            }
+        })
+        check_health_response = read_message()
+        print(f"Check Health (Subprocess) Response: {json.dumps(check_health_response, indent=2)}")
+
     except Exception as e:
         print(f"Error during test: {e}", file=sys.stderr)
     finally:
