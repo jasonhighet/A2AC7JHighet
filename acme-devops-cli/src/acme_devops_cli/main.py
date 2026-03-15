@@ -64,7 +64,12 @@ def health(ctx, env, app):
 @click.pass_context
 def promote(ctx, release, from_env, to_env, app):
     """Promote a release between environments."""
-    result = promote_release(release, from_env, to_env, app)
+    result = promote_release(
+        applicationId=app,
+        version=release,
+        fromEnvironment=from_env,
+        toEnvironment=to_env
+    )
     click.echo(json.dumps(result, indent=2))
     sys.exit(0 if result['status'] == 'success' else 1)
 

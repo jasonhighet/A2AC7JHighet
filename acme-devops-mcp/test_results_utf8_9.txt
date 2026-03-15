@@ -1,0 +1,157 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: E:\Github\HyprCourse\Project\acme-devops-mcp
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests\test_fastmcp.py .FFFFFFFF                                          [100%]
+
+================================== FAILURES ===================================
+_________________________ test_get_deployment_status __________________________
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_status():
+        """Test get_deployment_status tool directly."""
+        result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "prod"})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:19: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+ERROR    acme_devops_cli.commands.deployment_status:deployment_status.py:80 Error loading deployment data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+________________________ test_check_environment_health ________________________
+
+    @pytest.mark.asyncio
+    async def test_check_environment_health():
+        """Test check_environment_health tool directly."""
+        result = await mcp.call_tool("check_environment_health", {"environment": "prod"})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:29: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\release_health.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\release_health.json
+ERROR    acme_devops_cli.commands.environment_health:environment_health.py:97 Error loading environment health data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\release_health.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\release_health.json
+__________________________ test_list_recent_releases __________________________
+
+    @pytest.mark.asyncio
+    async def test_list_recent_releases():
+        """Test list_recent_releases tool directly."""
+        result = await mcp.call_tool("list_recent_releases", {"limit": 5})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:38: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\releases.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\releases.json
+ERROR    acme_devops_cli.commands.recent_releases:recent_releases.py:103 Error loading releases data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\releases.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\releases.json
+____________________________ test_promote_release _____________________________
+
+    @pytest.mark.asyncio
+    async def test_promote_release():
+        """Test promote_release tool directly."""
+        # We need a valid version from data
+        status_result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "uat"})
+        content, _ = status_result
+        status_data = json.loads(content[0].text)
+>       version = status_data["deployments"][0]["version"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests\test_fastmcp.py:48: IndexError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+ERROR    acme_devops_cli.commands.deployment_status:deployment_status.py:80 Error loading deployment data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+________________________ test_list_releases_subprocess ________________________
+
+    @pytest.mark.asyncio
+    async def test_list_releases_subprocess():
+        """Test list-releases (subprocess) tool directly."""
+        result = await mcp.call_tool("list-releases", {"limit": 2})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:66: AssertionError
+________________________ test_check_health_subprocess _________________________
+
+    @pytest.mark.asyncio
+    async def test_check_health_subprocess():
+        """Test check-health (subprocess) tool directly."""
+        result = await mcp.call_tool("check-health", {"env": "prod"})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:75: AssertionError
+_______________________ test_invalid_app_returns_empty ________________________
+
+    @pytest.mark.asyncio
+    async def test_invalid_app_returns_empty():
+        """Test tool behavior when application is not found (should return success but empty list).."""
+        result = await mcp.call_tool("get_deployment_status", {"application": "non-existent-app"})
+        content, _ = result
+        data = json.loads(content[0].text)
+>       assert data["status"] == "success"
+E       AssertionError: assert 'error' == 'success'
+E         
+E         - success
+E         + error
+
+tests\test_fastmcp.py:84: AssertionError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+ERROR    acme_devops_cli.commands.deployment_status:deployment_status.py:80 Error loading deployment data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+_______________________ test_promote_release_subprocess _______________________
+
+    @pytest.mark.asyncio
+    async def test_promote_release_subprocess():
+        """Test promote-release (subprocess) tool directly."""
+        # Get a valid version first
+        status_result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "uat"})
+        content, _ = status_result
+        status_data = json.loads(content[0].text)
+>       version = status_data["deployments"][0]["version"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests\test_fastmcp.py:95: IndexError
+------------------------------ Captured log call ------------------------------
+ERROR    acme_devops_cli.data_loader:data_loader.py:80 Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+ERROR    acme_devops_cli.commands.deployment_status:deployment_status.py:80 Error loading deployment data: Unexpected error loading file E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json: Data file not found: E:\Github\HyprCourse\Project\acme-devops-mcp\acme-devops-cli\data\deployments.json
+=========================== short test summary info ===========================
+FAILED tests/test_fastmcp.py::test_get_deployment_status - AssertionError: as...
+FAILED tests/test_fastmcp.py::test_check_environment_health - AssertionError:...
+FAILED tests/test_fastmcp.py::test_list_recent_releases - AssertionError: ass...
+FAILED tests/test_fastmcp.py::test_promote_release - IndexError: list index o...
+FAILED tests/test_fastmcp.py::test_list_releases_subprocess - AssertionError:...
+FAILED tests/test_fastmcp.py::test_check_health_subprocess - AssertionError: ...
+FAILED tests/test_fastmcp.py::test_invalid_app_returns_empty - AssertionError...
+FAILED tests/test_fastmcp.py::test_promote_release_subprocess - IndexError: l...
+========================= 8 failed, 1 passed in 1.18s =========================

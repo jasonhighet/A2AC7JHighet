@@ -29,11 +29,15 @@ async def _run_cli_command(args: list[str]) -> dict:
         full_cmd = [sys.executable, "-m", "acme_devops_cli.main", "--format", "json"] + args
         
         env = os.environ.copy()
-        # Remove problematic environment variables to avoid conflicts with parent environment
-        if "PYTHONPATH" in env:
-            del env["PYTHONPATH"]
-        if "VIRTUAL_ENV" in env:
-            del env["VIRTUAL_ENV"]
+        # Set data directory explicitly
+        env["ACME_DATA_DIR"] = str(project_root / "acme-devops-cli" / "data")
+        
+        # Ensure local CLI source is prioritized if it exists
+        cli_src = project_root / "acme-devops-cli" / "src"
+        if cli_src.exists():
+            current_pp = env.get("PYTHONPATH", "")
+            env["PYTHONPATH"] = str(cli_src) + (os.pathsep + current_pp if current_pp else "")
+            
         # Ensure utf-8 encoding
         env["PYTHONIOENCODING"] = "utf-8"
         
@@ -140,6 +144,47 @@ async def check_health_subprocess(env: str | None = None) -> str:
     if env:
         cmd_args += ["--env", env]
     result = await _run_cli_command(cmd_args)
+    return json.dumps(result, indent=2)
+
+@mcp.tool(name="promote-release")
+async def promote_release_subprocess(
+    application: str,
+    version: str,
+    from_environment: str,
+    to_environment: str
+) -> str:
+    """
+    Promote a release via subprocess call to devops-cli.
+    
+    Args:
+        application: Application ID (e.g., 'web-app')
+        version: Version string (e.g., 'v1.2.3')
+        from_environment: Source environment (e.g., 'staging', 'uat')
+        to_environment: Target environment (e.g., 'prod', 'uat')
+    """
+    # Validation
+    valid_envs = ["staging", "uat", "prod", "test", "dev"]
+    if from_environment not in valid_envs or to_environment not in valid_envs:
+        error_msg = f"Invalid environment. Valid environments are: {', '.join(valid_envs)}"
+        return json.dumps({"status": "error", "error": error_msg}, indent=2)
+
+    # Production Warning
+    warnings = []
+    if to_environment == "prod":
+        warnings.append("WARNING: This is a promotion to PRODUCTION. High impact operation.")
+
+    cmd_args = [
+        "promote",
+        "--app", application,
+        "--release", version,
+        "--from", from_environment,
+        "--to", to_environment
+    ]
+    result = await _run_cli_command(cmd_args)
+    
+    if warnings:
+        result["warnings"] = warnings
+        
     return json.dumps(result, indent=2)
 
 def main():

@@ -1,0 +1,12 @@
+﻿Running: E:\Github\HyprCourse\Project\acme-devops-mcp\.venv\Scripts\python.exe -m acme_devops_cli.main --format json promote web-app v2.1.4 uat prod
+Exit code: 2
+STDOUT: 
+STDERR: Usage: python -m acme_devops_cli.main promote [OPTIONS]
+
+Try 'python -m acme_devops_cli.main promote --help' for help.
+
+
+
+Error: Missing option '--release'.
+
+

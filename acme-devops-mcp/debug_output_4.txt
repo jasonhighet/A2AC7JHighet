@@ -1,0 +1,18 @@
+﻿Running: E:\Github\HyprCourse\Project\acme-devops-mcp\.venv\Scripts\python.exe -m acme_devops_cli.main --format json promote --app web-app --release v2.1.4 --from uat --to prod
+CWD: E:\Github\HyprCourse\Project
+ACME_DATA_DIR: E:\Github\HyprCourse\Project\acme-devops-cli\data
+Exit code: 1
+STDOUT: {
+
+  "status": "error",
+
+  "error": "Application 'v2.1.4' not found. Valid applications: ['web-app', 'api-service', 'worker-service', 'analytics-dashboard']",
+
+  "promotion_details": null,
+
+  "timestamp": "2026-03-16T08:03:04.966075Z"
+
+}
+
+
+STDERR: 

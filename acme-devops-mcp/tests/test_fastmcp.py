@@ -84,3 +84,24 @@ async def test_invalid_app_returns_empty():
     assert data["status"] == "success"
     assert data["total_count"] == 0
     assert len(data["deployments"]) == 0
+
+@pytest.mark.asyncio
+async def test_promote_release_subprocess():
+    """Test promote-release (subprocess) tool directly."""
+    # Get a valid version first
+    status_result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "uat"})
+    content, _ = status_result
+    status_data = json.loads(content[0].text)
+    version = status_data["deployments"][0]["version"]
+
+    result = await mcp.call_tool("promote-release", {
+        "application": "web-app",
+        "version": version,
+        "from_environment": "uat",
+        "to_environment": "prod"
+    })
+    content, _ = result
+    data = json.loads(content[0].text)
+    assert data["status"] == "success"
+    assert "warnings" in data
+    assert "PRODUCTION" in data["warnings"][0]

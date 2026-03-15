@@ -1,0 +1,77 @@
+﻿Running: E:\Github\HyprCourse\Project\acme-devops-mcp\.venv\Scripts\python.exe -m acme_devops_cli.main --format json --verbose promote --app web-app --release v2.1.4 --from uat --to prod
+PYTHONPATH: E:\Github\HyprCourse\Project\acme-devops-cli\src;
+Exit code: 0
+STDOUT: {
+
+  "status": "success",
+
+  "message": "Successfully promoted web-app v2.1.4 from uat to prod",
+
+  "promotion_details": {
+
+    "deployment": {
+
+      "id": "deploy-6eb4c644",
+
+      "applicationId": "web-app",
+
+      "environment": "prod",
+
+      "version": "v2.1.4",
+
+      "status": "deployed",
+
+      "deployedAt": "2026-03-16T08:06:29.514641Z",
+
+      "deployedBy": "system@company.com",
+
+      "commitHash": "def456ghi789"
+
+    },
+
+    "source_deployment": {
+
+      "id": "deploy-002",
+
+      "applicationId": "web-app",
+
+      "environment": "uat",
+
+      "version": "v2.1.4",
+
+      "status": "deployed",
+
+      "deployedAt": "2024-01-16T14:20:00Z",
+
+      "deployedBy": "bob@company.com",
+
+      "commitHash": "def456ghi789"
+
+    },
+
+    "release_info": {
+
+      "version": "v2.1.4",
+
+      "releaseDate": "2024-01-16T12:00:00Z",
+
+      "author": "bob@company.com",
+
+      "releaseNotes": "Added new user dashboard features and security updates"
+
+    },
+
+    "promotion_path": "uat \u2192 prod",
+
+    "promotion_successful": true
+
+  },
+
+  "timestamp": "2026-03-16T08:06:29.514673Z"
+
+}
+
+
+STDERR: DEBUG: promote called with release=v2.1.4, from=uat, to=prod, app=web-app
+
+
