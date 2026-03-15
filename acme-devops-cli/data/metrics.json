@@ -1,0 +1,85 @@
+{
+  "metrics": [
+    {
+      "applicationId": "web-app",
+      "environment": "prod",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 45.2,
+      "memory": 67.8,
+      "requests": 1250,
+      "errors": 3
+    },
+    {
+      "applicationId": "web-app",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:00:00Z",
+      "cpu": 42.1,
+      "memory": 65.3,
+      "requests": 1180,
+      "errors": 2
+    },
+    {
+      "applicationId": "web-app",
+      "environment": "uat",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 28.5,
+      "memory": 45.2,
+      "requests": 320,
+      "errors": 1
+    },
+    {
+      "applicationId": "api-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 38.7,
+      "memory": 52.1,
+      "requests": 2850,
+      "errors": 1
+    },
+    {
+      "applicationId": "api-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:00:00Z",
+      "cpu": 41.2,
+      "memory": 54.8,
+      "requests": 2920,
+      "errors": 2
+    },
+    {
+      "applicationId": "api-service",
+      "environment": "uat",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 22.3,
+      "memory": 35.7,
+      "requests": 580,
+      "errors": 0
+    },
+    {
+      "applicationId": "worker-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 0.0,
+      "memory": 0.0,
+      "requests": 0,
+      "errors": 0
+    },
+    {
+      "applicationId": "analytics-dashboard",
+      "environment": "uat",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "cpu": 15.8,
+      "memory": 28.4,
+      "requests": 95,
+      "errors": 1
+    },
+    {
+      "applicationId": "analytics-dashboard",
+      "environment": "uat",
+      "timestamp": "2024-01-17T11:00:00Z",
+      "cpu": 18.2,
+      "memory": 31.1,
+      "requests": 110,
+      "errors": 0
+    }
+  ]
+}

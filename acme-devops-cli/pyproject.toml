@@ -1,0 +1,20 @@
+[project]
+name = "acme-devops-cli"
+version = "0.1.0"
+description = "A standalone CLI tool for DevOps operations"
+readme = "README.md"
+authors = [
+    { name = "DevOps Team", email = "devops@acme.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.3.1",
+    "tabulate>=0.10.0",
+]
+
+[project.scripts]
+devops-cli = "acme_devops_cli.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

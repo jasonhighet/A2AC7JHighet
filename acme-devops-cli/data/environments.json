@@ -1,0 +1,76 @@
+{
+  "environmentHealth": [
+    {
+      "environment": "prod",
+      "applicationId": "web-app",
+      "status": "healthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "99.9%",
+      "responseTime": "120ms",
+      "issues": []
+    },
+    {
+      "environment": "uat",
+      "applicationId": "web-app",
+      "status": "healthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "98.5%",
+      "responseTime": "95ms",
+      "issues": []
+    },
+    {
+      "environment": "staging",
+      "applicationId": "web-app",
+      "status": "degraded",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "97.2%",
+      "responseTime": "250ms",
+      "issues": ["High response times", "Intermittent database connections"]
+    },
+    {
+      "environment": "prod",
+      "applicationId": "api-service",
+      "status": "healthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "99.8%",
+      "responseTime": "85ms",
+      "issues": []
+    },
+    {
+      "environment": "uat",
+      "applicationId": "api-service",
+      "status": "healthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "99.1%",
+      "responseTime": "110ms",
+      "issues": []
+    },
+    {
+      "environment": "staging",
+      "applicationId": "api-service",
+      "status": "unhealthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "45.2%",
+      "responseTime": "timeout",
+      "issues": ["Deployment in progress", "Service unavailable", "Database migration running"]
+    },
+    {
+      "environment": "prod",
+      "applicationId": "worker-service",
+      "status": "unhealthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "0%",
+      "responseTime": "N/A",
+      "issues": ["Service down due to failed deployment", "Queue processing stopped"]
+    },
+    {
+      "environment": "uat",
+      "applicationId": "analytics-dashboard",
+      "status": "healthy",
+      "lastChecked": "2024-01-17T12:00:00Z",
+      "uptime": "99.5%",
+      "responseTime": "180ms",
+      "issues": []
+    }
+  ]
+}

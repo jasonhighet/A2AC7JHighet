@@ -1,0 +1,41 @@
+{
+  "applications": [
+    {
+      "id": "web-app",
+      "name": "Customer Web Portal",
+      "environments": ["staging", "uat", "prod"]
+    },
+    {
+      "id": "api-service",
+      "name": "Core API Service",
+      "environments": ["staging", "uat", "prod"]
+    },
+    {
+      "id": "worker-service",
+      "name": "Background Worker",
+      "environments": ["staging", "uat", "prod"]
+    },
+    {
+      "id": "analytics-dashboard",
+      "name": "Analytics Dashboard",
+      "environments": ["staging", "uat", "prod"]
+    }
+  ],
+  "environments": [
+    {
+      "id": "staging",
+      "name": "Staging",
+      "url": "https://staging.company.com"
+    },
+    {
+      "id": "uat",
+      "name": "User Acceptance Testing",
+      "url": "https://uat.company.com"
+    },
+    {
+      "id": "prod",
+      "name": "Production",
+      "url": "https://company.com"
+    }
+  ]
+}
