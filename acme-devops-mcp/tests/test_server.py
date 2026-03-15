@@ -74,8 +74,71 @@ async def test_ping():
             }
         })
         call_response = read_message()
-        print(f"Call Response: {json.dumps(call_response, indent=2)}")
+        print(f"Ping Response: {json.dumps(call_response, indent=2)}")
 
+        # Step 4: Call get_deployment_status
+        print("\nCalling get_deployment_status...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 4,
+            "method": "tools/call",
+            "params": {
+                "name": "get_deployment_status",
+                "arguments": {"environment": "prod"}
+            }
+        })
+        status_response = read_message()
+        print(f"Status Response: {json.dumps(status_response, indent=2)}")
+
+        # Step 5: Call check_environment_health
+        print("\nCalling check_environment_health...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 5,
+            "method": "tools/call",
+            "params": {
+                "name": "check_environment_health",
+                "arguments": {"application": "web-app"}
+            }
+        })
+        health_response = read_message()
+        print(f"Health Response: {json.dumps(health_response, indent=2)}")
+
+        # Step 6: Call list_recent_releases
+        print("\nCalling list_recent_releases...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 6,
+            "method": "tools/call",
+            "params": {
+                "name": "list_recent_releases",
+                "arguments": {"limit": 2}
+            }
+        })
+        releases_response = read_message()
+        print(f"Releases Response: {json.dumps(releases_response, indent=2)}")
+
+        # Step 7: Call promote_release
+        print("\nCalling promote_release...")
+        send_message({
+            "jsonrpc": "2.0",
+            "id": 7,
+            "method": "tools/call",
+            "params": {
+                "name": "promote_release",
+                "arguments": {
+                    "applicationId": "web-app",
+                    "version": "v2.1.3",
+                    "fromEnvironment": "prod",
+                    "toEnvironment": "uat"
+                }
+            }
+        })
+        promote_response = read_message()
+        print(f"Promote Response: {json.dumps(promote_response, indent=2)}")
+
+    except Exception as e:
+        print(f"Error during test: {e}", file=sys.stderr)
     finally:
         stdout, stderr = process.communicate()
         if stderr:

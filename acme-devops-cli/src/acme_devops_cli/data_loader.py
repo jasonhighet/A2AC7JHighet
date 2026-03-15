@@ -42,9 +42,20 @@ def load_json(file_path: str | Path) -> dict[str, Any]:
     
     # If it's just a filename (no directory), assume it's in the data directory
     if not path.is_absolute() and path.parent == Path('.'):
-        # Look for data directory relative to this file
-        # src/acme_devops_cli/data_loader.py -> ../../../data
-        data_dir = Path(__file__).parent.parent.parent / "data"
+        # 1. Check environment variable
+        import os
+        env_data_dir = os.environ.get("ACME_DATA_DIR")
+        if env_data_dir:
+            data_dir = Path(env_data_dir)
+        else:
+            # 2. Try to find relative to this file (development mode)
+            # src/acme_devops_cli/data_loader.py -> ../../../data
+            data_dir = Path(__file__).resolve().parent.parent.parent / "data"
+            
+            # 3. If not found relative to file, try current working directory
+            if not data_dir.exists():
+                data_dir = Path("data")
+        
         path = data_dir / path
     
     try:
