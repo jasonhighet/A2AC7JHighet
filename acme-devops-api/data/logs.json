@@ -1,0 +1,108 @@
+{
+  "logs": [
+    {
+      "id": "log-001",
+      "applicationId": "web-app",
+      "environment": "prod",
+      "timestamp": "2024-01-17T12:00:00Z",
+      "level": "error",
+      "message": "Database connection timeout",
+      "source": "database-connector",
+      "metadata": {
+        "requestId": "req-123",
+        "userId": "user-456"
+      }
+    },
+    {
+      "id": "log-002",
+      "applicationId": "web-app",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:58:00Z",
+      "level": "warn",
+      "message": "High memory usage detected",
+      "source": "monitoring-agent",
+      "metadata": {
+        "memoryUsage": "85%",
+        "threshold": "80%"
+      }
+    },
+    {
+      "id": "log-003",
+      "applicationId": "web-app",
+      "environment": "uat",
+      "timestamp": "2024-01-17T11:55:00Z",
+      "level": "info",
+      "message": "User login successful",
+      "source": "auth-service",
+      "metadata": {
+        "userId": "user-789",
+        "sessionId": "sess-abc"
+      }
+    },
+    {
+      "id": "log-004",
+      "applicationId": "api-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:50:00Z",
+      "level": "error",
+      "message": "API rate limit exceeded",
+      "source": "rate-limiter",
+      "metadata": {
+        "clientId": "client-123",
+        "limit": "1000/hour"
+      }
+    },
+    {
+      "id": "log-005",
+      "applicationId": "api-service",
+      "environment": "uat",
+      "timestamp": "2024-01-17T11:45:00Z",
+      "level": "debug",
+      "message": "Cache miss for key: user_profile_456",
+      "source": "cache-service",
+      "metadata": {
+        "cacheKey": "user_profile_456",
+        "ttl": "3600"
+      }
+    },
+    {
+      "id": "log-006",
+      "applicationId": "worker-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:40:00Z",
+      "level": "info",
+      "message": "Job processing completed",
+      "source": "job-processor",
+      "metadata": {
+        "jobId": "job-789",
+        "duration": "45s"
+      }
+    },
+    {
+      "id": "log-007",
+      "applicationId": "analytics-dashboard",
+      "environment": "uat",
+      "timestamp": "2024-01-17T11:35:00Z",
+      "level": "info",
+      "message": "Dashboard report generated",
+      "source": "report-generator",
+      "metadata": {
+        "reportId": "rpt-456",
+        "recordCount": 1250
+      }
+    },
+    {
+      "id": "log-008",
+      "applicationId": "worker-service",
+      "environment": "prod",
+      "timestamp": "2024-01-17T11:30:00Z",
+      "level": "error",
+      "message": "Failed to process job queue",
+      "source": "job-processor",
+      "metadata": {
+        "queueName": "high-priority",
+        "errorCode": "QUEUE_TIMEOUT"
+      }
+    }
+  ]
+}

@@ -1,25 +1,54 @@
-[project]
-name = "acme-devops-mcp"
-version = "0.1.0"
-description = "A minimal MCP server for Module 5"
-readme = "README.md"
-authors = [
-    { name = "Acme DevOps", email = "devops@acme.com" }
-]
-requires-python = ">=3.13"
-dependencies = [
-    "acme-devops-cli",
-    "mcp>=1.2.6",
-    "pytest",
-    "pytest-asyncio",
-]
-
-[project.scripts]
-acme-devops-mcp = "acme_devops_mcp.server:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv.sources]
-acme-devops-cli = { path = "../acme-devops-cli" }
+[project]
+name = "devops-dashboard-mcp"
+version = "0.1.0"
+description = "DevOps Dashboard MCP Server Example - Educational implementation demonstrating both stdio and HTTP MCP server patterns"
+authors = [
+    {name = "Don Smith, HYPR"}
+]
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "fastmcp>=0.1.0",
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=1.2.0",
+]
+
+[project.scripts]
+http-server = "http_server.main:main"
+stdio-server = "stdio_server.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["stdio_server", "http_server"]
+
+[tool.black]
+line-length = 100
+target-version = ['py313']
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["stdio_server", "http_server"]
+python_files = "*_test.py"
+
+[dependency-groups]
+dev = [
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=1.2.0",
+]

@@ -1,0 +1,64 @@
+{
+  "deployments": [
+    {
+      "id": "deploy-001",
+      "applicationId": "web-app",
+      "environment": "prod",
+      "version": "v2.1.3",
+      "status": "deployed",
+      "deployedAt": "2024-01-15T10:30:00Z",
+      "deployedBy": "alice@company.com",
+      "commitHash": "abc123def456"
+    },
+    {
+      "id": "deploy-002",
+      "applicationId": "web-app",
+      "environment": "uat",
+      "version": "v2.1.4",
+      "status": "deployed",
+      "deployedAt": "2024-01-16T14:20:00Z",
+      "deployedBy": "bob@company.com",
+      "commitHash": "def456ghi789"
+    },
+    {
+      "id": "deploy-003",
+      "applicationId": "api-service",
+      "environment": "prod",
+      "version": "v1.8.2",
+      "status": "deployed",
+      "deployedAt": "2024-01-14T09:15:00Z",
+      "deployedBy": "charlie@company.com",
+      "commitHash": "ghi789jkl012"
+    },
+    {
+      "id": "deploy-004",
+      "applicationId": "api-service",
+      "environment": "staging",
+      "version": "v1.9.0",
+      "status": "in-progress",
+      "deployedAt": "2024-01-17T11:45:00Z",
+      "deployedBy": "alice@company.com",
+      "commitHash": "jkl012mno345"
+    },
+    {
+      "id": "deploy-005",
+      "applicationId": "worker-service",
+      "environment": "prod",
+      "version": "v3.2.1",
+      "status": "failed",
+      "deployedAt": "2024-01-16T16:30:00Z",
+      "deployedBy": "diana@company.com",
+      "commitHash": "mno345pqr678"
+    },
+    {
+      "id": "deploy-006",
+      "applicationId": "analytics-dashboard",
+      "environment": "uat",
+      "version": "v1.5.0",
+      "status": "deployed",
+      "deployedAt": "2024-01-15T13:00:00Z",
+      "deployedBy": "eve@company.com",
+      "commitHash": "pqr678stu901"
+    }
+  ]
+}

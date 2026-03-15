@@ -1,0 +1,106 @@
+{
+  "releaseHealth": [
+    {
+      "releaseId": "rel-001",
+      "applicationId": "web-app",
+      "version": "v2.1.3",
+      "environment": "prod",
+      "status": "healthy",
+      "deploymentSuccess": true,
+      "errorRate": 0.02,
+      "performanceScore": 95.5,
+      "rollbackRequired": false,
+      "healthChecks": {
+        "database": "healthy",
+        "cache": "healthy",
+        "externalApis": "degraded"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    },
+    {
+      "releaseId": "rel-002",
+      "applicationId": "web-app",
+      "version": "v2.1.4",
+      "environment": "uat",
+      "status": "healthy",
+      "deploymentSuccess": true,
+      "errorRate": 0.01,
+      "performanceScore": 97.2,
+      "rollbackRequired": false,
+      "healthChecks": {
+        "database": "healthy",
+        "cache": "healthy",
+        "externalApis": "healthy"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    },
+    {
+      "releaseId": "rel-003",
+      "applicationId": "api-service",
+      "version": "v1.8.2",
+      "environment": "prod",
+      "status": "healthy",
+      "deploymentSuccess": true,
+      "errorRate": 0.005,
+      "performanceScore": 98.8,
+      "rollbackRequired": false,
+      "healthChecks": {
+        "database": "healthy",
+        "cache": "healthy",
+        "externalApis": "healthy"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    },
+    {
+      "releaseId": "rel-004",
+      "applicationId": "api-service",
+      "version": "v1.9.0",
+      "environment": "staging",
+      "status": "deploying",
+      "deploymentSuccess": false,
+      "errorRate": 0.0,
+      "performanceScore": 0.0,
+      "rollbackRequired": false,
+      "healthChecks": {
+        "database": "unknown",
+        "cache": "unknown",
+        "externalApis": "unknown"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    },
+    {
+      "releaseId": "rel-005",
+      "applicationId": "worker-service",
+      "version": "v3.2.1",
+      "environment": "prod",
+      "status": "unhealthy",
+      "deploymentSuccess": false,
+      "errorRate": 1.0,
+      "performanceScore": 0.0,
+      "rollbackRequired": true,
+      "healthChecks": {
+        "database": "healthy",
+        "cache": "healthy",
+        "externalApis": "healthy"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    },
+    {
+      "releaseId": "rel-006",
+      "applicationId": "analytics-dashboard",
+      "version": "v1.5.0",
+      "environment": "uat",
+      "status": "healthy",
+      "deploymentSuccess": true,
+      "errorRate": 0.03,
+      "performanceScore": 92.1,
+      "rollbackRequired": false,
+      "healthChecks": {
+        "database": "healthy",
+        "cache": "degraded",
+        "externalApis": "healthy"
+      },
+      "lastChecked": "2024-01-17T12:00:00Z"
+    }
+  ]
+}

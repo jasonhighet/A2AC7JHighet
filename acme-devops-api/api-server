@@ -1,0 +1,29 @@
+#!/bin/bash
+# api-server - Main API server entry point
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PYTHONPATH="${SCRIPT_DIR}:${PYTHONPATH}"
+
+# Default configuration
+HOST="${HOST:-127.0.0.1}"
+PORT="${PORT:-8000}"
+WORKERS="${WORKERS:-1}"
+
+echo "Starting DevOps Dashboard API server..."
+echo "Host: $HOST"
+echo "Port: $PORT"
+echo "Workers: $WORKERS"
+
+# Activate virtual environment if it exists
+if [ -d "${SCRIPT_DIR}/.venv" ]; then
+    source "${SCRIPT_DIR}/.venv/bin/activate"
+    echo "Using virtual environment: ${SCRIPT_DIR}/.venv"
+fi
+
+# Start the FastAPI server with uvicorn
+uvicorn app:app \
+    --host "$HOST" \
+    --port "$PORT" \
+    --workers "$WORKERS" \
+    --reload \
+    --log-level info
