@@ -1,0 +1,18 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: E:\Github\HyprCourse\Project\acme-devops-mcp
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_fastmcp.py ____________________
+tests\test_fastmcp.py:28: in <module>
+    @pytest.mark.asyncio
+     ^^^^^^
+E   NameError: name 'pytest' is not defined
+=========================== short test summary info ===========================
+ERROR tests/test_fastmcp.py - NameError: name 'pytest' is not defined
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.76s ===============================

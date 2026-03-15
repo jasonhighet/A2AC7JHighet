@@ -1,0 +1,111 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: E:\Github\HyprCourse\Project\acme-devops-mcp
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 8 items
+
+tests\test_fastmcp.py FFFFFFFF                                           [100%]
+
+================================== FAILURES ===================================
+__________________________________ test_ping __________________________________
+
+    @pytest.mark.asyncio
+    async def test_ping():
+        """Test the ping tool directly via FastMCP.call_tool."""
+        result = await mcp.call_tool("ping", {"message": "Direct Test"})
+        # results from call_tool are typically Sequence[ContentBlock]
+>       assert "Pong: Direct Test" in result[0].text
+                                      ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:10: AttributeError
+_________________________ test_get_deployment_status __________________________
+
+    @pytest.mark.asyncio
+    async def test_get_deployment_status():
+        """Test get_deployment_status tool directly."""
+        result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "prod"})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:16: AttributeError
+________________________ test_check_environment_health ________________________
+
+    @pytest.mark.asyncio
+    async def test_check_environment_health():
+        """Test check_environment_health tool directly."""
+        result = await mcp.call_tool("check_environment_health", {"environment": "prod"})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:25: AttributeError
+__________________________ test_list_recent_releases __________________________
+
+    @pytest.mark.asyncio
+    async def test_list_recent_releases():
+        """Test list_recent_releases tool directly."""
+        result = await mcp.call_tool("list_recent_releases", {"limit": 5})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:33: AttributeError
+____________________________ test_promote_release _____________________________
+
+    @pytest.mark.asyncio
+    async def test_promote_release():
+        """Test promote_release tool directly."""
+        # We need a valid version from data
+        status_result = await mcp.call_tool("get_deployment_status", {"application": "web-app", "environment": "uat"})
+>       status_data = json.loads(status_result[0].text)
+                                 ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:42: AttributeError
+________________________ test_list_releases_subprocess ________________________
+
+    @pytest.mark.asyncio
+    async def test_list_releases_subprocess():
+        """Test list-releases (subprocess) tool directly."""
+        result = await mcp.call_tool("list-releases", {"limit": 2})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:58: AttributeError
+________________________ test_check_health_subprocess _________________________
+
+    @pytest.mark.asyncio
+    async def test_check_health_subprocess():
+        """Test check-health (subprocess) tool directly."""
+        result = await mcp.call_tool("check-health", {"env": "prod"})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:66: AttributeError
+_______________________ test_invalid_app_returns_empty ________________________
+
+    @pytest.mark.asyncio
+    async def test_invalid_app_returns_empty():
+        """Test tool behavior when application is not found (should return success but empty list)."""
+        result = await mcp.call_tool("get_deployment_status", {"application": "non-existent-app"})
+>       data = json.loads(result[0].text)
+                          ^^^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'text'
+
+tests\test_fastmcp.py:74: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_fastmcp.py::test_ping - AttributeError: 'list' object has n...
+FAILED tests/test_fastmcp.py::test_get_deployment_status - AttributeError: 'l...
+FAILED tests/test_fastmcp.py::test_check_environment_health - AttributeError:...
+FAILED tests/test_fastmcp.py::test_list_recent_releases - AttributeError: 'li...
+FAILED tests/test_fastmcp.py::test_promote_release - AttributeError: 'list' o...
+FAILED tests/test_fastmcp.py::test_list_releases_subprocess - AttributeError:...
+FAILED tests/test_fastmcp.py::test_check_health_subprocess - AttributeError: ...
+FAILED tests/test_fastmcp.py::test_invalid_app_returns_empty - AttributeError...
+============================== 8 failed in 0.94s ==============================

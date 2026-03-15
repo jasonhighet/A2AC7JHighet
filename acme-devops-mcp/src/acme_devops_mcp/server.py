@@ -1,29 +1,33 @@
 import asyncio
 import sys
 import json
-import mcp.types as types
-from mcp.server.lowlevel import Server
-from mcp.server.stdio import stdio_server
-import subprocess
 import os
 from pathlib import Path
+from typing import Any
+
+from mcp.server.fastmcp import FastMCP
 
 # Import DevOps CLI business logic (for direct tools)
-from acme_devops_cli.commands.deployment_status import get_deployment_status
-from acme_devops_cli.commands.environment_health import check_environment_health
-from acme_devops_cli.commands.recent_releases import list_recent_releases
-from acme_devops_cli.commands.promote_release import promote_release
+from acme_devops_cli.commands.deployment_status import get_deployment_status as get_status_logic
+from acme_devops_cli.commands.environment_health import check_environment_health as check_health_logic
+from acme_devops_cli.commands.recent_releases import list_recent_releases as list_releases_logic
+from acme_devops_cli.commands.promote_release import promote_release as promote_logic
+
+# Initialize FastMCP
+mcp = FastMCP("acme-devops")
+
+# Set data directory for acme-devops-cli
+project_root = Path(__file__).resolve().parent.parent.parent.parent
+os.environ["ACME_DATA_DIR"] = str(project_root / "acme-devops-cli" / "data")
 
 async def _run_cli_command(args: list[str]) -> dict:
     """
     Run the devops-cli tool as a subprocess and return the JSON results.
     """
     try:
-        # Construct the command using current python interpreter to avoid uv overhead
-        # Click global options must come before the command
+        # Construct the command using current python interpreter
         full_cmd = [sys.executable, "-m", "acme_devops_cli.main", "--format", "json"] + args
         
-        # Execute the process with a timeout and explicit environment
         env = os.environ.copy()
         # Remove problematic environment variables to avoid conflicts with parent environment
         if "PYTHONPATH" in env:
@@ -75,184 +79,72 @@ async def _run_cli_command(args: list[str]) -> dict:
             "error": f"Unexpected error running CLI command: {str(e)}"
         }
 
-async def _main():
-    """
-    Internal main entry point for the minimal MCP server.
-    """
-    # Set data directory for acme-devops-cli
-    import os
-    project_root = Path(__file__).resolve().parent.parent.parent.parent
-    os.environ["ACME_DATA_DIR"] = str(project_root / "acme-devops-cli" / "data")
+@mcp.tool()
+async def ping(message: str) -> str:
+    """A simple ping tool to test connectivity."""
+    return f"Pong: {message}"
 
-    # Create the server instance
-    server = Server("acme-devops-mcp")
+@mcp.tool()
+async def get_deployment_status(application: str | None = None, environment: str | None = None) -> str:
+    """Get deployment status for applications across environments."""
+    result = get_status_logic(
+        application=application,
+        environment=environment
+    )
+    return json.dumps(result, indent=2)
 
-    # Define tool list handler
-    @server.list_tools()
-    async def handle_list_tools() -> list[types.Tool]:
-        """List available tools."""
-        return [
-            types.Tool.model_validate({
-                "name": "ping",
-                "description": "A simple ping tool to test connectivity.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "message": {"type": "string", "description": "The message to ping with."}
-                    },
-                    "required": ["message"],
-                },
-            }),
-            types.Tool.model_validate({
-                "name": "get_deployment_status",
-                "description": "Get deployment status for applications across environments.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "application": {"type": "string", "description": "Optional application ID to filter by."},
-                        "environment": {"type": "string", "description": "Optional environment to filter by."}
-                    }
-                },
-            }),
-            types.Tool.model_validate({
-                "name": "check_environment_health",
-                "description": "Get health status across all services and environments.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "environment": {"type": "string", "description": "Optional environment to filter by."},
-                        "application": {"type": "string", "description": "Optional application ID to filter by."}
-                    }
-                },
-            }),
-            types.Tool.model_validate({
-                "name": "list_recent_releases",
-                "description": "Show recent version deployments across all applications.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {"type": "integer", "description": "Number of recent releases to return (default: 10)."},
-                        "application": {"type": "string", "description": "Optional application ID to filter by."}
-                    }
-                },
-            }),
-            types.Tool.model_validate({
-                "name": "promote_release",
-                "description": "Promote a release from one environment to another.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "applicationId": {"type": "string", "description": "Application to promote."},
-                        "version": {"type": "string", "description": "Version to promote."},
-                        "fromEnvironment": {"type": "string", "description": "Source environment."},
-                        "toEnvironment": {"type": "string", "description": "Target environment."}
-                    },
-                    "required": ["applicationId", "version", "fromEnvironment", "toEnvironment"],
-                },
-            }),
-            # Subprocess-based tools as requested
-            types.Tool.model_validate({
-                "name": "list-releases",
-                "description": "List releases via subprocess call to devops-cli.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {"type": "integer", "description": "Limit results."},
-                        "app": {"type": "string", "description": "Filter by app ID."}
-                    }
-                }
-            }),
-            types.Tool.model_validate({
-                "name": "check-health",
-                "description": "Check health via subprocess call to devops-cli.",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "env": {"type": "string", "description": "Filter by environment."}
-                    }
-                }
-            })
-        ]
+@mcp.tool()
+async def check_environment_health(environment: str | None = None, application: str | None = None) -> str:
+    """Get health status across all services and environments."""
+    result = check_health_logic(
+        environment=environment,
+        application=application
+    )
+    return json.dumps(result, indent=2)
 
-    # Define the tool execution handler
-    @server.call_tool()
-    async def handle_call_tool(
-        name: str, arguments: dict | None
-    ) -> list[types.TextContent]:
-        """Handle tool calls."""
-        args = arguments or {}
-        
-        if name == "ping":
-            message = args.get("message", "")
-            return [types.TextContent(type="text", text=f"Pong: {message}")]
-        
-        elif name == "get_deployment_status":
-            result = get_deployment_status(
-                application=args.get("application"),
-                environment=args.get("environment")
-            )
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-            
-        elif name == "check_environment_health":
-            result = check_environment_health(
-                environment=args.get("environment"),
-                application=args.get("application")
-            )
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-            
-        elif name == "list_recent_releases":
-            result = list_recent_releases(
-                limit=args.get("limit", 10),
-                application=args.get("application")
-            )
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-            
-        elif name == "promote_release":
-            result = promote_release(
-                applicationId=args.get("applicationId"),
-                version=args.get("version"),
-                fromEnvironment=args.get("fromEnvironment"),
-                toEnvironment=args.get("toEnvironment")
-            )
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+@mcp.tool()
+async def list_recent_releases(limit: int = 10, application: str | None = None) -> str:
+    """Show recent version deployments across all applications."""
+    result = list_releases_logic(
+        limit=limit,
+        application=application
+    )
+    return json.dumps(result, indent=2)
 
-        # Subprocess-based implementations
-        elif name == "list-releases":
-            cmd_args = ["releases"]
-            if "limit" in args:
-                cmd_args += ["--limit", str(args["limit"])]
-            if "app" in args:
-                cmd_args += ["--app", args["app"]]
-            result = await _run_cli_command(cmd_args)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
+@mcp.tool()
+async def promote_release(applicationId: str, version: str, fromEnvironment: str, toEnvironment: str) -> str:
+    """Promote a release from one environment to another."""
+    result = promote_logic(
+        applicationId=applicationId,
+        version=version,
+        fromEnvironment=fromEnvironment,
+        toEnvironment=toEnvironment
+    )
+    return json.dumps(result, indent=2)
 
-        elif name == "check-health":
-            cmd_args = ["health"]
-            if "env" in args:
-                cmd_args += ["--env", args["env"]]
-            result = await _run_cli_command(cmd_args)
-            return [types.TextContent(type="text", text=json.dumps(result, indent=2))]
-            
-        raise ValueError(f"Unknown tool: {name}")
+@mcp.tool(name="list-releases")
+async def list_releases_subprocess(limit: int | None = None, app: str | None = None) -> str:
+    """List releases via subprocess call to devops-cli."""
+    cmd_args = ["releases"]
+    if limit is not None:
+        cmd_args += ["--limit", str(limit)]
+    if app:
+        cmd_args += ["--app", app]
+    result = await _run_cli_command(cmd_args)
+    return json.dumps(result, indent=2)
 
-    # Use stdio transport for communication
-    async with stdio_server() as (read_stream, write_stream):
-        print("Acme DevOps MCP Server starting...", file=sys.stderr)
-        # Run the server with the handshake
-        await server.run(
-            read_stream,
-            write_stream,
-            server.create_initialization_options()
-        )
+@mcp.tool(name="check-health")
+async def check_health_subprocess(env: str | None = None) -> str:
+    """Check health via subprocess call to devops-cli."""
+    cmd_args = ["health"]
+    if env:
+        cmd_args += ["--env", env]
+    result = await _run_cli_command(cmd_args)
+    return json.dumps(result, indent=2)
 
 def main():
-    """
-    Public entry point for the minimal MCP server.
-    """
-    try:
-        asyncio.run(_main())
-    except KeyboardInterrupt:
-        pass
+    """Main entry point for the MCP server."""
+    mcp.run()
 
 if __name__ == "__main__":
     main()

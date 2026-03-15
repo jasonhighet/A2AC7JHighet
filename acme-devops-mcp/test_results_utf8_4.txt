@@ -1,0 +1,437 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.5, pytest-9.0.2, pluggy-1.6.0
+rootdir: E:\Github\HyprCourse\Project\acme-devops-mcp
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 8 items
+
+tests\test_fastmcp.py .E.E.E.E.E.E.E.E                                   [100%]
+
+=================================== ERRORS ====================================
+_______________________ ERROR at teardown of test_ping ________________________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A5654BAA50>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+_______________ ERROR at teardown of test_get_deployment_status _______________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A56532FF50>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+_____________ ERROR at teardown of test_check_environment_health ______________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A56532FC50>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+_______________ ERROR at teardown of test_list_recent_releases ________________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A565610C50>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+__________________ ERROR at teardown of test_promote_release __________________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A565610AD0>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+_____________ ERROR at teardown of test_list_releases_subprocess ______________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A565611250>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+______________ ERROR at teardown of test_check_health_subprocess ______________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A56532FDD0>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+_____________ ERROR at teardown of test_invalid_app_returns_empty _____________
+
+    @pytest_asyncio.fixture
+    async def client():
+        """Fixture to provide a connected MCP client session."""
+        server_to_client_send, server_to_client_receive = anyio.create_memory_object_stream(10)
+        client_to_server_send, client_to_server_receive = anyio.create_memory_object_stream(10)
+    
+        # Run the server in a background task
+        server_task = asyncio.create_task(
+            mcp._mcp_server.run(
+                client_to_server_receive,
+                server_to_client_send,
+                mcp._mcp_server.create_initialization_options()
+            )
+        )
+    
+        try:
+>           async with ClientSession(server_to_client_receive, client_to_server_send) as session:
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_fastmcp.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\mcp\shared\session.py:238: in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:794: in __aexit__
+    return self.cancel_scope.__exit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <anyio._backends._asyncio.CancelScope object at 0x000002A56532F890>
+exc_type = None, exc_val = None
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool:
+        del exc_tb
+    
+        if not self._active:
+            raise RuntimeError("This cancel scope is not active")
+        if current_task() is not self._host_task:
+>           raise RuntimeError(
+                "Attempted to exit cancel scope in a different task than it was "
+                "entered in"
+            )
+E           RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:461: RuntimeError
+=========================== short test summary info ===========================
+ERROR tests/test_fastmcp.py::test_ping - RuntimeError: Attempted to exit canc...
+ERROR tests/test_fastmcp.py::test_get_deployment_status - RuntimeError: Attem...
+ERROR tests/test_fastmcp.py::test_check_environment_health - RuntimeError: At...
+ERROR tests/test_fastmcp.py::test_list_recent_releases - RuntimeError: Attemp...
+ERROR tests/test_fastmcp.py::test_promote_release - RuntimeError: Attempted t...
+ERROR tests/test_fastmcp.py::test_list_releases_subprocess - RuntimeError: At...
+ERROR tests/test_fastmcp.py::test_check_health_subprocess - RuntimeError: Att...
+ERROR tests/test_fastmcp.py::test_invalid_app_returns_empty - RuntimeError: A...
+========================= 8 passed, 8 errors in 1.44s =========================
