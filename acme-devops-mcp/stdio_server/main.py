@@ -40,6 +40,18 @@ class CLIError(Exception):
     pass
 
 
+def validate_environment(environment: str | None) -> str | None:
+    """
+    Validate the environment name against allowed values.
+    """
+    if environment is None:
+        return None
+    valid_envs = ["dev", "staging", "prod", "test", "uat"]
+    if environment.lower() not in valid_envs:
+        return f"Invalid environment '{environment}'. Valid environments are: {', '.join(valid_envs)}"
+    return None
+
+
 def run_cli_command(args: List[str], timeout: int = 30) -> dict[str, Any]:
     """
     Execute the CLI tool with proper error handling.
@@ -165,6 +177,11 @@ def get_deployment_status(application: str | None = None, environment: str | Non
     """
     logger.info(f"Getting deployment status - app: {application}, env: {environment}")
     
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {"status": "error", "message": env_error, "deployments": []}
+    
     # Build CLI arguments
     args = ["status", "--format", "json"]
     if application:
@@ -233,6 +250,11 @@ def check_environment_health(environment: str | None = None, application: str | 
     """
     logger.info(f"Checking environment health - env: {environment}, app: {application}")
     
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {"status": "error", "message": env_error, "environments": []}
+    
     # Build CLI arguments
     args = ["health", "--format", "json"]
     if environment:
@@ -274,6 +296,12 @@ def promote_release(
         dict: Response containing promotion status and deployment details
     """
     logger.info(f"Promoting release - app: {applicationId}, version: {version}, from: {fromEnvironment}, to: {toEnvironment}")
+    
+    # Input Validation
+    for env in [fromEnvironment, toEnvironment]:
+        env_error = validate_environment(env)
+        if env_error:
+            return {"status": "error", "message": env_error, "promotion": None}
     
     # Build CLI arguments - promote uses positional arguments
     args = [

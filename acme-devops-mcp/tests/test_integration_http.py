@@ -60,3 +60,25 @@ async def test_api_unavailable():
     content = result[0]
     assert "error" in content[0].text
     assert "Connection Refused" in content[0].text
+
+@pytest.mark.asyncio
+async def test_environment_validation():
+    # Test invalid environment (should fail before API call)
+    result = await mcp.call_tool("get_health", {"environment": "invalid-env"})
+    content = result[0]
+    assert "error" in content[0].text
+    assert "Invalid environment" in content[0].text
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_pagination_parameters():
+    # Verify limit and offset are passed to params
+    mock_deploy = respx.get("http://localhost:8000/api/v1/deployments").mock(return_value=Response(200, json={
+        "status": "success", "deployments": []
+    }))
+    
+    await mcp.call_tool("get_deployments", {"limit": 5, "offset": 10})
+    
+    # Check the call parameters
+    assert mock_deploy.calls[0].request.url.params["limit"] == "5"
+    assert mock_deploy.calls[0].request.url.params["offset"] == "10"

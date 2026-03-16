@@ -88,6 +88,21 @@ async def call_api_endpoint(
             raise APIError(error_msg)
 
 
+def validate_environment(environment: str | None) -> str | None:
+    """
+    Validate the environment name against allowed values.
+    
+    Returns an error message if invalid, None otherwise.
+    """
+    if environment is None:
+        return None
+        
+    valid_envs = ["dev", "staging", "prod", "test", "uat"]
+    if environment.lower() not in valid_envs:
+        return f"Invalid environment '{environment}'. Valid environments are: {', '.join(valid_envs)}"
+    return None
+
+
 @mcp.tool()
 def ping(message: str = "Hello from DevOps Dashboard HTTP MCP!") -> dict[str, Any]:
     """
@@ -119,36 +134,41 @@ def ping(message: str = "Hello from DevOps Dashboard HTTP MCP!") -> dict[str, An
 async def get_deployments(
     application: str | None = None,
     environment: str | None = None,
-    limit: int | None = None,
-    offset: int | None = None
+    limit: int = 50,
+    offset: int = 0
 ) -> dict[str, Any]:
     """
-    Get detailed deployment history and current states.
+    Get detailed deployment history and current states with pagination support.
     
     This tool provides deployment data with support for filtering by application 
-    and environment, plus pagination capabilities.
+    and environment, plus pagination using limit and offset.
     
     Args:
         application: Optional application ID to filter by
-        environment: Optional environment to filter by  
-        limit: Optional maximum number of results to return
-        offset: Optional pagination offset
+        environment: Optional environment to filter by (dev, staging, prod, etc.)
+        limit: Maximum number of results to return (default: 50)
+        offset: Pagination offset for the result set (default: 0)
         
     Returns:
         dict: Response containing deployment data, pagination info, and metadata
     """
-    logger.info(f"get_deployments tool called with filters: application={application}, environment={environment}")
+    logger.info(f"get_deployments tool called: application={application}, environment={environment}, limit={limit}")
+    
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {
+            "status": "error",
+            "message": env_error,
+            "timestamp": "2024-01-15T10:30:00Z"
+        }
     
     try:
-        params = {}
+        params = {"limit": limit, "offset": offset}
         if application:
             params["application"] = application
         if environment:
             params["environment"] = environment
-        if limit:
-            params["limit"] = limit
-        if offset:
-            params["offset"] = offset
         
         return await call_api_endpoint("deployments", params)
         
@@ -175,13 +195,22 @@ async def get_metrics(
     
     Args:
         application: Optional application ID to filter by
-        environment: Optional environment to filter by
+        environment: Optional environment to filter by (dev, staging, prod, etc.)
         time_range: Time range for metrics (1h, 24h, 7d, 30d)
         
     Returns:
         dict: Response containing metrics data with aggregations and metadata
     """
     logger.info(f"get_metrics tool called with filters: application={application}, environment={environment}")
+    
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {
+            "status": "error",
+            "message": env_error,
+            "timestamp": "2024-01-15T10:30:00Z"
+        }
     
     try:
         params = {}
@@ -216,7 +245,7 @@ async def get_health(
     and application, plus detailed diagnostic information.
     
     Args:
-        environment: Optional environment to filter by
+        environment: Optional environment to filter by (dev, staging, prod, etc.)
         application: Optional application ID to filter by
         detailed: Include detailed diagnostic information
         
@@ -224,6 +253,15 @@ async def get_health(
         dict: Response containing health status, summary, and metadata
     """
     logger.info(f"get_health tool called with filters: environment={environment}, application={application}")
+    
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {
+            "status": "error",
+            "message": env_error,
+            "timestamp": "2024-01-15T10:30:00Z"
+        }
     
     try:
         params = {}
@@ -250,35 +288,44 @@ async def get_logs(
     application: str | None = None,
     environment: str | None = None,
     level: str | None = None,
-    limit: int | None = None
+    limit: int = 50,
+    offset: int = 0
 ) -> dict[str, Any]:
     """
-    Get recent logs and events from deployments.
+    Get recent logs and events with pagination support.
     
     This tool provides log entries with support for filtering by application,
-    environment, and log level.
+    environment, and log level, plus pagination using limit and offset.
     
     Args:
         application: Optional application ID to filter by
-        environment: Optional environment to filter by
+        environment: Optional environment to filter by (dev, staging, prod, etc.)
         level: Optional log level filter (error, warn, info, debug)
-        limit: Optional maximum number of log entries to return
+        limit: Maximum number of log entries to return (default: 50)
+        offset: Pagination offset for the result set (default: 0)
         
     Returns:
         dict: Response containing log entries, summary, and metadata
     """
-    logger.info(f"get_logs tool called with filters: application={application}, environment={environment}")
+    logger.info(f"get_logs tool called with filters: application={application}, environment={environment}, limit={limit}")
+    
+    # Input Validation
+    env_error = validate_environment(environment)
+    if env_error:
+        return {
+            "status": "error",
+            "message": env_error,
+            "timestamp": "2024-01-15T10:30:00Z"
+        }
     
     try:
-        params = {}
+        params = {"limit": limit, "offset": offset}
         if application:
             params["application"] = application
         if environment:
             params["environment"] = environment
         if level:
             params["level"] = level
-        if limit:
-            params["limit"] = limit
         
         return await call_api_endpoint("logs", params)
         
