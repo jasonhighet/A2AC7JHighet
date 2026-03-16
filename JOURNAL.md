@@ -85,3 +85,17 @@ Local execution is ideal for Postgres or filesystem tools where the agent needs 
 In my organisation, we already have established MCPs for Jira, Confluence, GitHub, Office, Teams, and many others, which support our current operational needs. For my personal projects, I would like to implement integration with Google Workspace (Tasks, Calendar, Docs) to better support my individual requirements.
 
 Beyond these standard integrations, there is a significant new opportunity to develop custom MCP servers for our centralised architectural standards and engineering practice playbooks. Instead of engineers manually searching through internal wikis, an MCP could provide our agents with real-time "compliance-as-context," ensuring that new service designs automatically align with our specific engineering practices as they are being written.
+
+## Module 5: Reflections - HTTP MCP Server & Integration
+
+1.  **How smooth was the process of getting your first tool working in the MCP Inspector?**
+    The process was logically straightforward but required attention to environmental details. Using `npx` to launch the Inspector made it easy to get a visual interface quickly. The main "speed bumps" were local port conflicts (like port 6277 already being in use) and ensuring the Python environment had all dependencies installed. Once the server connected, the ability to see the tool schemas and test them with a single click was incredibly satisfying and much faster than manual terminal testing.
+
+2.  **How did you find the difference between building and using a stdio server versus the http one?**
+    Building the **stdio server** felt more direct for local development. We used the "Subprocess Wrapper" pattern, which allowed me to reuse an existing CLI tool without rewriting business logic—this is a huge efficiency gain for legacy code. The **HTTP server**, while requiring more setup (like a running API background process), felt more like a modern web service. It required more robust error handling for network issues (timeouts, 404s) but offered better scalability. The biggest "aha!" moment was realizing that while the transport layer changed, the MCP tool definitions remained almost identical, showing how flexible the protocol is.
+
+3.  **How successful was your assistant at knowing when and how to use the tools?**
+    The assistant was very proactive in chaining tools together. For example, it "knew" to call `get_deployment_status` to find a version number before it attempted a `promote_release`. The success largely came down to the quality of the docstrings in the `@mcp.tool()` decorators. When we added explicit environment validation at the MCP layer, the assistant became even more helpful because it could provide immediate corrections if I made a typo, rather than waiting for an API error.
+
+4.  **Have you identified an MCP server that might be good to build for yourself or your org?**
+    Beyond the standard integrations we already use, I think a custom **"Compliance-as-Context" MCP server** for our engineering standards and playbooks would be a significant opportunity. Instead of engineers manually searching through internal wikis, an MCP could provide our agents with real-time architectural standards, ensuring that new service designs automatically align with our specific engineering practices as they are being written.
