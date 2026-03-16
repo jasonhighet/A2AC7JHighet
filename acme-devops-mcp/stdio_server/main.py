@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import Any, List
 
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 
 # Add the current directory to Python path to handle imports correctly
 current_dir = Path(__file__).parent
