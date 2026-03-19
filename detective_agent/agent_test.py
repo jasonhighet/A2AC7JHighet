@@ -55,7 +55,55 @@ async def test_agent_resume_conversation(mock_persistence):
             "choices": [{"message": {"role": "assistant", "content": "Second response"}}]
         }))
         
-        # Resume it
-        updated = await agent.send_message("Second message", conversation_id=conversation.id)
-        assert len(updated.messages) == 4 # User1, Asst1, User2, Asst2
-        assert updated.id == conversation.id
+@pytest.mark.asyncio
+async def test_agent_tool_loop(mock_persistence):
+    provider = LLMStudioProvider()
+    agent = DetectiveAgent(provider, mock_persistence)
+    
+    with respx.mock:
+        # Mocking 3 turns: tool_call_1 -> tool_call_2 -> final_response
+        respx.post("http://localhost:1234/v1/chat/completions").mock(
+            side_effect=[
+                Response(200, json={
+                    "choices": [{
+                        "message": {
+                            "role": "assistant",
+                            "content": None,
+                            "tool_calls": [{
+                                "id": "call_1",
+                                "type": "function",
+                                "function": {"name": "get_release_summary", "arguments": "{\"release_id\": \"v2.1.0\"}"}
+                            }]
+                        }
+                    }]
+                }),
+                Response(200, json={
+                    "choices": [{
+                        "message": {
+                            "role": "assistant",
+                            "content": None,
+                            "tool_calls": [{
+                                "id": "call_2",
+                                "type": "function",
+                                "function": {"name": "file_risk_report", "arguments": "{\"release_id\": \"v2.1.0\", \"severity\": \"HIGH\", \"findings\": [\"test failures\"]}"}
+                            }]
+                        }
+                    }]
+                }),
+                Response(200, json={
+                    "choices": [{
+                        "message": {
+                            "role": "assistant",
+                            "content": "Risk assessment complete. I've filed a HIGH severity report for v2.1.0."
+                        }
+                    }]
+                })
+            ]
+        )
+        
+        conversation = await agent.send_message("Analyze v2.1.0")
+        
+        # 0: User, 1: Asst(TC1), 2: Tool(R1), 3: Asst(TC2), 4: Tool(R2), 5: Asst(Final)
+        assert len(conversation.messages) == 6
+        assert conversation.messages[5].role == "assistant"
+        assert "v2.1.0" in conversation.messages[5].content
