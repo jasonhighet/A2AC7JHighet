@@ -5,6 +5,7 @@ from .persistence import FilePersistence
 from .config import settings
 from .tools import ToolRegistry, default_registry
 from .observability import tracer
+from .context import ContextManager
 
 class DetectiveAgent:
     def __init__(
@@ -12,12 +13,14 @@ class DetectiveAgent:
         provider: LLMProvider, 
         persistence: FilePersistence, 
         system_prompt: Optional[str] = None,
-        registry: Optional[ToolRegistry] = None
+        registry: Optional[ToolRegistry] = None,
+        context_manager: Optional[ContextManager] = None
     ):
         self.provider = provider
         self.persistence = persistence
         self.system_prompt = system_prompt or settings.system_prompt
         self.registry = registry or default_registry
+        self.context_manager = context_manager or ContextManager(max_tokens=settings.max_context_tokens)
 
     async def send_message(self, content: str, conversation_id: Optional[str] = None) -> Conversation:
         with tracer.start_as_current_span("send_message") as span:
@@ -38,13 +41,19 @@ class DetectiveAgent:
             # Tool Loop
             with tracer.start_as_current_span("tool_loop") as loop_span:
                 while True:
+                    # Apply Context Management
+                    with tracer.start_as_current_span("context_management") as ctx_span:
+                        messages_to_send = self.context_manager.get_truncated_messages(conversation)
+                        ctx_span.set_attribute("context.original_count", len(conversation.messages))
+                        ctx_span.set_attribute("context.truncated_count", len(messages_to_send))
+
                     # Get tool definitions
                     tools = self.registry.get_definitions() if self.registry else None
                     
                     # Call provider
                     with tracer.start_as_current_span("provider_call") as prov_span:
                         response_message = await self.provider.complete(
-                            conversation.messages, 
+                            messages_to_send, 
                             conversation.system_prompt,
                             tools=tools
                         )
