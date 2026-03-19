@@ -1,0 +1,26 @@
+[
+    {
+        "id": "release_low_risk",
+        "name": "Green Release",
+        "description": "A stable release with passing tests and low error rates.",
+        "user_input": "Analyze the risk for release-123. It's a routine update.",
+        "expected_risk": "low",
+        "expected_tools": ["get_release_summary", "file_risk_report"]
+    },
+    {
+        "id": "release_high_risk_tests",
+        "name": "Failed Critical Tests",
+        "description": "A release where core tests are failing.",
+        "user_input": "Check the risk for release-999. I heard there are test failures.",
+        "expected_risk": "high",
+        "expected_tools": ["get_release_summary"]
+    },
+    {
+        "id": "release_missing_summary",
+        "name": "Missing Summary",
+        "description": "Asking about a release that doesn't exist in the system.",
+        "user_input": "What's the status of release-unknown?",
+        "expected_risk": "unknown",
+        "expected_tools": ["get_release_summary"]
+    }
+]

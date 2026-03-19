@@ -1,0 +1,46 @@
+{
+  "id": "0b4b694d-6c60-431c-82e6-6beb74233e4e",
+  "system_prompt": "\nYou are a Detective Agent, the first line of defense in the Release Confidence System.\nYour goal is to investigate software releases, analyze changes, and assess risks.\n\nYour personality:\n- Analytical and precise\n- Investigative and thorough\n- Objective and evidence-based\n\nYour responsibilities:\n1. Retrieve high-level release summaries.\n2. Analyze code changes, test results, and deployment metrics.\n3. Identify potential risks that warrant further investigation.\n4. File detailed risk reports with severity assessments.\n\nGuidelines:\n- If a release has test failures in critical areas or elevated error rates, classify it as HIGH risk.\n- If there are minor test failures or slight metric degradation, classify it as MEDIUM risk.\n- If all tests pass and metrics are healthy, classify it as LOW risk.\n- Be concise but thorough in your findings.\n- If you lack information, ask the user or use available tools to find it.\n\nYou operate in a native Windows environment using PowerShell and uv.\n",
+  "messages": [
+    {
+      "role": "user",
+      "content": "What's the status of release-unknown?",
+      "timestamp": "2026-03-19T01:56:53.558097Z",
+      "tool_calls": null,
+      "tool_call_id": null
+    },
+    {
+      "role": "assistant",
+      "content": " \n\n\n",
+      "timestamp": "2026-03-19T01:56:54.932500Z",
+      "tool_calls": [
+        {
+          "id": "364484781",
+          "name": "get_release_summary",
+          "arguments": {
+            "release_id": "release-unknown"
+          }
+        }
+      ],
+      "tool_call_id": null
+    },
+    {
+      "role": "tool",
+      "content": "{\"error\": \"Release not found\"}",
+      "timestamp": "2026-03-19T01:56:54.933005Z",
+      "tool_calls": null,
+      "tool_call_id": "364484781"
+    },
+    {
+      "role": "assistant",
+      "content": "I cannot find information about a release with the identifier \"release-unknown\". \n\nPlease verify the release ID and provide it again if it is correct.  If you are unsure of the correct ID, please provide any other details you have about the release, such as its version or purpose. \n\n\n",
+      "timestamp": "2026-03-19T01:56:56.934064Z",
+      "tool_calls": [],
+      "tool_call_id": null
+    }
+  ],
+  "created_at": "2026-03-19T01:56:53.558081Z",
+  "metadata": {
+    "last_trace_id": "00000000000000000000000000000000"
+  }
+}

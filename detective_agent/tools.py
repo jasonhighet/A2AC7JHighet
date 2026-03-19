@@ -63,37 +63,29 @@ class ToolRegistry:
         ]
 
 # Mock Release Assessment Tools
-def get_release_summary(release_id: str) -> Dict[str, Any]:
-    """Mock implementation of get_release_summary."""
-    releases = {
-        "v2.1.0": {
-            "version": "v2.1.0",
-            "changes": ["Added payment processing", "Fixed authentication bug"],
-            "tests": {"passed": 142, "failed": 2, "skipped": 5},
-            "deployment_metrics": {
-                "error_rate": 0.02,
-                "response_time_p95": 450
-            }
-        },
-        "v2.0.0": {
-            "version": "v2.0.0",
-            "changes": ["Initial release"],
-            "tests": {"passed": 100, "failed": 0, "skipped": 0},
-            "deployment_metrics": {
-                "error_rate": 0.00,
-                "response_time_p95": 200
-            }
+def get_release_summary(release_id: str):
+    """Get a summary of a release including test results and metrics."""
+    if "999" in release_id:
+        return {
+            "id": release_id,
+            "status": "failed",
+            "tests": {"total": 100, "passed": 85, "failed": 15},
+            "metrics": {"error_rate": "2.5%"}
         }
-    }
-    return releases.get(release_id, {"error": "Release not found"})
+    if "123" in release_id:
+        return {
+            "id": release_id,
+            "status": "success",
+            "tests": {"total": 100, "passed": 100, "failed": 0},
+            "metrics": {"error_rate": "0.1%"}
+        }
+    return {"error": f"Release {release_id} not found"}
 
-def file_risk_report(release_id: str, severity: str, findings: List[str]) -> Dict[str, Any]:
-    """Mock implementation of file_risk_report."""
-    return {
-        "status": "success",
-        "report_id": f"risk-{release_id}-{severity}",
-        "message": f"Risk report filed for {release_id} with severity {severity}"
-    }
+def file_risk_report(filename: str):
+    """Generate a risk report for a specific file based on recent changes."""
+    if "core" in filename:
+        return {"filename": filename, "risk_score": 0.8, "reason": "Modified critical path functions"}
+    return {"filename": filename, "risk_score": 0.2, "reason": "Minor changes"}
 
 default_registry = ToolRegistry()
 default_registry.register(
@@ -110,15 +102,13 @@ default_registry.register(
 )
 default_registry.register(
     name="file_risk_report",
-    description="Submit a risk assessment report for a release.",
+    description="Generate a risk report for a specific file based on recent changes.",
     parameters={
         "type": "object",
         "properties": {
-            "release_id": {"type": "string", "description": "The unique identifier for the release"},
-            "severity": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH"], "description": "The assessed severity level"},
-            "findings": {"type": "array", "items": {"type": "string"}, "description": "Key findings or concerns identified"}
+            "filename": {"type": "string", "description": "The name of the file to analyze"}
         },
-        "required": ["release_id", "severity", "findings"]
+        "required": ["filename"]
     },
     handler=file_risk_report
 )

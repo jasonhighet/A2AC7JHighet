@@ -1,0 +1,43 @@
+{
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1,
+    "pass_rate": 0.6666666666666666
+  },
+  "results": [
+    {
+      "scenario_id": "release_low_risk",
+      "passed": false,
+      "actual_risk": "low",
+      "actual_tools": [
+        "get_release_summary"
+      ],
+      "reasoning": "Based on the provided release summary, release-123 appears to be LOW risk.  All tests passed and the error rate is within acceptable limits. \n\n\nLet me know if you have any other releases you'd like me to analyze. \n",
+      "latency_ms": 4158.412299992051,
+      "tokens_used": 0
+    },
+    {
+      "scenario_id": "release_high_risk_tests",
+      "passed": true,
+      "actual_risk": "high",
+      "actual_tools": [
+        "get_release_summary"
+      ],
+      "reasoning": "Based on the provided release summary, release-999 has a HIGH risk level.  \n\nThere are 15 test failures out of 100 total tests, which is a significant number. Additionally, the error rate of 2.5% indicates potential issues in production.  Further investigation into the nature of the failed tests and the root cause of the elevated error rate is recommended. \n\n\n",
+      "latency_ms": 4115.3788000228815,
+      "tokens_used": 0
+    },
+    {
+      "scenario_id": "release_missing_summary",
+      "passed": true,
+      "actual_risk": "unknown",
+      "actual_tools": [
+        "get_release_summary"
+      ],
+      "reasoning": "I cannot find any information about a release with the identifier \"release-unknown\". \n\nPlease verify the release ID and provide it again if it is correct.  If you are unsure of the correct ID, please provide any additional details you have about the release, such as its version or purpose. \n\n\n",
+      "latency_ms": 3644.3850999930874,
+      "tokens_used": 0
+    }
+  ]
+}

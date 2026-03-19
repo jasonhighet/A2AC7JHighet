@@ -2,12 +2,12 @@
   {
     "name": "llm_completion",
     "context": {
-      "trace_id": "18b842df58b836c9febfa5a8748d28ce",
-      "span_id": "0e603ba703320948",
+      "trace_id": "405c9abcc84e3469a9b2ddd3009ec794",
+      "span_id": "9bab647005df56b3",
       "parent_id": null
     },
-    "start_time": "2026-03-19T01:49:23.294393+00:00",
-    "end_time": "2026-03-19T01:49:23.313839+00:00",
+    "start_time": "2026-03-19T01:56:33.466586+00:00",
+    "end_time": "2026-03-19T01:56:33.505087+00:00",
     "attributes": {
       "llm.model": "local-model",
       "llm.base_url": "http://localhost:1234/v1"

@@ -1,0 +1,86 @@
+[
+  {
+    "name": "context_management",
+    "context": {
+      "trace_id": "93523d93092f1743ad807f57bc9f3470",
+      "span_id": "1b64408b360ae9e2",
+      "parent_id": "37a36d3796a25594"
+    },
+    "start_time": "2026-03-19T01:56:31.877296+00:00",
+    "end_time": "2026-03-19T01:56:31.877470+00:00",
+    "attributes": {
+      "context.original_count": 1,
+      "context.truncated_count": 1
+    },
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  },
+  {
+    "name": "llm_completion",
+    "context": {
+      "trace_id": "93523d93092f1743ad807f57bc9f3470",
+      "span_id": "b92eff18659d69bd",
+      "parent_id": "329256f41438d3c0"
+    },
+    "start_time": "2026-03-19T01:56:31.933288+00:00",
+    "end_time": "2026-03-19T01:56:31.944443+00:00",
+    "attributes": {
+      "llm.model": "local-model",
+      "llm.base_url": "http://localhost:1234/v1",
+      "llm.usage.prompt_tokens": 10,
+      "llm.usage.completion_tokens": 5,
+      "llm.usage.total_tokens": 15
+    },
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  },
+  {
+    "name": "provider_call",
+    "context": {
+      "trace_id": "93523d93092f1743ad807f57bc9f3470",
+      "span_id": "329256f41438d3c0",
+      "parent_id": "37a36d3796a25594"
+    },
+    "start_time": "2026-03-19T01:56:31.933208+00:00",
+    "end_time": "2026-03-19T01:56:31.965177+00:00",
+    "attributes": {},
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  },
+  {
+    "name": "tool_loop",
+    "context": {
+      "trace_id": "93523d93092f1743ad807f57bc9f3470",
+      "span_id": "37a36d3796a25594",
+      "parent_id": "50d72830fecdabaa"
+    },
+    "start_time": "2026-03-19T01:56:31.877277+00:00",
+    "end_time": "2026-03-19T01:56:31.987381+00:00",
+    "attributes": {},
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  },
+  {
+    "name": "send_message",
+    "context": {
+      "trace_id": "93523d93092f1743ad807f57bc9f3470",
+      "span_id": "50d72830fecdabaa",
+      "parent_id": null
+    },
+    "start_time": "2026-03-19T01:56:31.877203+00:00",
+    "end_time": "2026-03-19T01:56:32.010115+00:00",
+    "attributes": {},
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  }
+]
