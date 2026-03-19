@@ -27,6 +27,7 @@
 -   **Planning efforts**: Rating: 8/10. The plan is now robust enough to handle the Windows environment, but the process of "prompting to prompt" still feels slightly academic compared to direct iteration.
 
 ## Entry 3: Initializing the Admin UI Prompt
+## Entry 3: Initializing the Admin UI Prompt
 - **Prompt Source**: Hand-crafted/AI-assisted draft for `prompts/4-admin-ui-prompt.md`.
 - **Goal**: Define the constraints for a framework-less Web Component frontend.
 - **Reflections**: Decided to stick with the `pnpm` requirement from the course brief despite `npm` being in the README, as it's a good test of the AI's ability to switch package managers.
@@ -98,4 +99,12 @@ Beyond these standard integrations, there is a significant new opportunity to de
     The assistant was very proactive in chaining tools together. For example, it "knew" to call `get_deployment_status` to find a version number before it attempted a `promote_release`. The success largely came down to the quality of the docstrings in the `@mcp.tool()` decorators. When we added explicit environment validation at the MCP layer, the assistant became even more helpful because it could provide immediate corrections if I made a typo, rather than waiting for an API error.
 
 4.  **Have you identified an MCP server that might be good to build for yourself or your org?**
-    Beyond the standard integrations we already use, I think a custom **"Compliance-as-Context" MCP server** for our engineering standards and playbooks would be a significant opportunity. Instead of engineers manually searching through internal wikis, an MCP could provide our agents with real-time architectural standards, ensuring that new service designs automatically align with our specific engineering practices as they are being written.
+    Beyond the standard integrations we already use, I think a custom **"Compliance-as-Context" MCP server** for our engineering standards and playbooks would be a significant opportunity. Instead of engineers manually searching through internal wikis, 
+
+## Module 6: Detective Agent Implementation (Steps 1-7)
+
+  - **What frustrated you?**: Pydantic validation errors! I accidentally broke the `Conversation` model during Step 7 and basically nuked every single existing test. Lesson learned: always check the default factories before stripping out "extra" fields. Also, my first "Mandatory Reporting" prompt caused an infinite tool loop—the agent was so eager to be thorough that it just kept filing reports until the token limit hit.
+  - **What surprised you?**: Seeing the OpenTelemetry spans in a local `.traces/` folder was surprisingly satisfying. It’s one thing to talk about observability, but seeing the JSON payloads of the LLM calls and tool execution times makes debugging the "black box" much easier.
+  - **Tool Chaining**: The agent "figuring out" it needs to call the release summary before the risk report felt like a solid win for the system prompt. It wasn't just following a script; it was actually trying to gather evidence.
+  - **Evaluation**: The 66.7% pass rate was a wake-up call. It's easy to assume the agent "knows" what to do, but without the evaluation runner, I wouldn't have spotted the cases where it skipped critical tools because it was being "too efficient."
+  - **Windows Native**: Still holding strong. `uv run pytest` is blazing fast compared to booting up a Docker container every time. (I still can't be bothered installing Docker)
