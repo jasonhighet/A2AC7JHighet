@@ -3,6 +3,7 @@ from typing import List, Protocol, runtime_checkable, Optional, Any, Dict
 import httpx
 from .models import Message, ToolCall
 from .observability import tracer
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception
 
 @runtime_checkable
 class LLMProvider(Protocol):
@@ -10,11 +11,25 @@ class LLMProvider(Protocol):
         """Complete the conversation using the provided messages and system prompt."""
         ...
 
+def is_transient_error(exception: Exception) -> bool:
+    """Check if the exception is a transient error that should be retried."""
+    if isinstance(exception, httpx.HTTPStatusError):
+        # Retry on 429 (Too Many Requests), 503 (Service Unavailable), 504 (Gateway Timeout)
+        return exception.response.status_code in [429, 503, 504]
+    # Retry on connectivity/network errors
+    return isinstance(exception, httpx.RequestError)
+
 class LLMStudioProvider:
     def __init__(self, base_url: str = "http://localhost:1234/v1", model: str = "local-model"):
         self.base_url = base_url
         self.model = model
 
+    @retry(
+        retry=retry_if_exception(is_transient_error),
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        reraise=True
+    )
     async def complete(self, messages: List[Message], system_prompt: str, tools: Optional[List[Dict[str, Any]]] = None) -> Message:
         with tracer.start_as_current_span("llm_completion") as span:
             span.set_attribute("llm.model", self.model)

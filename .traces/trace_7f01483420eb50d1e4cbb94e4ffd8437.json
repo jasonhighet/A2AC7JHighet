@@ -1,0 +1,20 @@
+[
+  {
+    "name": "llm_completion",
+    "context": {
+      "trace_id": "7f01483420eb50d1e4cbb94e4ffd8437",
+      "span_id": "a162c104ee4e0a28",
+      "parent_id": null
+    },
+    "start_time": "2026-03-19T01:49:19.114731+00:00",
+    "end_time": "2026-03-19T01:49:19.126885+00:00",
+    "attributes": {
+      "llm.model": "local-model",
+      "llm.base_url": "http://localhost:1234/v1"
+    },
+    "status": {
+      "status_code": "ERROR",
+      "description": "HTTPStatusError: Server error '503 Service Unavailable' for url 'http://localhost:1234/v1/chat/completions'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503"
+    }
+  }
+]
