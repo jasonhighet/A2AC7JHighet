@@ -39,8 +39,11 @@ class DetectiveAgent:
             conversation.messages.append(user_message)
             
             # Tool Loop
+            max_iterations = 10
+            iterations = 0
             with tracer.start_as_current_span("tool_loop") as loop_span:
-                while True:
+                while iterations < max_iterations:
+                    iterations += 1
                     # Apply Context Management
                     with tracer.start_as_current_span("context_management") as ctx_span:
                         messages_to_send = self.context_manager.get_truncated_messages(conversation)
