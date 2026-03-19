@@ -2,12 +2,13 @@ from typing import List, Optional
 from .models import Message, Conversation
 from .provider import LLMProvider
 from .persistence import FilePersistence
+from .config import settings
 
 class DetectiveAgent:
     def __init__(self, provider: LLMProvider, persistence: FilePersistence, system_prompt: Optional[str] = None):
         self.provider = provider
         self.persistence = persistence
-        self.system_prompt = system_prompt or "You are a Detective Agent. Your goal is to investigate software releases and assess risks."
+        self.system_prompt = system_prompt or settings.system_prompt
 
     async def send_message(self, content: str, conversation_id: Optional[str] = None) -> Conversation:
         if conversation_id:

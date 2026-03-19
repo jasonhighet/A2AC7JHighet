@@ -11,6 +11,14 @@ def mock_persistence(tmp_path):
     return FilePersistence(str(tmp_path))
 
 @pytest.mark.asyncio
+async def test_agent_default_system_prompt(mock_persistence):
+    from .config import settings
+    from .prompts import DEFAULT_SYSTEM_PROMPT
+    provider = LLMStudioProvider()
+    agent = DetectiveAgent(provider, mock_persistence)
+    assert agent.system_prompt == DEFAULT_SYSTEM_PROMPT
+
+@pytest.mark.asyncio
 async def test_agent_send_message(mock_persistence):
     provider = LLMStudioProvider()
     agent = DetectiveAgent(provider, mock_persistence)

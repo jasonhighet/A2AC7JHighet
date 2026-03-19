@@ -9,7 +9,8 @@ async def async_input(prompt: str) -> str:
     return await asyncio.to_thread(input, prompt)
 
 async def main():
-    provider = LLMStudioProvider()
+    from .config import settings
+    provider = LLMStudioProvider(base_url=settings.llm_base_url, model=settings.llm_model)
     persistence = FilePersistence()
     agent = DetectiveAgent(provider, persistence)
     
