@@ -4,6 +4,7 @@ from .provider import LLMProvider
 from .persistence import FilePersistence
 from .config import settings
 from .tools import ToolRegistry, default_registry
+from .observability import tracer
 
 class DetectiveAgent:
     def __init__(
@@ -19,44 +20,52 @@ class DetectiveAgent:
         self.registry = registry or default_registry
 
     async def send_message(self, content: str, conversation_id: Optional[str] = None) -> Conversation:
-        if conversation_id:
-            conversation = self.persistence.load(conversation_id)
-            if not conversation:
-                raise ValueError(f"Conversation {conversation_id} not found.")
-        else:
-            conversation = Conversation(system_prompt=self.system_prompt)
-        
-        user_message = Message(role="user", content=content)
-        conversation.messages.append(user_message)
-        
-        # Tool Loop
-        while True:
-            # Get tool definitions
-            tools = self.registry.get_definitions() if self.registry else None
+        with tracer.start_as_current_span("send_message") as span:
+            if conversation_id:
+                conversation = self.persistence.load(conversation_id)
+                if not conversation:
+                    raise ValueError(f"Conversation {conversation_id} not found.")
+            else:
+                conversation = Conversation(system_prompt=self.system_prompt)
             
-            # Call provider
-            response_message = await self.provider.complete(
-                conversation.messages, 
-                conversation.system_prompt,
-                tools=tools
-            )
-            conversation.messages.append(response_message)
+            # Link trace_id to conversation metadata
+            trace_id = format(span.get_span_context().trace_id, '032x')
+            conversation.metadata["last_trace_id"] = trace_id
             
-            # If no tool calls, we're done
-            if not response_message.tool_calls:
-                break
+            user_message = Message(role="user", content=content)
+            conversation.messages.append(user_message)
             
-            # Execute tool calls
-            for tool_call in response_message.tool_calls:
-                result = await self.registry.execute(tool_call)
-                result_message = Message(
-                    role="tool",
-                    content=result.content,
-                    tool_call_id=result.tool_call_id
-                )
-                conversation.messages.append(result_message)
+            # Tool Loop
+            with tracer.start_as_current_span("tool_loop") as loop_span:
+                while True:
+                    # Get tool definitions
+                    tools = self.registry.get_definitions() if self.registry else None
+                    
+                    # Call provider
+                    with tracer.start_as_current_span("provider_call") as prov_span:
+                        response_message = await self.provider.complete(
+                            conversation.messages, 
+                            conversation.system_prompt,
+                            tools=tools
+                        )
+                    conversation.messages.append(response_message)
+                    
+                    # If no tool calls, we're done
+                    if not response_message.tool_calls:
+                        break
+                    
+                    # Execute tool calls
+                    for tool_call in response_message.tool_calls:
+                        with tracer.start_as_current_span("execute_tool") as tool_span:
+                            tool_span.set_attribute("tool.name", tool_call.name)
+                            result = await self.registry.execute(tool_call)
+                            result_message = Message(
+                                role="tool",
+                                content=result.content,
+                                tool_call_id=result.tool_call_id
+                            )
+                            conversation.messages.append(result_message)
+                            tool_span.set_attribute("tool.success", result.success)
             
-            # Loop back to let the LLM process tool results
-        
-        self.persistence.save(conversation)
-        return conversation
+            self.persistence.save(conversation)
+            return conversation

@@ -3,6 +3,9 @@ import sys
 from .agent import DetectiveAgent
 from .provider import LLMStudioProvider
 from .persistence import FilePersistence
+from .observability import setup_tracing
+
+setup_tracing()
 
 async def async_input(prompt: str) -> str:
     """Read input asynchronously to avoid blocking the loop."""

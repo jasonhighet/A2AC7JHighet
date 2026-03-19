@@ -1,0 +1,23 @@
+[
+  {
+    "name": "llm_completion",
+    "context": {
+      "trace_id": "3159c30698dde10ed845f081f9c12e4d",
+      "span_id": "231fdcf91d3f383a",
+      "parent_id": null
+    },
+    "start_time": "2026-03-19T01:37:59.683133+00:00",
+    "end_time": "2026-03-19T01:37:59.704762+00:00",
+    "attributes": {
+      "llm.model": "local-model",
+      "llm.base_url": "http://localhost:1234/v1",
+      "llm.usage.prompt_tokens": 0,
+      "llm.usage.completion_tokens": 0,
+      "llm.usage.total_tokens": 0
+    },
+    "status": {
+      "status_code": "UNSET",
+      "description": ""
+    }
+  }
+]
