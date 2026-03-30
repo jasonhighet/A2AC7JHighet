@@ -108,3 +108,12 @@ Beyond these standard integrations, there is a significant new opportunity to de
   - **Tool Chaining**: The agent "figuring out" it needs to call the release summary before the risk report felt like a solid win for the system prompt. It wasn't just following a script; it was actually trying to gather evidence.
   - **Evaluation**: The 66.7% pass rate was a wake-up call. It's easy to assume the agent "knows" what to do, but without the evaluation runner, I wouldn't have spotted the cases where it skipped critical tools because it was being "too efficient."
   - **Windows Native**: Still holding strong. `uv run pytest` is blazing fast compared to booting up a Docker container every time. (I still can't be bothered installing Docker)
+## Module 7: Investigator Agent Implementation
+
+- **What frustrated you?**: Unicode characters on Windows! Fighting with cp1252 encoding errors while trying to print a simple "?" or "?" checkmark in the CLI was a reminder that "on the metal" Windows development has its own unique tax. I eventually had to scrub all emojis from the CLI to ensure a stable experience.
+- **What surprised you?**: The power of LangGraph's cyclic state. In previous modules, we built linear tools, but seeing the agent "think," realize it missed a metric, and loop back to the analysis tool autonomously felt like a step up in "agency."
+- **Aha! Moment**: The evaluation suite's "ground truth" scenarios. It's one thing to see the agent work once; it's another to see it hit an 83% success rate across 7 diverse scenarios. Realizing that evaluate() returns a nested 
+esults list inside evaluation_results was a bit of a debugging detour, but it made the final summary stats much more rewarding.
+- **Observability**: Integrating OpenTelemetry was a game-changer. Being able to see exactly why a tool failed or what the LLM was "thinking" by looking at a local JSON span file makes debugging non-deterministic agent behavior feel deterministic.
+- **Reliability**: Exponential back-off with jitter in the tool layer saved several runs when I accidentally had the analysis JSON file open in another editor (causing a transient permission error). The agent just waited a beat and successfully retried.
+- **Final Verdict**: uv + LangGraph + OpenTelemetry = A very powerful, lightweight stack for building production-ready agents without the "Docker tax."
