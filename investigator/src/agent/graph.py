@@ -14,6 +14,8 @@ from langgraph.prebuilt import ToolNode
 
 from src.agent.prompts import get_system_prompt
 from src.agent.state import AgentState
+from src.tools.analysis import get_analysis
+from src.tools.jira import get_jira_data
 from src.utils.config import Config
 
 # The OpenAI-compatible base URL for Google AI Studio
@@ -45,11 +47,10 @@ def create_agent_graph(config: Config):
         max_tokens=config.max_tokens,
     )
 
-    # Tools are registered here; Steps 2 and 3 will populate this list.
-    # For Step 1 the list is empty so the agent responds conversationally.
+    # Tools are registered here; Step 3 adds the analysis capability.
     # NOTE: Gemini returns an empty content string when bind_tools([]) is called
     # with an empty list, so we only bind tools when there are tools to bind.
-    tools: list = []
+    tools: list = [get_jira_data, get_analysis]
 
     llm_callable = llm.bind_tools(tools) if tools else llm
 

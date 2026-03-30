@@ -99,10 +99,25 @@ def run_conversation_mode() -> None:
         print_error(f"Failed to initialise agent: {e}")
         sys.exit(1)
 
-    print(f"✓ Agent initialised (model: {config.model_name})\n")
+    # Initialise conversation persistence
+    from src.agent.prompts import get_system_prompt
+    from src.utils.conversation_persistence import ConversationPersistence
+
+    conv_dir = Path("data/conversations")
+    # Passing the tool-aware prompt version for persistence reference
+    persistence = ConversationPersistence(
+        directory=conv_dir,
+        config=config,
+        system_prompt=get_system_prompt(with_tools=True),
+    )
+
+    print(f"✓ Agent initialised (model: {config.model_name})")
+    print(f"✓ Session ID: {persistence.conversation_id}")
+    print(f"✓ Saving to: {persistence.get_filepath()}\n")
 
     # Maintain conversation state across turns in this session
-    state: dict = {"messages": []}
+    # Load initial state (will be empty for new session ID)
+    state: dict = {"messages": persistence.load()}
 
     try:
         while True:
@@ -110,7 +125,8 @@ def run_conversation_mode() -> None:
                 user_input = input("You: ").strip()
 
                 if user_input.lower() in ("exit", "quit", "q"):
-                    print("\nGoodbye!\n")
+                    print(f"\nSession saved to: {persistence.get_filepath()}")
+                    print("Goodbye!\n")
                     break
 
                 if not user_input:
@@ -130,12 +146,15 @@ def run_conversation_mode() -> None:
                                     if text:
                                         print(f"\nAgent: {text}\n")
 
-                        # Keep state up to date with accumulated messages
+                        # Keep local state up to date with accumulated messages
                         if "messages" in node_output:
                             state["messages"] = (
                                 input_state["messages"] + list(node_output["messages"])
                             )
                             input_state["messages"] = state["messages"]
+
+                # Save session to disk after each turn
+                persistence.save(state["messages"])
 
             except KeyboardInterrupt:
                 print("\n\nGoodbye!\n")
