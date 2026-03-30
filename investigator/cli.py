@@ -28,6 +28,8 @@ from src.observability.tracer import (
     force_flush_traces,
 )
 from src.observability.callbacks import OpenTelemetryCallbackHandler
+from src.evaluation.scenarios import create_evaluation_dataset
+from src.evaluation.runner import run_evaluation, get_experiment_stats
 
 
 def print_welcome() -> None:
@@ -223,13 +225,33 @@ if __name__ == "__main__":
     args = parse_args()
 
     if args.create_dataset:
-        # Evaluation scaffolding added in Step 6
-        print("Dataset creation will be available in Step 6.")
-        sys.exit(0)
+        try:
+            name = create_evaluation_dataset()
+            print(f"\n[v] Dataset '{name}' created/updated in LangSmith.")
+            sys.exit(0)
+        except Exception as e:
+            print(f"\n[X] Error creating dataset: {e}")
+            sys.exit(1)
 
     if args.eval:
-        # Evaluation scaffolding added in Step 6
-        print("Evaluation mode will be available in Step 6.")
-        sys.exit(0)
+        try:
+            results = run_evaluation()
+            stats = get_experiment_stats(results)
+            print("\n" + "=" * 30)
+            print("Evaluation Results Summary")
+            print("=" * 30)
+            for key, val in stats.items():
+                print(f"{key}: {val*100}%")
+            print("=" * 30)
+            print(f"\n[v] Full results viewable in LangSmith UI.")
+            sys.exit(0)
+        except Exception as e:
+            import traceback
+            try:
+                print(f"\n[X] Evaluation failed: {e}")
+            except UnicodeEncodeError:
+                print("\n[X] Evaluation failed with a Unicode error message.")
+            traceback.print_exc()
+            sys.exit(1)
 
     run_conversation_mode()
