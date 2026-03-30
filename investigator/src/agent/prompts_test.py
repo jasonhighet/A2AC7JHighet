@@ -50,6 +50,12 @@ def test_full_prompt_mentions_tools():
     assert "get_analysis" in FULL_SYSTEM_PROMPT
 
 
+def test_full_prompt_includes_guiding_principles():
+    """Full prompt includes the guiding principles for step-by-step thinking."""
+    assert "Guiding Principles" in FULL_SYSTEM_PROMPT
+    assert "Think Step-by-Step" in FULL_SYSTEM_PROMPT
+
+
 def test_full_prompt_includes_critical_rule():
     """Full prompt includes the critical failing-test rule."""
     assert "ANY failing tests" in FULL_SYSTEM_PROMPT
@@ -57,8 +63,9 @@ def test_full_prompt_includes_critical_rule():
 
 
 def test_full_prompt_includes_workflow():
-    """Full prompt includes the agent workflow."""
+    """Full prompt includes the explicit 6-step agent workflow."""
     assert "Workflow" in FULL_SYSTEM_PROMPT
+    assert "State your plan" in FULL_SYSTEM_PROMPT
 
 
 def test_base_prompt_asks_for_clarification():

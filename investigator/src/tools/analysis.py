@@ -12,6 +12,7 @@ from langchain_core.tools import tool
 
 from src.utils.config import load_config
 from src.utils.file_utils import (
+    get_analysis_file_path,
     get_feature_folder,
     read_json_file,
 )
@@ -43,9 +44,8 @@ def _read_analysis_file(inputs: Dict[str, str]) -> Dict[str, Any]:
     if not folder_name:
         raise FileNotFoundError(f"Feature ID '{feature_id}' not found in incoming_data.")
 
-    # Construct the path to the analysis file
-    # analysis_type is expected to be like 'metrics/unit_test_results'
-    file_path = f"incoming_data/{folder_name}/{analysis_type}.json"
+    # Get the system-agnostic Path to the analysis file
+    file_path = get_analysis_file_path(folder_name, analysis_type)
     
     logger.debug(f"Reading analysis file: {file_path}")
     

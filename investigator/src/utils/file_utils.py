@@ -53,7 +53,7 @@ def get_feature_folder_mapping() -> Dict[str, str]:
     return mapping
 
 
-def get_folder_for_feature_id(feature_id: str) -> Optional[str]:
+def get_feature_folder(feature_id: str) -> Optional[str]:
     """Get the folder name for a given feature ID.
 
     Args:
