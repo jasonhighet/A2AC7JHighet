@@ -22,6 +22,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from src.agent.graph import create_agent_graph
 from src.utils.config import load_config
+from src.observability.tracer import (
+    initialize_tracing,
+    shutdown_tracing,
+    force_flush_traces,
+)
+from src.observability.callbacks import OpenTelemetryCallbackHandler
 
 
 def print_welcome() -> None:
@@ -29,7 +35,7 @@ def print_welcome() -> None:
     print("\n" + "=" * 60)
     print("  Investigator Agent CLI")
     print("=" * 60)
-    print("\nAssess feature readiness: Development → UAT → Production\n")
+    print("\nAssess feature readiness: Development -> UAT -> Production\n")
     print("Type your question and press Enter.")
     print("Type 'exit' or 'quit' to end the session.\n")
 
@@ -111,9 +117,16 @@ def run_conversation_mode() -> None:
         system_prompt=get_system_prompt(with_tools=True),
     )
 
-    print(f"✓ Agent initialised (model: {config.model_name})")
-    print(f"✓ Session ID: {persistence.conversation_id}")
-    print(f"✓ Saving to: {persistence.get_filepath()}\n")
+    # Step 4: Initialise observability tracing
+    tracer = initialize_tracing(
+        output_dir="data/traces",
+        service_name="investigator-agent",
+        conversation_id=persistence.conversation_id,
+    )
+
+    print(f"[v] Agent initialised (model: {config.model_name})")
+    print(f"[v] Session ID: {persistence.conversation_id}")
+    print(f"[v] Saving to: {persistence.get_filepath()}\n")
 
     # Maintain conversation state across turns in this session
     # Load initial state (will be empty for new session ID)
@@ -132,12 +145,22 @@ def run_conversation_mode() -> None:
                 if not user_input:
                     continue
 
+                # Create callback handler for this turn to capture spans
+                otel_handler = OpenTelemetryCallbackHandler(
+                    tracer=tracer,
+                    conversation_id=persistence.conversation_id
+                )
+                
                 # Append this turn's user message and invoke the graph
                 input_state = {
                     "messages": list(state["messages"]) + [HumanMessage(content=user_input)]
                 }
 
-                for event in graph.stream(input_state):
+                # Run the graph with OpenTelemetry callbacks
+                for event in graph.stream(
+                    input_state, 
+                    config={"callbacks": [otel_handler]}
+                ):
                     for node_name, node_output in event.items():
                         if node_name == "agent" and "messages" in node_output:
                             for msg in node_output["messages"]:
@@ -155,6 +178,9 @@ def run_conversation_mode() -> None:
 
                 # Save session to disk after each turn
                 persistence.save(state["messages"])
+                
+                # Step 4: Flush traces to disk after each turn
+                force_flush_traces()
 
             except KeyboardInterrupt:
                 print("\n\nGoodbye!\n")
@@ -164,7 +190,8 @@ def run_conversation_mode() -> None:
                 continue
 
     finally:
-        pass  # Future: flush traces here in Step 4
+        # Step 4: Graceful shutdown of tracing
+        shutdown_tracing()
 
 
 def parse_args() -> argparse.Namespace:
