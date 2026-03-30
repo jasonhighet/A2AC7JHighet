@@ -1,0 +1,175 @@
+commit 8a7f3e2d1c9b5a4f6e8d2c1a9b7f5e3d1c9a7b5f
+Author: Sarah Chen <sarah.chen@communityshare.io>
+Date:   Mon Sep 23 14:22:33 2025 -0700
+
+    Add database schema for reservation system
+    
+    Creates reservations and reservation_waitlist tables with proper
+    indexes for performance. Implements conflict detection support
+    via PostgreSQL range types.
+    
+    Tables:
+    - reservations: Main reservation storage with state machine
+    - reservation_waitlist: FIFO queue for unavailable slots
+    
+    Indexes optimized for:
+    - Conflict detection (interval overlap queries)
+    - User reservation lookup
+    - Calendar availability queries
+    - No-show detection (cron job)
+
+---
+ migrations/2025-09-23_reservation_schema.sql | 145 ++++++++++++++++++++++
+ 1 file changed, 145 insertions(+)
+
+diff --git a/migrations/2025-09-23_reservation_schema.sql b/migrations/2025-09-23_reservation_schema.sql
+new file mode 100644
+index 0000000..a1b2c3d
+--- /dev/null
++++ b/migrations/2025-09-23_reservation_schema.sql
+@@ -0,0 +1,145 @@
++-- Migration: Create reservation system tables
++-- Author: Sarah Chen
++-- Date: 2025-09-23
++
++BEGIN;
++
++-- Main reservations table
++CREATE TABLE reservations (
++  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
++  resource_id INTEGER NOT NULL REFERENCES resources(id) ON DELETE CASCADE,
++  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
++  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
++  end_time TIMESTAMP WITH TIME ZONE NOT NULL,
++  status VARCHAR(20) NOT NULL CHECK (status IN (
++    'PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'NO_SHOW', 'CANCELLED'
++  )),
++  purpose TEXT NOT NULL CHECK (length(purpose) >= 10 AND length(purpose) <= 500),
++  special_requirements TEXT CHECK (length(special_requirements) <= 1000),
++  priority BOOLEAN DEFAULT FALSE,
++  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++  
++  CONSTRAINT valid_time_range CHECK (start_time < end_time),
++  CONSTRAINT future_start_time CHECK (start_time > created_at),
++  CONSTRAINT max_advance_booking CHECK (
++    start_time <= created_at + INTERVAL '30 days'
++  ),
++  CONSTRAINT reasonable_duration CHECK (
++    end_time - start_time >= INTERVAL '30 minutes' AND
++    end_time - start_time <= INTERVAL '8 hours'
++  )
++);
++
++COMMENT ON TABLE reservations IS 'Resource reservations with conflict detection';
++COMMENT ON COLUMN reservations.start_time IS 'Reservation start time in UTC';
++COMMENT ON COLUMN reservations.end_time IS 'Reservation end time in UTC (exclusive)';
++COMMENT ON COLUMN reservations.status IS 'Current state in reservation lifecycle';
++
++-- Waitlist queue table
++CREATE TABLE reservation_waitlist (
++  id SERIAL PRIMARY KEY,
++  reservation_request_id UUID,
++  resource_id INTEGER NOT NULL REFERENCES resources(id) ON DELETE CASCADE,
++  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
++  requested_start_time TIMESTAMP WITH TIME ZONE NOT NULL,
++  requested_end_time TIMESTAMP WITH TIME ZONE NOT NULL,
++  position INTEGER NOT NULL CHECK (position > 0),
++  notified_at TIMESTAMP WITH TIME ZONE,
++  expires_at TIMESTAMP WITH TIME ZONE,
++  status VARCHAR(20) NOT NULL CHECK (status IN (
++    'WAITING', 'NOTIFIED', 'BOOKED', 'EXPIRED', 'CANCELLED'
++  )),
++  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++  
++  CONSTRAINT valid_waitlist_time_range CHECK (requested_start_time < requested_end_time),
++  CONSTRAINT notification_logic CHECK (
++    (status = 'NOTIFIED' AND notified_at IS NOT NULL AND expires_at IS NOT NULL) OR
++    (status != 'NOTIFIED')
++  )
++);
++
++COMMENT ON TABLE reservation_waitlist IS 'FIFO queue for unavailable time slots';
++COMMENT ON COLUMN reservation_waitlist.position IS 'Queue position (1 = next in line)';
++
++-- Critical index for conflict detection
++CREATE INDEX idx_reservations_conflict ON reservations (
++  resource_id,
++  start_time,
++  end_time
++) WHERE status IN ('CONFIRMED', 'ACTIVE');
++
++COMMENT ON INDEX idx_reservations_conflict IS 
++  'Critical for conflict detection using interval overlap queries';
++
++-- User reservation lookup
++CREATE INDEX idx_reservations_user ON reservations (
++  user_id,
++  start_time DESC
++);
++
++-- Waitlist queue ordering
++CREATE INDEX idx_waitlist_queue ON reservation_waitlist (
++  resource_id,
++  position,
++  status
++) WHERE status IN ('WAITING', 'NOTIFIED');
++
++-- No-show detection (for cron job)
++CREATE INDEX idx_reservations_no_show ON reservations (
++  start_time,
++  status
++) WHERE status = 'CONFIRMED';
++
++-- Calendar availability queries
++CREATE INDEX idx_reservations_calendar ON reservations (
++  resource_id,
++  start_time,
++  status
++) WHERE status IN ('CONFIRMED', 'ACTIVE');
++
++-- Prevent duplicate waitlist entries
++CREATE UNIQUE INDEX idx_waitlist_unique_request ON reservation_waitlist (
++  user_id,
++  resource_id,
++  requested_start_time,
++  requested_end_time
++) WHERE status IN ('WAITING', 'NOTIFIED');
++
++-- Trigger for updated_at timestamp
++CREATE OR REPLACE FUNCTION update_updated_at_column()
++RETURNS TRIGGER AS $$
++BEGIN
++  NEW.updated_at = NOW();
++  RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++
++CREATE TRIGGER update_reservations_updated_at
++  BEFORE UPDATE ON reservations
++  FOR EACH ROW
++  EXECUTE FUNCTION update_updated_at_column();
++
++-- Function to check for conflicts
++CREATE OR REPLACE FUNCTION has_reservation_conflict(
++  p_resource_id INTEGER,
++  p_start_time TIMESTAMP WITH TIME ZONE,
++  p_end_time TIMESTAMP WITH TIME ZONE,
++  p_exclude_reservation_id UUID DEFAULT NULL
++)
++RETURNS BOOLEAN AS $$
++DECLARE
++  conflict_count INTEGER;
++BEGIN
++  SELECT COUNT(*) INTO conflict_count
++  FROM reservations
++  WHERE resource_id = p_resource_id
++    AND status IN ('CONFIRMED', 'ACTIVE')
++    AND (id != p_exclude_reservation_id OR p_exclude_reservation_id IS NULL)
++    AND (start_time, end_time) OVERLAPS (p_start_time, p_end_time);
++  
++  RETURN conflict_count > 0;
++END;
++$$ LANGUAGE plpgsql;
++
++COMMIT;

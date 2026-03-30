@@ -1,0 +1,238 @@
+{
+  "scan_id": "SEC-SCAN-2025-Q4-018",
+  "feature_id": "FEAT-RS-003",
+  "scan_type": "SAST and dependency check",
+  "scan_date": "2025-10-11T03:15:22Z",
+  "scanner_versions": {
+    "semgrep": "1.45.0",
+    "snyk": "1.1292.0",
+    "npm_audit": "10.2.3"
+  },
+  "scan_duration_seconds": 89,
+  "files_scanned": 38,
+  "lines_of_code_scanned": 3201,
+  "vulnerabilities": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 4,
+    "info": 9,
+    "total": 14
+  },
+  "critical_vulnerabilities": [],
+  "high_vulnerabilities": [],
+  "medium_vulnerabilities": [
+    {
+      "id": "DEP-8842",
+      "severity": "MEDIUM",
+      "cvss_score": 4.8,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+      "category": "DEPENDENCY_VULNERABILITY",
+      "title": "Cross-Site Scripting (XSS) in FullCalendar.js",
+      "description": "FullCalendar.js version 6.1.8 has a minor XSS vulnerability (CVE-2024-XXXX) that could allow malicious event data to execute scripts",
+      "affected_component": "node_modules/fullcalendar",
+      "affected_version": "6.1.8",
+      "fixed_version": "6.1.10",
+      "cwe": "CWE-79",
+      "owasp_category": "A03:2021 – Injection",
+      "exploitability": "LOW",
+      "exploitability_notes": "Requires admin to upload malicious event data through calendar import feature",
+      "impact": "LOW",
+      "impact_notes": "XSS only exploitable if admin uploads malicious CSV/ICS file with crafted event names",
+      "attack_scenario": "Attacker with admin access imports malicious calendar file with XSS payload in event title, which could execute when other users view calendar",
+      "status": "ACCEPTED_RISK",
+      "risk_acceptance": {
+        "accepted_by": "david.kim@communityshare.io",
+        "accepted_by_role": "Security Engineer",
+        "accepted_date": "2025-10-11",
+        "justification": "XSS only exploitable if admin uploads malicious event data through calendar import feature, which is not exposed in our system. All calendar events are generated server-side with sanitized data. No user-provided event names are rendered without escaping. Calendar import feature is disabled in our configuration.",
+        "compensating_controls": [
+          "All calendar events created through API with server-side sanitization",
+          "Calendar import feature disabled in configuration",
+          "Content Security Policy (CSP) headers prevent inline script execution",
+          "Regular security awareness training for admins"
+        ],
+        "residual_risk": "VERY_LOW",
+        "reassessment_date": "2025-12-01",
+        "approved_by": "rachel.green@communityshare.io",
+        "approved_by_role": "CISO"
+      },
+      "remediation_plan": {
+        "planned_action": "Upgrade to FullCalendar.js 6.1.10",
+        "deadline": "2025-12-01",
+        "priority": "MEDIUM",
+        "effort_estimate_hours": 4,
+        "notes": "Will upgrade during next maintenance window. Low priority due to accepted risk status."
+      },
+      "references": [
+        "https://nvd.nist.gov/vuln/detail/CVE-2024-XXXX",
+        "https://github.com/fullcalendar/fullcalendar/security/advisories/GHSA-xxxx-yyyy-zzzz"
+      ]
+    }
+  ],
+  "low_vulnerabilities": [
+    {
+      "id": "DEP-8843",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "category": "OUTDATED_DEPENDENCY",
+      "title": "Outdated Luxon.js version",
+      "description": "Luxon.js version 3.3.0 is outdated; newer version 3.4.4 available with bug fixes",
+      "affected_component": "node_modules/luxon",
+      "status": "OPEN",
+      "recommendation": "Upgrade to Luxon.js 3.4.4 in next maintenance cycle"
+    },
+    {
+      "id": "INFO-9201",
+      "severity": "LOW",
+      "category": "CODE_QUALITY",
+      "title": "Potential race condition in waitlist notification",
+      "description": "Concurrent notification processing may cause race condition",
+      "affected_file": "src/services/waitlist-service.js",
+      "line": 142,
+      "status": "OPEN",
+      "recommendation": "Add database-level locking for waitlist notification processing"
+    },
+    {
+      "id": "INFO-9202",
+      "severity": "LOW",
+      "category": "CONFIGURATION",
+      "title": "Missing rate limiting on reservation endpoint",
+      "description": "Reservation creation endpoint lacks rate limiting",
+      "affected_endpoint": "POST /api/reservations",
+      "status": "OPEN",
+      "recommendation": "Implement rate limiting (e.g., 10 reservations per minute per user)"
+    },
+    {
+      "id": "INFO-9203",
+      "severity": "LOW",
+      "category": "LOGGING",
+      "title": "Insufficient audit logging for admin overrides",
+      "description": "Admin priority overrides not fully logged",
+      "affected_file": "src/services/waitlist-service.js",
+      "status": "OPEN",
+      "recommendation": "Add comprehensive audit logging for all admin override actions"
+    }
+  ],
+  "info_findings": [
+    {
+      "id": "INFO-9204",
+      "category": "BEST_PRACTICE",
+      "title": "Consider adding CSRF tokens to reservation endpoints",
+      "recommendation": "While not strictly required due to JWT auth, CSRF tokens add defense in depth"
+    },
+    {
+      "id": "INFO-9205",
+      "category": "BEST_PRACTICE",
+      "title": "Consider implementing request signing for API calls",
+      "recommendation": "Add HMAC request signing for additional API security"
+    },
+    {
+      "id": "INFO-9206",
+      "category": "DOCUMENTATION",
+      "title": "Security considerations not documented in API spec",
+      "recommendation": "Document auth requirements and security best practices in API documentation"
+    }
+  ],
+  "code_analysis": {
+    "sql_injection": {
+      "findings": 0,
+      "status": "PASS",
+      "notes": "All database queries use parameterized statements"
+    },
+    "xss_prevention": {
+      "findings": 1,
+      "status": "PASS_WITH_FINDINGS",
+      "notes": "1 medium finding in dependency (FullCalendar.js) - accepted risk"
+    },
+    "authentication": {
+      "findings": 0,
+      "status": "PASS",
+      "notes": "Proper JWT validation on all endpoints"
+    },
+    "authorization": {
+      "findings": 0,
+      "status": "PASS",
+      "notes": "Resource-level permission checks implemented correctly"
+    },
+    "sensitive_data": {
+      "findings": 0,
+      "status": "PASS",
+      "notes": "No sensitive data in logs or client responses"
+    },
+    "cryptography": {
+      "findings": 0,
+      "status": "PASS",
+      "notes": "No custom cryptography; using standard libraries"
+    }
+  },
+  "dependency_analysis": {
+    "total_dependencies": 47,
+    "direct_dependencies": 12,
+    "transitive_dependencies": 35,
+    "outdated_dependencies": 3,
+    "dependencies_with_vulnerabilities": 1,
+    "vulnerable_dependencies": [
+      {
+        "name": "fullcalendar",
+        "version": "6.1.8",
+        "vulnerability_count": 1,
+        "highest_severity": "MEDIUM"
+      }
+    ]
+  },
+  "compliance": {
+    "owasp_top_10_2021": {
+      "status": "COMPLIANT",
+      "exceptions": 0,
+      "notes": "No violations of OWASP Top 10"
+    },
+    "cwe_top_25": {
+      "status": "COMPLIANT",
+      "exceptions": 0,
+      "notes": "No violations of CWE Top 25"
+    }
+  },
+  "passed": true,
+  "overall_risk_level": "LOW",
+  "quality_gate": {
+    "threshold": "No critical or high severity vulnerabilities",
+    "actual": "0 critical, 0 high, 1 medium (accepted)",
+    "passed": true
+  },
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "recommendation": "Upgrade FullCalendar.js to 6.1.10 by December 1, 2025"
+    },
+    {
+      "priority": "LOW",
+      "recommendation": "Add rate limiting to reservation creation endpoint"
+    },
+    {
+      "priority": "LOW",
+      "recommendation": "Enhance audit logging for admin actions"
+    },
+    {
+      "priority": "LOW",
+      "recommendation": "Upgrade Luxon.js to 3.4.4 in next maintenance cycle"
+    }
+  ],
+  "scan_metadata": {
+    "scan_url": "https://security.communityshare.io/scans/SEC-SCAN-2025-Q4-018",
+    "report_generated_at": "2025-10-11T03:25:18Z",
+    "reviewed_by": {
+      "name": "David Kim",
+      "email": "david.kim@communityshare.io",
+      "role": "Security Engineer"
+    },
+    "approved_by": {
+      "name": "Rachel Green",
+      "email": "rachel.green@communityshare.io",
+      "role": "CISO"
+    },
+    "approval_date": "2025-10-11T10:30:00Z"
+  },
+  "notes": "Security scan completed with 1 medium severity finding (FullCalendar.js XSS). Risk accepted with valid business justification and compensating controls in place. No critical or high severity issues found. 4 low severity findings identified as future improvements. Overall security posture: ACCEPTABLE for production deployment.",
+  "next_scan_date": "2026-01-11"
+}

@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "feature": "qr-code-checkin",
+    "feature_id": "FEAT-QR-002",
+    "jira_ticket": "PLAT-1687",
+    "test_date": "2025-10-14T10:00:00Z",
+    "environment": "performance-testing",
+    "tools": ["artillery", "k6", "jmeter"],
+    "test_duration_hours": 4
+  },
+  "summary": {
+    "status": "FAILED",
+    "pass_rate": 62.5,
+    "tests_run": 8,
+    "tests_passed": 5,
+    "tests_failed": 3,
+    "critical_failures": 2
+  },
+  "api_endpoints": {
+    "post_qr_generate": {
+      "endpoint": "POST /api/qr/generate",
+      "test_date": "2025-10-14T10:15:00Z",
+      "status": "PASSED",
+      "load_profile": {
+        "concurrent_users": 100,
+        "duration_minutes": 30,
+        "requests_per_second": 50
+      },
+      "results": {
+        "total_requests": 90000,
+        "successful_requests": 89847,
+        "failed_requests": 153,
+        "success_rate": 99.83,
+        "response_times": {
+          "min_ms": 45,
+          "max_ms": 892,
+          "mean_ms": 156,
+          "median_ms": 142,
+          "p95_ms": 287,
+          "p99_ms": 456
+        },
+        "threshold_met": true,
+        "threshold": "p95 < 500ms"
+      }
+    },
+    "post_qr_validate": {
+      "endpoint": "POST /api/qr/validate",
+      "test_date": "2025-10-14T11:00:00Z",
+      "status": "PASSED",
+      "load_profile": {
+        "concurrent_users": 200,
+        "duration_minutes": 30,
+        "requests_per_second": 100
+      },
+      "results": {
+        "total_requests": 180000,
+        "successful_requests": 179234,
+        "failed_requests": 766,
+        "success_rate": 99.57,
+        "response_times": {
+          "min_ms": 52,
+          "max_ms": 1234,
+          "mean_ms": 189,
+          "median_ms": 167,
+          "p95_ms": 389,
+          "p99_ms": 678
+        },
+        "threshold_met": true,
+        "threshold": "p95 < 500ms"
+      },
+      "notes": "Some slow queries on database, but within acceptable range"
+    },
+    "get_qr_status": {
+      "endpoint": "GET /api/qr/:qrId/status",
+      "test_date": "2025-10-14T11:45:00Z",
+      "status": "PASSED",
+      "load_profile": {
+        "concurrent_users": 150,
+        "duration_minutes": 20,
+        "requests_per_second": 75
+      },
+      "results": {
+        "total_requests": 90000,
+        "successful_requests": 89912,
+        "failed_requests": 88,
+        "success_rate": 99.90,
+        "response_times": {
+          "min_ms": 23,
+          "max_ms": 456,
+          "mean_ms": 87,
+          "median_ms": 78,
+          "p95_ms": 167,
+          "p99_ms": 234
+        },
+        "threshold_met": true,
+        "threshold": "p95 < 200ms"
+      }
+    }
+  },
+  "websocket_performance": {
+    "connection_establishment": {
+      "test_date": "2025-10-14T12:30:00Z",
+      "status": "PASSED",
+      "load_profile": {
+        "total_connections": 1000,
+        "ramp_up_seconds": 60
+      },
+      "results": {
+        "successful_connections": 998,
+        "failed_connections": 2,
+        "success_rate": 99.8,
+        "connection_time": {
+          "min_ms": 67,
+          "max_ms": 892,
+          "mean_ms": 234,
+          "median_ms": 198,
+          "p95_ms": 456,
+          "p99_ms": 678
+        },
+        "threshold_met": true,
+        "threshold": "99% success, p95 < 500ms"
+      }
+    },
+    "message_broadcast_small_scale": {
+      "test_date": "2025-10-14T13:00:00Z",
+      "status": "PASSED",
+      "description": "Broadcasting check-in events to 100 connected clients",
+      "load_profile": {
+        "connected_clients": 100,
+        "messages_per_second": 50,
+        "duration_minutes": 20
+      },
+      "results": {
+        "total_messages_sent": 60000,
+        "messages_delivered": 59987,
+        "messages_lost": 13,
+        "delivery_rate": 99.98,
+        "latency": {
+          "min_ms": 12,
+          "max_ms": 234,
+          "mean_ms": 45,
+          "median_ms": 38,
+          "p95_ms": 89,
+          "p99_ms": 134
+        },
+        "threshold_met": true,
+        "threshold": "99.9% delivery, p95 < 100ms"
+      }
+    },
+    "message_broadcast_large_scale": {
+      "test_date": "2025-10-14T13:30:00Z",
+      "status": "FAILED",
+      "severity": "HIGH",
+      "description": "Broadcasting check-in events to 1000 connected clients",
+      "load_profile": {
+        "connected_clients": 1000,
+        "messages_per_second": 100,
+        "duration_minutes": 30
+      },
+      "results": {
+        "total_messages_sent": 180000,
+        "messages_delivered": 162341,
+        "messages_lost": 17659,
+        "delivery_rate": 90.19,
+        "latency": {
+          "min_ms": 15,
+          "max_ms": 15678,
+          "mean_ms": 1234,
+          "median_ms": 892,
+          "p95_ms": 4567,
+          "p99_ms": 8901
+        },
+        "threshold_met": false,
+        "threshold": "99.5% delivery, p95 < 500ms",
+        "failures": {
+          "connection_drops": 234,
+          "timeouts": 567,
+          "server_errors": 89
+        }
+      },
+      "error_analysis": {
+        "primary_issue": "Connection pool exhaustion",
+        "description": "Server ran out of available connections after ~800 concurrent clients",
+        "server_errors": [
+          "ECONNREFUSED",
+          "Connection pool timeout",
+          "Socket hang up"
+        ],
+        "memory_usage": {
+          "start_mb": 512,
+          "peak_mb": 3456,
+          "end_mb": 2891,
+          "oom_errors": 3
+        }
+      }
+    },
+    "concurrent_connections_stress": {
+      "test_date": "2025-10-14T14:15:00Z",
+      "status": "FAILED",
+      "severity": "CRITICAL",
+      "description": "Stress test with rapid connection/disconnection cycles",
+      "load_profile": {
+        "peak_connections": 2000,
+        "connection_churn_per_second": 50,
+        "duration_minutes": 15
+      },
+      "results": {
+        "attempted_connections": 45000,
+        "successful_connections": 28934,
+        "failed_connections": 16066,
+        "success_rate": 64.3,
+        "threshold_met": false,
+        "threshold": "95% success rate"
+      },
+      "failure_modes": {
+        "connection_refused": 8234,
+        "timeout": 5678,
+        "server_crash": 2,
+        "memory_leak_detected": true
+      },
+      "server_stability": {
+        "restarts_required": 2,
+        "max_uptime_minutes": 8.5,
+        "crash_reason": "Out of memory error"
+      }
+    }
+  },
+  "database_performance": {
+    "qr_validation_query": {
+      "test_date": "2025-10-14T12:00:00Z",
+      "status": "PASSED",
+      "query": "SELECT * FROM qr_codes WHERE token = ? AND used = false AND expires_at > NOW()",
+      "load_profile": {
+        "queries_per_second": 100,
+        "duration_minutes": 10
+      },
+      "results": {
+        "total_queries": 60000,
+        "successful_queries": 59987,
+        "failed_queries": 13,
+        "query_time": {
+          "min_ms": 2,
+          "max_ms": 89,
+          "mean_ms": 12,
+          "median_ms": 10,
+          "p95_ms": 23,
+          "p99_ms": 45
+        },
+        "threshold_met": true,
+        "threshold": "p95 < 50ms"
+      }
+    },
+    "concurrent_checkout_updates": {
+      "test_date": "2025-10-14T12:20:00Z",
+      "status": "FAILED",
+      "severity": "HIGH",
+      "description": "Testing race condition scenarios with concurrent updates",
+      "load_profile": {
+        "concurrent_transactions": 50,
+        "duration_minutes": 5
+      },
+      "results": {
+        "total_transactions": 15000,
+        "successful_transactions": 14234,
+        "failed_transactions": 766,
+        "deadlocks_detected": 234,
+        "duplicate_records_created": 45,
+        "threshold_met": false,
+        "threshold": "< 1% deadlocks, 0 duplicates"
+      },
+      "issues": [
+        "Database deadlocks when multiple transactions attempt to update same QR code",
+        "Lack of proper row-level locking allows duplicate check-ins",
+        "Transaction isolation level insufficient for concurrent scenarios"
+      ]
+    }
+  },
+  "mobile_app_performance": {
+    "qr_scanner_initialization": {
+      "test_date": "2025-10-14T09:30:00Z",
+      "status": "PASSED",
+      "platform": "iOS",
+      "device": "iPhone 14",
+      "results": {
+        "cold_start_ms": 1234,
+        "warm_start_ms": 456,
+        "camera_ready_ms": 892,
+        "threshold_met": true,
+        "threshold": "< 2000ms total"
+      }
+    },
+    "qr_scan_to_api_call": {
+      "test_date": "2025-10-14T09:45:00Z",
+      "status": "PASSED",
+      "description": "Time from QR scan to API validation call",
+      "results": {
+        "min_ms": 234,
+        "max_ms": 1234,
+        "mean_ms": 567,
+        "median_ms": 489,
+        "p95_ms": 892,
+        "threshold_met": true,
+        "threshold": "p95 < 1000ms"
+      }
+    }
+  },
+  "critical_issues": [
+    {
+      "issue_id": "PERF-001",
+      "severity": "CRITICAL",
+      "title": "WebSocket server crashes under load of 2000+ concurrent connections",
+      "description": "Server runs out of memory and crashes when handling rapid connection churn at scale. Memory leak suspected in connection pool management.",
+      "impact": "Cannot support expected production load of 5000+ concurrent users during peak hours",
+      "recommendation": "Implement connection pooling, add memory limits, fix memory leak",
+      "blocker": true
+    },
+    {
+      "issue_id": "PERF-002",
+      "severity": "HIGH",
+      "title": "Message delivery rate drops to 90% with 1000 connected clients",
+      "description": "Broadcasting check-in events fails to reach ~10% of connected clients at scale. Latency increases dramatically (4.5s at p95).",
+      "impact": "Staff won't receive real-time notifications of equipment check-ins, defeating purpose of feature",
+      "recommendation": "Optimize broadcast logic, implement message queuing, add horizontal scaling",
+      "blocker": true
+    },
+    {
+      "issue_id": "PERF-003",
+      "severity": "HIGH",
+      "title": "Database race condition creates duplicate check-in records",
+      "description": "Concurrent QR validations can both succeed, creating duplicate check-ins. 45 duplicates in 15000 transactions (0.3%).",
+      "impact": "Data integrity issues, incorrect equipment tracking, confused users",
+      "recommendation": "Implement proper row-level locking or optimistic concurrency control",
+      "blocker": true
+    }
+  ],
+  "quality_gates": {
+    "api_performance_acceptable": true,
+    "websocket_scalability_acceptable": false,
+    "database_integrity_acceptable": false,
+    "mobile_performance_acceptable": true
+  },
+  "blocker_status": {
+    "is_blocker": true,
+    "reason": "Critical scalability and data integrity issues",
+    "can_deploy": false,
+    "must_fix": [
+      "PERF-001: WebSocket server crashes under expected production load",
+      "PERF-002: Message delivery rate insufficient for real-time notifications",
+      "PERF-003: Race condition creates duplicate check-in records"
+    ]
+  },
+  "recommendations": [
+    "CRITICAL: Fix WebSocket connection pool memory leak before any deployment",
+    "CRITICAL: Implement horizontal scaling for WebSocket servers to handle 5000+ concurrent connections",
+    "CRITICAL: Add database-level constraints to prevent duplicate check-ins",
+    "HIGH: Implement message queuing (Redis/RabbitMQ) for reliable event broadcasting",
+    "HIGH: Add connection rate limiting to prevent server overload",
+    "MEDIUM: Optimize database queries and add proper indexes",
+    "MEDIUM: Implement circuit breakers and graceful degradation",
+    "LOW: Add performance monitoring and alerting in production"
+  ],
+  "production_readiness": {
+    "ready": false,
+    "confidence_level": "VERY_LOW",
+    "risk_assessment": "CRITICAL",
+    "expected_failure_scenarios": [
+      "Server crash during peak usage hours",
+      "Silent failures in real-time notifications",
+      "Data corruption from race conditions"
+    ]
+  }
+}

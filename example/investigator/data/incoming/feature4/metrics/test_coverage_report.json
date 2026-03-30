@@ -1,0 +1,42 @@
+{
+  "feature": "contribution-tracking",
+  "generated_at": "2025-10-14T08:15:33Z",
+  "overall_coverage": 91,
+  "coverage_by_type": {
+    "lines": 92,
+    "functions": 94,
+    "branches": 87,
+    "statements": 91
+  },
+  "by_component": {
+    "api_endpoints": {
+      "coverage": 93,
+      "lines_covered": 245,
+      "lines_total": 263
+    },
+    "credit_calculation_service": {
+      "coverage": 96,
+      "lines_covered": 112,
+      "lines_total": 117
+    },
+    "frontend_components": {
+      "coverage": 89,
+      "lines_covered": 567,
+      "lines_total": 637
+    },
+    "database_triggers": {
+      "coverage": 88,
+      "lines_covered": 45,
+      "lines_total": 51
+    }
+  },
+  "well_covered_areas": [
+    "Credit calculation service: 96%",
+    "API endpoints: 93%",
+    "Frontend components: 89%",
+    "Database triggers: 88%"
+  ],
+  "threshold": 80,
+  "passed": true,
+  "notes": "Excellent coverage, significantly above 80% threshold"
+}

@@ -1,0 +1,40 @@
+{
+  "pipeline_name": "contribution-tracking-ci",
+  "recent_runs": [
+    {
+      "run_id": 9305,
+      "status": "success",
+      "duration_seconds": 356,
+      "timestamp": "2025-10-15T09:30:44Z",
+      "stages": {
+        "build": "success",
+        "unit_tests": "success",
+        "integration_tests": "success",
+        "lint": "success",
+        "security_scan": "success"
+      }
+    },
+    {
+      "run_id": 9304,
+      "status": "success",
+      "duration_seconds": 349,
+      "timestamp": "2025-10-14T15:11:22Z"
+    },
+    {
+      "run_id": 9303,
+      "status": "success",
+      "duration_seconds": 362,
+      "timestamp": "2025-10-13T11:44:08Z"
+    },
+    {
+      "run_id": 9302,
+      "status": "success",
+      "duration_seconds": 351,
+      "timestamp": "2025-10-12T14:55:17Z"
+    }
+  ],
+  "success_rate": 1.0,
+  "average_duration_seconds": 355,
+  "status": "GREEN",
+  "notes": "Perfect success rate, all recent runs passed"
+}

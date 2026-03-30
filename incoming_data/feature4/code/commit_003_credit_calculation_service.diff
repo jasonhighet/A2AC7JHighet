@@ -1,0 +1,84 @@
+commit 7b3d5f9e1a2c4d6f8e0a2b4d6f8e0a2b4d6f8e0a
+Author: James Wilson <james.wilson@communityshare.io>
+Date:   Thu Oct 10 10:45:30 2025 -0700
+
+    Add credit calculation background service
+
+    - Node-cron job running daily at 3 AM UTC
+    - Recalculates all user balances
+    - Updates tier assignments
+    - Batch processing (100 users per batch)
+    - Error handling and retry logic
+    - Comprehensive logging
+
+diff --git a/src/services/credit-calculation.service.ts b/src/services/credit-calculation.service.ts
+new file mode 100644
++++ b/src/services/credit-calculation.service.ts
+@@ -0,0 +1,85 @@
++import cron from 'node-cron';
++import { db } from '../db';
++import { logger } from '../utils/logger';
++
++export class CreditCalculationService {
++  private readonly BATCH_SIZE = 100;
++
++  start() {
++    // Run daily at 3 AM UTC
++    cron.schedule('0 3 * * *', async () => {
++      logger.info('Starting credit calculation job');
++      try {
++        await this.recalculateAllBalances();
++        logger.info('Credit calculation job completed successfully');
++      } catch (error) {
++        logger.error('Credit calculation job failed', { error });
++        await this.notifyAdmins(error);
++      }
++    });
++  }
++
++  private async recalculateAllBalances() {
++    const userIds = await db.query('SELECT id FROM users WHERE status = $1', ['active']);
++
++    for (let i = 0; i < userIds.length; i += this.BATCH_SIZE) {
++      const batch = userIds.slice(i, i + this.BATCH_SIZE);
++      await this.processBatch(batch);
++    }
++  }
++
++  private async processBatch(userIds: string[]) {
++    const promises = userIds.map(id => this.recalculateUserBalance(id));
++    await Promise.allSettled(promises);
++  }
++
++  private async recalculateUserBalance(userId: string) {
++    try {
++      const result = await db.query(`
++        SELECT SUM(calculated_credits) as total
++        FROM contributions
++        WHERE user_id = $1 AND status = 'approved'
++      `, [userId]);
++
++      const balance = result.rows[0].total || 0;
++      const tier = this.calculateTier(balance);
++
++      await db.query(`
++        INSERT INTO credit_balances (user_id, balance, tier, last_calculated_at)
++        VALUES ($1, $2, $3, NOW())
++        ON CONFLICT (user_id)
++        DO UPDATE SET
++          balance = $2,
++          tier = $3,
++          last_calculated_at = NOW()
++      `, [userId, balance, tier]);
++    } catch (error) {
++      logger.error(`Failed to recalculate balance for user ${userId}`, { error });
++    }
++  }
++
++  private calculateTier(balance: number): string {
++    if (balance >= 101) return 'platinum';
++    if (balance >= 51) return 'gold';
++    if (balance >= 21) return 'silver';
++    return 'bronze';
++  }
++}

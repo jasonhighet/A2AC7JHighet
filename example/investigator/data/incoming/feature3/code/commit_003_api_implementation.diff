@@ -1,0 +1,28 @@
+commit 7c4d2a9f6b8e3c5d1a7f9b4e6c8d2a5f3b7e1c9d
+Author: James Wilson <james.wilson@communityshare.io>
+Date:   Fri Sep 27 16:44:18 2025 -0700
+
+    Add REST API endpoints for reservations
+    
+    Implements Express.js routes and controllers for reservation CRUD operations.
+    Includes validation, authentication middleware, and error handling.
+    Triggers email notifications on successful bookings.
+    
+    Endpoints:
+    - POST /api/reservations
+    - GET /api/reservations
+    - GET /api/reservations/:id
+    - PATCH /api/reservations/:id
+    - DELETE /api/reservations/:id
+    - GET /api/reservations/conflicts
+    - GET /api/resources/:id/availability
+
+---
+ src/routes/reservations.js          | 156 +++++++++++++++++++++++++++++
+ src/controllers/reservation-ctrl.js | 234 ++++++++++++++++++++++++++++++++++++++++
+ src/middleware/auth.js               |  23 ++++
+ src/middleware/validation.js         |  67 +++++++++++++
+ 4 files changed, 480 insertions(+)
+
+[Content abbreviated for brevity - full implementation includes Express routes,
+controller logic with conflict detection, authentication middleware, and validation]

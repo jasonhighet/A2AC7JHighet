@@ -1,0 +1,34 @@
+commit 5d7f9b1c3e5d7f9b1c3e5d7f9b1c3e5d7f9b1c3e
+Author: James Wilson <james.wilson@communityshare.io>
+Date:   Mon Oct 14 11:20:15 2025 -0700
+
+    Integrate credit system with reservation waitlist
+
+    - Modified waitlist query to prioritize by credit balance
+    - Added UI indicator for priority status
+    - Optimized query with proper indexing
+
+diff --git a/src/services/reservation/waitlist.service.ts b/src/services/reservation/waitlist.service.ts
+@@ -15,10 +15,21 @@ export class WaitlistService {
+   async getWaitlist(resourceId: string): Promise<WaitlistEntry[]> {
+     return await this.db.query(`
+       SELECT
+         r.id, r.user_id, r.requested_at, u.name,
++        COALESCE(cb.balance, 0) as credit_balance,
++        CASE
++          WHEN cb.balance >= 51 THEN 1
++          WHEN cb.balance >= 21 THEN 2
++          ELSE 3
++        END as priority_tier
+       FROM reservations r
+       JOIN users u ON r.user_id = u.id
++      LEFT JOIN credit_balances cb ON u.id = cb.user_id
+       WHERE r.resource_id = $1 AND r.status = 'waitlist'
+-      ORDER BY r.requested_at ASC
++      ORDER BY
++        priority_tier ASC,
++        cb.balance DESC,
++        r.requested_at ASC
+     `, [resourceId]);
+   }
+ }

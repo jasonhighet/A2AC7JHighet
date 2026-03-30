@@ -1,0 +1,12 @@
+{
+  "feature_id": "FEAT-QR-002",
+  "feature_name": "QR Code Check-in/out System",
+  "jira_issue": "PLAT-1687",
+  "approval_process_metadata": {
+    "approval_workflow": "Feature Production Approval",
+    "workflow_version": "2.1"
+  },
+  "overall_status": "PENDING",
+  "production_clearance": false,
+  "deployment_authorized": false
+}

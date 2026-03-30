@@ -1,0 +1,26 @@
+commit 2f5e8a1c9d6b4e3f7a2c5d8e1b9f4a6c3e7d2b5f
+Author: Lisa Park <lisa.park@communityshare.io>
+Date:   Tue Oct 1 11:33:27 2025 -0700
+
+    Add calendar UI with FullCalendar.js integration
+    
+    Implements React calendar component for viewing resource availability
+    and making reservations. Features:
+    - Month, week, and day views
+    - Click-to-book interaction
+    - Color-coded availability (green/yellow/red)
+    - Timezone conversion (UTC to user's local time)
+    - Responsive design for mobile/tablet
+    
+    Uses FullCalendar.js library for calendar rendering.
+    Integrates with reservation API for real-time availability.
+
+---
+ src/components/Calendar/ReservationCalendar.jsx | 287 +++++++++++++++++++++++
+ src/components/Calendar/BookingModal.jsx        | 156 +++++++++++++
+ src/components/Calendar/TimeSlotPicker.jsx      |  89 ++++++++
+ src/utils/timezoneConverter.js                  |  45 ++++
+ 4 files changed, 577 insertions(+)
+
+[Calendar implementation using FullCalendar React component with event handlers
+for date selection, conflict checking, and booking flow]

@@ -1,0 +1,866 @@
+{
+  "id": "10789",
+  "key": "PLAT-1677",
+  "self": "https://communityshare.atlassian.net/rest/api/3/issue/10789",
+  "fields": {
+    "summary": "Advanced Resource Reservation System",
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Feature Overview"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Calendar-based advance booking system with conflict detection and waitlist management. Allows members to reserve resources up to 30 days in advance with automated confirmations."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Business Value"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Current system only tracks check-ins/outs but has no way to book resources in advance. Communities need this for planning workshops, events, and ensuring tool availability for projects."
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Reduces scheduling conflicts by 80% (target metric)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Enables advance planning for workshops and events"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Improves member satisfaction and resource utilization"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Key Features"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "📅 Calendar UI with month/week/day views (FullCalendar.js)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "🔍 Automatic conflict detection using PostgreSQL interval overlap queries"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "⏰ Waitlist queue with FIFO ordering and admin priority overrides"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "🌍 Timezone-aware datetime handling (store UTC, display local)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "📧 Email notifications for confirmations and waitlist availability"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "📱 Mobile-responsive design (works on tablets and phones)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "🔄 Auto-cancellation for no-shows (30min window)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Technical Implementation"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Backend: Node.js, Express, PostgreSQL"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Frontend: React, FullCalendar.js, Luxon.js"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Database: New 'reservations' and 'reservation_waitlist' tables"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "State machine: PENDING → CONFIRMED → ACTIVE → COMPLETED/NO_SHOW"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Current Status (as of 2025-10-16)"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "✅ Planning complete, designs approved (Sep 5)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "✅ Development complete, PR #401 merged (Oct 9)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "✅ Unit tests: 167/167 passing, 87.3% coverage"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "⚠️ Integration tests: 42/45 passing (3 DST edge cases failing)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "🔄 UAT: In progress (Oct 11-16), mixed feedback"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "✅ Security review: Approved (Oct 11)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "❌ Performance testing: Not yet run (scheduled Oct 18)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "⚠️ Documentation: API docs complete, user docs outdated"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "issuetype": {
+      "id": "10001",
+      "name": "Epic",
+      "subtask": false,
+      "hierarchyLevel": 1,
+      "iconUrl": "https://communityshare.atlassian.net/secure/viewavatar?size=xsmall&avatarId=10307&avatarType=issuetype"
+    },
+    "project": {
+      "id": "10000",
+      "key": "PLAT",
+      "name": "CommunityShare Platform",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "next-gen"
+    },
+    "status": {
+      "id": "10003",
+      "name": "UAT",
+      "description": "Feature in User Acceptance Testing",
+      "iconUrl": "https://communityshare.atlassian.net/images/icons/statuses/generic.png",
+      "statusCategory": {
+        "id": 4,
+        "key": "indeterminate",
+        "colorName": "yellow",
+        "name": "In Progress"
+      }
+    },
+    "priority": {
+      "id": "2",
+      "name": "High",
+      "iconUrl": "https://communityshare.atlassian.net/images/icons/priorities/high.svg"
+    },
+    "assignee": {
+      "accountId": "5d5e8c7f8e4b3a0001234567",
+      "accountType": "atlassian",
+      "displayName": "Emma Rodriguez",
+      "emailAddress": "emma.rodriguez@communityshare.io",
+      "avatarUrls": {
+        "48x48": "https://avatar-management.services.atlassian.com/avatar/48x48",
+        "24x24": "https://avatar-management.services.atlassian.com/avatar/24x24",
+        "16x16": "https://avatar-management.services.atlassian.com/avatar/16x16",
+        "32x32": "https://avatar-management.services.atlassian.com/avatar/32x32"
+      },
+      "active": true,
+      "timeZone": "America/Los_Angeles"
+    },
+    "reporter": {
+      "accountId": "5d5e8c7f8e4b3a0001234567",
+      "accountType": "atlassian",
+      "displayName": "Emma Rodriguez",
+      "emailAddress": "emma.rodriguez@communityshare.io",
+      "avatarUrls": {
+        "48x48": "https://avatar-management.services.atlassian.com/avatar/48x48",
+        "24x24": "https://avatar-management.services.atlassian.com/avatar/24x24",
+        "16x16": "https://avatar-management.services.atlassian.com/avatar/16x16",
+        "32x32": "https://avatar-management.services.atlassian.com/avatar/32x32"
+      },
+      "active": true,
+      "timeZone": "America/Los_Angeles"
+    },
+    "created": "2025-09-01T08:00:00.000+0000",
+    "updated": "2025-10-16T10:22:33.000+0000",
+    "resolutiondate": null,
+    "duedate": "2025-10-25",
+    "labels": [
+      "feature",
+      "backend",
+      "frontend",
+      "high-complexity",
+      "uat-in-progress",
+      "mixed-feedback",
+      "q4-2025"
+    ],
+    "components": [
+      {
+        "id": "10021",
+        "name": "Backend",
+        "description": "Backend services and APIs"
+      },
+      {
+        "id": "10023",
+        "name": "Frontend",
+        "description": "React UI components"
+      },
+      {
+        "id": "10022",
+        "name": "Notifications",
+        "description": "Email and in-app notifications"
+      },
+      {
+        "id": "10025",
+        "name": "Database",
+        "description": "PostgreSQL schema and migrations"
+      }
+    ],
+    "customfield_10001": "FEAT-RS-003",
+    "customfield_10002": "HIGH",
+    "customfield_10010": "2025-10-25",
+    "customfield_10015": {
+      "id": "10101",
+      "value": "Core Platform Team"
+    },
+    "customfield_10020": "https://github.com/communityshare/platform/pull/401",
+    "customfield_10030": 8,
+    "customfield_10031": "2025-Q4 Release",
+    "issuelinks": [
+      {
+        "id": "10678",
+        "type": {
+          "id": "10000",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by"
+        },
+        "outwardIssue": {
+          "id": "10456",
+          "key": "PLAT-1401",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10456",
+          "fields": {
+            "summary": "Check-in/Check-out System v1.2",
+            "status": {
+              "id": "10004",
+              "name": "Done",
+              "statusCategory": {
+                "id": 3,
+                "key": "done",
+                "colorName": "green",
+                "name": "Done"
+              }
+            },
+            "issuetype": {
+              "id": "10002",
+              "name": "Story"
+            }
+          }
+        }
+      },
+      {
+        "id": "10679",
+        "type": {
+          "id": "10000",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by"
+        },
+        "outwardIssue": {
+          "id": "10334",
+          "key": "PLAT-1289",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10334",
+          "fields": {
+            "summary": "Email Service v1.6",
+            "status": {
+              "id": "10004",
+              "name": "Done",
+              "statusCategory": {
+                "id": 3,
+                "key": "done",
+                "colorName": "green",
+                "name": "Done"
+              }
+            },
+            "issuetype": {
+              "id": "10002",
+              "name": "Story"
+            }
+          }
+        }
+      },
+      {
+        "id": "10680",
+        "type": {
+          "id": "10001",
+          "name": "Blocks",
+          "inward": "is blocked by",
+          "outward": "blocks"
+        },
+        "inwardIssue": {
+          "id": "10790",
+          "key": "BUG-RES-499",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10790",
+          "fields": {
+            "summary": "DST spring forward transition causes incorrect start time",
+            "status": {
+              "id": "10001",
+              "name": "Open",
+              "statusCategory": {
+                "id": 2,
+                "key": "new",
+                "colorName": "blue-gray",
+                "name": "To Do"
+              }
+            },
+            "priority": {
+              "id": "4",
+              "name": "Minor"
+            },
+            "issuetype": {
+              "id": "10004",
+              "name": "Bug"
+            }
+          }
+        }
+      },
+      {
+        "id": "10681",
+        "type": {
+          "id": "10001",
+          "name": "Blocks",
+          "inward": "is blocked by",
+          "outward": "blocks"
+        },
+        "inwardIssue": {
+          "id": "10791",
+          "key": "BUG-RES-500",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10791",
+          "fields": {
+            "summary": "DST fall back causes duration calculation error",
+            "status": {
+              "id": "10001",
+              "name": "Open",
+              "statusCategory": {
+                "id": 2,
+                "key": "new",
+                "colorName": "blue-gray",
+                "name": "To Do"
+              }
+            },
+            "priority": {
+              "id": "4",
+              "name": "Minor"
+            },
+            "issuetype": {
+              "id": "10004",
+              "name": "Bug"
+            }
+          }
+        }
+      },
+      {
+        "id": "10682",
+        "type": {
+          "id": "10001",
+          "name": "Blocks",
+          "inward": "is blocked by",
+          "outward": "blocks"
+        },
+        "inwardIssue": {
+          "id": "10792",
+          "key": "BUG-RES-501",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10792",
+          "fields": {
+            "summary": "Rapid repeated bookings can create overlapping reservations",
+            "status": {
+              "id": "10001",
+              "name": "Open",
+              "statusCategory": {
+                "id": 2,
+                "key": "new",
+                "colorName": "blue-gray",
+                "name": "To Do"
+              }
+            },
+            "priority": {
+              "id": "4",
+              "name": "Minor"
+            },
+            "issuetype": {
+              "id": "10004",
+              "name": "Bug"
+            }
+          }
+        }
+      }
+    ],
+    "subtasks": [
+      {
+        "id": "10793",
+        "key": "PLAT-1678",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10793",
+        "fields": {
+          "summary": "Database schema for reservations",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      },
+      {
+        "id": "10794",
+        "key": "PLAT-1679",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10794",
+        "fields": {
+          "summary": "Conflict detection algorithm",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      },
+      {
+        "id": "10795",
+        "key": "PLAT-1680",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10795",
+        "fields": {
+          "summary": "Calendar UI with FullCalendar.js",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      },
+      {
+        "id": "10796",
+        "key": "PLAT-1681",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10796",
+        "fields": {
+          "summary": "Waitlist management feature",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      },
+      {
+        "id": "10797",
+        "key": "PLAT-1682",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10797",
+        "fields": {
+          "summary": "Email notifications for reservations",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      },
+      {
+        "id": "10798",
+        "key": "PLAT-1683",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issue/10798",
+        "fields": {
+          "summary": "Auto-cancellation for no-shows",
+          "status": {
+            "id": "10004",
+            "name": "Done",
+            "statusCategory": {
+              "id": 3,
+              "key": "done",
+              "colorName": "green",
+              "name": "Done"
+            }
+          },
+          "issuetype": {
+            "id": "10003",
+            "name": "Sub-task",
+            "subtask": true
+          }
+        }
+      }
+    ],
+    "fixVersions": [
+      {
+        "id": "10048",
+        "name": "2025-Q4 Release",
+        "description": "Q4 2025 platform release",
+        "released": false,
+        "releaseDate": "2025-10-31",
+        "archived": false,
+        "projectId": 10000
+      }
+    ],
+    "environment": "Production (pending), UAT (active)",
+    "timetracking": {
+      "originalEstimate": "3w",
+      "originalEstimateSeconds": 604800,
+      "remainingEstimate": "0h",
+      "remainingEstimateSeconds": 0,
+      "timeSpent": "3w 2d",
+      "timeSpentSeconds": 691200
+    },
+    "storyPoints": 21,
+    "epicLink": null,
+    "votes": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/issue/PLAT-1677/votes",
+      "votes": 8,
+      "hasVoted": false
+    },
+    "watchers": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/issue/PLAT-1677/watchers",
+      "watchCount": 12,
+      "isWatching": false
+    }
+  }
+}

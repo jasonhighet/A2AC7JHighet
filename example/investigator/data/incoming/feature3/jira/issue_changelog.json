@@ -1,0 +1,654 @@
+{
+  "id": "10789",
+  "key": "PLAT-1677",
+  "self": "https://communityshare.atlassian.net/rest/api/3/issue/10789/changelog",
+  "changelog": {
+    "startAt": 0,
+    "maxResults": 100,
+    "total": 18,
+    "histories": [
+      {
+        "id": "102341",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-01T08:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": null,
+            "fromString": null,
+            "to": "10001",
+            "toString": "Planning"
+          },
+          {
+            "field": "priority",
+            "fieldtype": "jira",
+            "fieldId": "priority",
+            "from": null,
+            "fromString": null,
+            "to": "2",
+            "toString": "High"
+          }
+        ]
+      },
+      {
+        "id": "102456",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-01T14:30:00.000+0000",
+        "items": [
+          {
+            "field": "assignee",
+            "fieldtype": "jira",
+            "fieldId": "assignee",
+            "from": null,
+            "fromString": null,
+            "to": "5d5e8c7f8e4b3a0001234567",
+            "toString": "Emma Rodriguez"
+          },
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "",
+            "to": null,
+            "toString": "feature backend frontend high-complexity"
+          }
+        ]
+      },
+      {
+        "id": "102678",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-05T15:45:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "156001",
+            "toString": "Design review completed. All designs approved. Ready to move to development."
+          }
+        ]
+      },
+      {
+        "id": "103002",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-12T09:15:00.000+0000",
+        "items": [
+          {
+            "field": "Link",
+            "fieldtype": "jira",
+            "fieldId": "issuelinks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1401",
+            "toString": "depends on PLAT-1401 (Check-in/Check-out System v1.2)"
+          },
+          {
+            "field": "Link",
+            "fieldtype": "jira",
+            "fieldId": "issuelinks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1289",
+            "toString": "depends on PLAT-1289 (Email Service v1.6)"
+          }
+        ]
+      },
+      {
+        "id": "103789",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-15T09:30:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10001",
+            "fromString": "Planning",
+            "to": "10002",
+            "toString": "In Development"
+          },
+          {
+            "field": "customfield_10020",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10020",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "https://github.com/communityshare/platform/pull/401"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "156789",
+            "toString": "Planning complete, designs approved. Starting development. Created PR #401."
+          }
+        ]
+      },
+      {
+        "id": "103890",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-23T15:00:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1678",
+            "toString": "PLAT-1678 (Database schema for reservations)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "157001",
+            "toString": "Database schema implemented. Migration ready for review."
+          }
+        ]
+      },
+      {
+        "id": "104123",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-09-28T12:00:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1679",
+            "toString": "PLAT-1679 (Conflict detection algorithm)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "157234",
+            "toString": "Conflict detection algorithm complete. Using PostgreSQL OVERLAPS operator for efficiency."
+          }
+        ]
+      },
+      {
+        "id": "104456",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0012345678",
+          "displayName": "James Park",
+          "emailAddress": "james.park@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-02T16:30:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1680",
+            "toString": "PLAT-1680 (Calendar UI with FullCalendar.js)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "157456",
+            "toString": "Calendar UI implemented with FullCalendar.js. Month/week/day views working. Mobile responsive."
+          }
+        ]
+      },
+      {
+        "id": "104789",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-06T11:00:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1681",
+            "toString": "PLAT-1681 (Waitlist management feature)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "157678",
+            "toString": "Waitlist feature complete. FIFO queue with admin priority override. 2-hour notification window."
+          }
+        ]
+      },
+      {
+        "id": "104890",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-08T09:00:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1682",
+            "toString": "PLAT-1682 (Email notifications for reservations)"
+          }
+        ]
+      },
+      {
+        "id": "104991",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-08T14:30:00.000+0000",
+        "items": [
+          {
+            "field": "Subtask",
+            "fieldtype": "jira",
+            "fieldId": "subtasks",
+            "from": null,
+            "fromString": null,
+            "to": "PLAT-1683",
+            "toString": "PLAT-1683 (Auto-cancellation for no-shows)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "157889",
+            "toString": "All subtasks complete. Email notifications and auto-cancellation working. Ready for code review."
+          }
+        ]
+      },
+      {
+        "id": "105123",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0011111111",
+          "displayName": "Michael Torres",
+          "emailAddress": "michael.torres@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-09T10:15:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158001",
+            "toString": "Code review complete. Approved with minor concerns about DST edge cases. 3 integration tests failing but marked as non-blocking."
+          }
+        ]
+      },
+      {
+        "id": "105234",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0011111111",
+          "displayName": "James Wilson",
+          "emailAddress": "james.wilson@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-09T16:22:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158123",
+            "toString": "PR #401 merged to main. Code review approved by Michael Torres and myself."
+          }
+        ]
+      },
+      {
+        "id": "105345",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0022222222",
+          "displayName": "Alex Thompson",
+          "emailAddress": "alex.thompson@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-11T13:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10002",
+            "fromString": "In Development",
+            "to": "10003",
+            "toString": "UAT"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158234",
+            "toString": "Development complete. PR #401 merged. Moving to UAT. Note: 3 DST-related integration tests still failing but marked as edge cases. Security review approved."
+          },
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "feature backend frontend high-complexity",
+            "to": null,
+            "toString": "feature backend frontend high-complexity uat-in-progress"
+          }
+        ]
+      },
+      {
+        "id": "105456",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-12T10:00:00.000+0000",
+        "items": [
+          {
+            "field": "Link",
+            "fieldtype": "jira",
+            "fieldId": "issuelinks",
+            "from": null,
+            "fromString": null,
+            "to": "BUG-RES-499",
+            "toString": "is blocked by BUG-RES-499 (DST spring forward transition causes incorrect start time)"
+          },
+          {
+            "field": "Link",
+            "fieldtype": "jira",
+            "fieldId": "issuelinks",
+            "from": null,
+            "fromString": null,
+            "to": "BUG-RES-500",
+            "toString": "is blocked by BUG-RES-500 (DST fall back causes duration calculation error)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158345",
+            "toString": "Linked DST-related bugs. These are edge cases that occur twice per year. Monitoring in UAT to determine if they're production blockers."
+          }
+        ]
+      },
+      {
+        "id": "105567",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0022222222",
+          "displayName": "Alex Thompson",
+          "emailAddress": "alex.thompson@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-13T18:00:00.000+0000",
+        "items": [
+          {
+            "field": "Link",
+            "fieldtype": "jira",
+            "fieldId": "issuelinks",
+            "from": null,
+            "fromString": null,
+            "to": "BUG-RES-501",
+            "toString": "is blocked by BUG-RES-501 (Rapid repeated bookings can create overlapping reservations)"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158456",
+            "toString": "UAT tester Eve Brown found a race condition bug. Rapid double-clicks (<1s) can create overlapping reservations. Marked as minor - very unlikely in real usage."
+          }
+        ]
+      },
+      {
+        "id": "105678",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-15T16:30:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158567",
+            "toString": "UAT update: 6 testers completed. 3 approved, 3 approved with non-blocking concerns. Main feedback: waitlist UX clarity, minor race condition bug, mobile optimization. Awaiting Community Manager sign-off."
+          },
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "feature backend frontend high-complexity uat-in-progress",
+            "to": null,
+            "toString": "feature backend frontend high-complexity uat-in-progress mixed-feedback"
+          }
+        ]
+      },
+      {
+        "id": "105789",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "active": true
+        },
+        "created": "2025-10-16T10:22:33.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "158678",
+            "toString": "As Product Manager, I approve moving forward. UAT feedback is positive overall. Concerns are non-blocking UX improvements that can be addressed post-launch. Awaiting Community Manager (Rachel Green) final sign-off. Performance testing scheduled for Oct 18."
+          },
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "feature backend frontend high-complexity uat-in-progress mixed-feedback",
+            "to": null,
+            "toString": "feature backend frontend high-complexity uat-in-progress mixed-feedback q4-2025"
+          }
+        ]
+      }
+    ]
+  },
+  "velocity_metrics": {
+    "planning_phase_days": 14,
+    "development_phase_days": 26,
+    "uat_phase_days": 5,
+    "total_elapsed_days": 45,
+    "story_points": 21,
+    "story_points_per_day": 0.47,
+    "time_estimate_vs_actual": {
+      "estimated_days": 42,
+      "actual_days": 45,
+      "variance_percent": 7.1
+    }
+  },
+  "state_transitions": [
+    {
+      "from_state": null,
+      "to_state": "Planning",
+      "transitioned_at": "2025-09-01T08:00:00.000+0000",
+      "transitioned_by": "Emma Rodriguez",
+      "duration_in_state_days": 14
+    },
+    {
+      "from_state": "Planning",
+      "to_state": "In Development",
+      "transitioned_at": "2025-09-15T09:30:00.000+0000",
+      "transitioned_by": "Sarah Chen",
+      "duration_in_state_days": 26
+    },
+    {
+      "from_state": "In Development",
+      "to_state": "UAT",
+      "transitioned_at": "2025-10-11T13:00:00.000+0000",
+      "transitioned_by": "Alex Thompson",
+      "duration_in_state_days": 5,
+      "notes": "Currently in UAT - awaiting final decision"
+    }
+  ],
+  "key_decisions_from_changelog": [
+    {
+      "date": "2025-09-05",
+      "decision": "Design review approved - all designs ready for implementation",
+      "decided_by": "Sarah Chen"
+    },
+    {
+      "date": "2025-09-15",
+      "decision": "Moved to development after planning complete",
+      "decided_by": "Sarah Chen"
+    },
+    {
+      "date": "2025-10-09",
+      "decision": "PR #401 merged despite 3 failing DST integration tests - marked as non-blocking edge cases",
+      "decided_by": "James Wilson, Michael Torres"
+    },
+    {
+      "date": "2025-10-11",
+      "decision": "Moved to UAT with known DST issues - to monitor if they're production blockers",
+      "decided_by": "Alex Thompson"
+    },
+    {
+      "date": "2025-10-15",
+      "decision": "Product Manager (Emma Rodriguez) approved despite mixed UAT feedback - concerns deemed non-blocking",
+      "decided_by": "Emma Rodriguez"
+    }
+  ],
+  "blocking_issues_timeline": [
+    {
+      "date": "2025-10-12",
+      "action": "Linked BUG-RES-499 and BUG-RES-500 (DST edge cases)",
+      "severity": "Minor",
+      "blocking": "Potentially, under evaluation"
+    },
+    {
+      "date": "2025-10-13",
+      "action": "Linked BUG-RES-501 (race condition)",
+      "severity": "Minor",
+      "blocking": "No - very unlikely scenario"
+    }
+  ],
+  "stakeholder_activity": [
+    {
+      "date": "2025-09-01",
+      "stakeholder": "Emma Rodriguez (Product Manager)",
+      "action": "Created epic and assigned to self"
+    },
+    {
+      "date": "2025-09-05",
+      "stakeholder": "Sarah Chen (Engineering Lead)",
+      "action": "Design review approved"
+    },
+    {
+      "date": "2025-10-09",
+      "stakeholder": "Michael Torres (Code Reviewer)",
+      "action": "Code review approved with concerns"
+    },
+    {
+      "date": "2025-10-11",
+      "stakeholder": "Alex Thompson (QA Lead)",
+      "action": "Moved to UAT"
+    },
+    {
+      "date": "2025-10-15",
+      "stakeholder": "Emma Rodriguez (Product Manager)",
+      "action": "Approved for production (pending Community Manager)"
+    },
+    {
+      "date": "2025-10-16",
+      "stakeholder": "Rachel Green (Community Manager)",
+      "action": "PENDING - final sign-off expected by Oct 18",
+      "status": "AWAITING"
+    }
+  ]
+}

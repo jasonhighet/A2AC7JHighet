@@ -1,0 +1,57 @@
+{
+  "overall_coverage": 87,
+  "timestamp": "2025-10-15T08:23:14Z",
+  "coverage_by_type": {
+    "lines": 89,
+    "functions": 91,
+    "branches": 82,
+    "statements": 88
+  },
+  "coverage_by_module": {
+    "controllers": {
+      "lines": 92,
+      "functions": 95,
+      "branches": 88,
+      "statements": 91
+    },
+    "services": {
+      "lines": 94,
+      "functions": 96,
+      "branches": 90,
+      "statements": 93
+    },
+    "jobs": {
+      "lines": 82,
+      "functions": 85,
+      "branches": 75,
+      "statements": 81
+    },
+    "utils": {
+      "lines": 88,
+      "functions": 90,
+      "branches": 84,
+      "statements": 87
+    },
+    "routes": {
+      "lines": 86,
+      "functions": 88,
+      "branches": 78,
+      "statements": 85
+    }
+  },
+  "uncovered_files": [
+    {
+      "file": "src/jobs/maintenance-checker.js",
+      "coverage": 82,
+      "uncovered_lines": [145, 146, 187, 223, 224, 225]
+    },
+    {
+      "file": "src/services/maintenance-alert.service.js",
+      "coverage": 85,
+      "uncovered_lines": [67, 98, 112]
+    }
+  ],
+  "threshold": 80,
+  "passed": true,
+  "report_url": "https://codecov.io/gh/communityshare/platform/tree/main/features/maintenance"
+}

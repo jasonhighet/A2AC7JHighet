@@ -1,0 +1,168 @@
+commit 8f2a1c4d5e6b7a8c9d0e1f2a3b4c5d6e7f8a9b0c
+Author: Sarah Chen <sarah.chen@communityshare.io>
+Date:   Mon Oct 7 09:15:23 2025 -0700
+
+    Add database schema for contribution tracking
+
+    - Create contributions, credit_balances, credit_transactions tables
+    - Add polymorphic contribution types (item, money, volunteer)
+    - Create triggers for audit trail and auto-credit calculation
+    - Add indexes for performance optimization
+
+diff --git a/db/migrations/001_create_contribution_tables.sql b/db/migrations/001_create_contribution_tables.sql
+new file mode 100644
+index 0000000..a1b2c3d
+--- /dev/null
++++ b/db/migrations/001_create_contribution_tables.sql
+@@ -0,0 +1,150 @@
++-- Migration: Create contribution tracking schema
++BEGIN;
++
++-- Create enum types
++CREATE TYPE contribution_type AS ENUM ('item_donation', 'money', 'volunteer_hours');
++CREATE TYPE contribution_status AS ENUM ('pending', 'approved', 'rejected');
++
++-- Main contributions table
++CREATE TABLE contributions (
++  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
++  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
++  type contribution_type NOT NULL,
++  value_json JSONB NOT NULL,
++  status contribution_status NOT NULL DEFAULT 'pending',
++  calculated_credits DECIMAL(10,2),
++  approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
++  approved_at TIMESTAMP,
++  rejection_reason TEXT,
++  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
++  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
++
++  CONSTRAINT chk_credits_positive CHECK (calculated_credits >= 0),
++  CONSTRAINT chk_approved_when_approved CHECK (
++    status != 'approved' OR (approved_by IS NOT NULL AND approved_at IS NOT NULL)
++  )
++);
++
++-- Credit balances table
++CREATE TABLE credit_balances (
++  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
++  balance DECIMAL(10,2) NOT NULL DEFAULT 0,
++  tier VARCHAR(20) NOT NULL DEFAULT 'bronze',
++  last_calculated_at TIMESTAMP NOT NULL DEFAULT NOW(),
++  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
++  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
++
++  CONSTRAINT chk_balance_not_negative CHECK (balance >= 0),
++  CONSTRAINT chk_valid_tier CHECK (tier IN ('bronze', 'silver', 'gold', 'platinum'))
++);
++
++-- Credit transactions (audit trail)
++CREATE TABLE credit_transactions (
++  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
++  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
++  amount DECIMAL(10,2) NOT NULL,
++  balance_after DECIMAL(10,2) NOT NULL,
++  reason VARCHAR(255) NOT NULL,
++  contribution_id UUID REFERENCES contributions(id) ON DELETE SET NULL,
++  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
++  created_at TIMESTAMP NOT NULL DEFAULT NOW()
++);
++
++-- Indexes
++CREATE INDEX idx_contributions_user ON contributions(user_id);
++CREATE INDEX idx_contributions_status ON contributions(status, created_at DESC);
++CREATE INDEX idx_contributions_created ON contributions(created_at DESC);
++CREATE INDEX idx_contributions_value_json ON contributions USING GIN (value_json);
++
++CREATE INDEX idx_credit_balances_balance ON credit_balances(balance DESC);
++CREATE INDEX idx_credit_balances_tier ON credit_balances(tier);
++
++CREATE INDEX idx_transactions_user ON credit_transactions(user_id, created_at DESC);
++CREATE INDEX idx_transactions_contribution ON credit_transactions(contribution_id);
++
++-- Trigger: Auto-update updated_at
++CREATE OR REPLACE FUNCTION update_updated_at_column()
++RETURNS TRIGGER AS $$
++BEGIN
++  NEW.updated_at = NOW();
++  RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++
++CREATE TRIGGER update_contributions_updated_at
++  BEFORE UPDATE ON contributions
++  FOR EACH ROW
++  EXECUTE FUNCTION update_updated_at_column();
++
++CREATE TRIGGER update_credit_balances_updated_at
++  BEFORE UPDATE ON credit_balances
++  FOR EACH ROW
++  EXECUTE FUNCTION update_updated_at_column();
++
++-- Trigger: Log credit transaction on approval
++CREATE OR REPLACE FUNCTION log_credit_transaction()
++RETURNS TRIGGER AS $$
++DECLARE
++  current_balance DECIMAL(10,2);
++  new_balance DECIMAL(10,2);
++BEGIN
++  IF NEW.status = 'approved' AND OLD.status != 'approved' THEN
++    -- Get/create balance record
++    SELECT balance INTO current_balance
++    FROM credit_balances WHERE user_id = NEW.user_id FOR UPDATE;
++
++    IF current_balance IS NULL THEN
++      INSERT INTO credit_balances (user_id, balance)
++      VALUES (NEW.user_id, 0);
++      current_balance := 0;
++    END IF;
++
++    new_balance := current_balance + NEW.calculated_credits;
++
++    -- Update balance and tier
++    UPDATE credit_balances
++    SET balance = new_balance,
++        tier = CASE
++          WHEN new_balance >= 101 THEN 'platinum'
++          WHEN new_balance >= 51 THEN 'gold'
++          WHEN new_balance >= 21 THEN 'silver'
++          ELSE 'bronze'
++        END
++    WHERE user_id = NEW.user_id;
++
++    -- Log transaction
++    INSERT INTO credit_transactions (
++      user_id, amount, balance_after, reason, contribution_id, created_by
++    ) VALUES (
++      NEW.user_id, NEW.calculated_credits, new_balance,
++      'Contribution approved: ' || NEW.type, NEW.id, NEW.approved_by
++    );
++  END IF;
++
++  RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++
++CREATE TRIGGER contribution_approved_trigger
++  AFTER UPDATE OF status ON contributions
++  FOR EACH ROW
++  EXECUTE FUNCTION log_credit_transaction();
++
++-- Views
++CREATE VIEW contribution_summary AS
++SELECT
++  c.id, c.user_id, u.name as user_name, c.type, c.status,
++  c.calculated_credits, c.created_at, c.approved_at
++FROM contributions c
++JOIN users u ON c.user_id = u.id;
++
++CREATE VIEW user_credit_summary AS
++SELECT
++  u.id as user_id, u.name, COALESCE(cb.balance, 0) as balance,
++  COALESCE(cb.tier, 'bronze') as tier,
++  COUNT(c.id) as total_contributions
++FROM users u
++LEFT JOIN credit_balances cb ON u.id = cb.user_id
++LEFT JOIN contributions c ON u.id = c.user_id AND c.status = 'approved'
++GROUP BY u.id, u.name, cb.balance, cb.tier;
++
++COMMIT;

@@ -1,0 +1,227 @@
+diff --git a/backend/routes/qrCode.js b/backend/routes/qrCode.js
+new file mode 100644
+index 0000000..5c8e3d2
+--- /dev/null
++++ b/backend/routes/qrCode.js
+@@ -0,0 +1,132 @@
++const express = require('express');
++const router = express.Router();
++const qrCodeService = require('../services/qrCodeService');
++const checkoutService = require('../services/checkoutService');
++const auth = require('../middleware/auth');
++const { body, param, query, validationResult } = require('express-validator');
++const logger = require('../utils/logger');
++
++/**
++ * POST /api/qr-codes/generate
++ * Generate a QR code for equipment
++ */
++router.post(
++  '/generate',
++  auth,
++  [
++    body('equipmentId')
++      .notEmpty()
++      .withMessage('Equipment ID is required')
++      .isMongoId()
++      .withMessage('Invalid equipment ID')
++  ],
++  async (req, res) => {
++    try {
++      const errors = validationResult(req);
++      if (!errors.isEmpty()) {
++        return res.status(400).json({ errors: errors.array() });
++      }
++
++      const { equipmentId } = req.body;
++      const userId = req.user.id;
++
++      const qrCode = await qrCodeService.generateQRCode(equipmentId, userId);
++
++      res.status(201).json({
++        success: true,
++        data: qrCode
++      });
++    } catch (error) {
++      logger.error('Error in QR code generation endpoint', { error: error.message });
++      res.status(500).json({
++        success: false,
++        error: 'Failed to generate QR code'
++      });
++    }
++  }
++);
++
++/**
++ * POST /api/qr-codes/scan
++ * Scan a QR code and perform checkout/checkin
++ */
++router.post(
++  '/scan',
++  auth,
++  [
++    body('token')
++      .notEmpty()
++      .withMessage('QR code token is required')
++      .isLength({ min: 32, max: 32 })
++      .withMessage('Invalid token format'),
++    body('action')
++      .notEmpty()
++      .withMessage('Action is required')
++      .isIn(['checkout', 'checkin'])
++      .withMessage('Action must be checkout or checkin'),
++    body('location')
++      .optional()
++      .isObject()
++      .withMessage('Location must be an object'),
++    body('location.latitude')
++      .optional()
++      .isFloat({ min: -90, max: 90 })
++      .withMessage('Invalid latitude'),
++    body('location.longitude')
++      .optional()
++      .isFloat({ min: -180, max: 180 })
++      .withMessage('Invalid longitude')
++  ],
++  async (req, res) => {
++    try {
++      const errors = validationResult(req);
++      if (!errors.isEmpty()) {
++        return res.status(400).json({ errors: errors.array() });
++      }
++
++      const { token, action, location } = req.body;
++      const userId = req.user.id;
++
++      // Validate QR code token
++      const qrCodeRecord = await qrCodeService.validateToken(token);
++      
++      if (!qrCodeRecord) {
++        return res.status(400).json({
++          success: false,
++          error: 'Invalid or expired QR code'
++        });
++      }
++
++      const equipmentId = qrCodeRecord.equipmentId._id;
++      let result;
++
++      if (action === 'checkout') {
++        result = await checkoutService.createCheckout({
++          equipmentId,
++          userId,
++          location,
++          method: 'qr_code',
++          qrCodeId: qrCodeRecord._id
++        });
++      } else if (action === 'checkin') {
++        result = await checkoutService.checkinEquipment({
++          equipmentId,
++          userId,
++          location,
++          method: 'qr_code'
++        });
++      }
++
++      res.status(200).json({
++        success: true,
++        data: result
++      });
++    } catch (error) {
++      logger.error('Error in QR code scan endpoint', { error: error.message });
++      res.status(500).json({
++        success: false,
++        error: error.message || 'Failed to process QR code scan'
++      });
++    }
++  }
++);
++
++module.exports = router;
+diff --git a/backend/app.js b/backend/app.js
+index 7c5a9e3..9f3e2c1 100644
+--- a/backend/app.js
++++ b/backend/app.js
+@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
+ const equipmentRoutes = require('./routes/equipment');
+ const checkoutRoutes = require('./routes/checkouts');
+ const userRoutes = require('./routes/users');
++const qrCodeRoutes = require('./routes/qrCode');
+ 
+ const app = express();
+ 
+@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
+ app.use('/api/equipment', equipmentRoutes);
+ app.use('/api/checkouts', checkoutRoutes);
+ app.use('/api/users', userRoutes);
++app.use('/api/qr-codes', qrCodeRoutes);
+ 
+ // Error handling middleware
+ app.use((err, req, res, next) => {
+diff --git a/backend/services/checkoutService.js b/backend/services/checkoutService.js
+index 4a8e3d1..6c8b2f5 100644
+--- a/backend/services/checkoutService.js
++++ b/backend/services/checkoutService.js
+@@ -5,7 +5,7 @@ const logger = require('../utils/logger');
+ /**
+  * Create a new equipment checkout
+  */
+-async function createCheckout({ equipmentId, userId, location }) {
++async function createCheckout({ equipmentId, userId, location, method = 'manual', qrCodeId = null }) {
+   try {
+     const equipment = await Equipment.findById(equipmentId);
+     
+@@ -25,7 +25,9 @@ async function createCheckout({ equipmentId, userId, location }) {
+       equipmentId,
+       userId,
+       checkoutDate: new Date(),
+-      location
++      location,
++      checkoutMethod: method,
++      qrCodeId
+     });
+ 
+     // Update equipment status
+@@ -50,7 +52,7 @@ async function createCheckout({ equipmentId, userId, location }) {
+ /**
+  * Check in equipment
+  */
+-async function checkinEquipment({ equipmentId, userId, location }) {
++async function checkinEquipment({ equipmentId, userId, location, method = 'manual' }) {
+   try {
+     const checkout = await Checkout.findOne({
+       equipmentId,
+@@ -69,7 +71,8 @@ async function checkinEquipment({ equipmentId, userId, location }) {
+     checkout.checkinDate = new Date();
+     checkout.returnLocation = location;
+     checkout.status = 'completed';
++    checkout.checkinMethod = method;
+     await checkout.save();
+ 
+     // Update equipment status
+diff --git a/backend/models/checkout.js b/backend/models/checkout.js
+index 9c4f2e1..3e8a7f5 100644
+--- a/backend/models/checkout.js
++++ b/backend/models/checkout.js
+@@ -28,6 +28,18 @@ const checkoutSchema = new mongoose.Schema({
+       type: { type: String, default: 'Point' }
+     }
+   },
++  checkoutMethod: {
++    type: String,
++    enum: ['manual', 'qr_code'],
++    default: 'manual'
++  },
++  checkinMethod: {
++    type: String,
++    enum: ['manual', 'qr_code'],
++    default: null
++  },
++  qrCodeId: {
++    type: mongoose.Schema.Types.ObjectId,
++    ref: 'QRCode',
++    default: null
++  },
+   returnLocation: {
+     address: String,
+     coordinates: {

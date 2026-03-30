@@ -1,0 +1,95 @@
+diff --git a/db/migrations/20250915_001_maintenance_tables.sql b/db/migrations/20250915_001_maintenance_tables.sql
+new file mode 100644
+index 0000000..a3f2d1e
+--- /dev/null
++++ b/db/migrations/20250915_001_maintenance_tables.sql
+@@ -0,0 +1,89 @@
++-- Migration: Create maintenance scheduling tables
++-- Version: 20250915_001
++-- Author: Sarah Chen <sarah.chen@communityshare.io>
++-- Date: 2025-09-15
++
++-- Create maintenance_schedules table
++CREATE TABLE maintenance_schedules (
++    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
++    resource_id UUID NOT NULL REFERENCES resources(id) ON DELETE CASCADE,
++    schedule_type VARCHAR(50) NOT NULL CHECK (schedule_type IN ('one_time', 'recurring')),
++    frequency VARCHAR(50) CHECK (frequency IN ('daily', 'weekly', 'monthly', 'quarterly', 'yearly')),
++    interval_value INTEGER DEFAULT 1,
++    next_due_date TIMESTAMP WITH TIME ZONE NOT NULL,
++    last_completed_date TIMESTAMP WITH TIME ZONE,
++    description TEXT,
++    estimated_duration_minutes INTEGER,
++    assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
++    priority VARCHAR(20) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
++    alert_enabled BOOLEAN DEFAULT true,
++    alert_days_before INTEGER DEFAULT 7,
++    is_active BOOLEAN DEFAULT true,
++    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++    created_by UUID NOT NULL REFERENCES users(id),
++    updated_by UUID REFERENCES users(id)
++);
++
++-- Create maintenance_logs table
++CREATE TABLE maintenance_logs (
++    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
++    resource_id UUID NOT NULL REFERENCES resources(id) ON DELETE CASCADE,
++    schedule_id UUID REFERENCES maintenance_schedules(id) ON DELETE SET NULL,
++    performed_by UUID NOT NULL REFERENCES users(id),
++    performed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++    completion_status VARCHAR(50) NOT NULL CHECK (completion_status IN ('completed', 'partial', 'skipped', 'failed')),
++    notes TEXT,
++    issues_found TEXT,
++    parts_replaced TEXT[],
++    cost_amount DECIMAL(10, 2),
++    duration_minutes INTEGER,
++    photo_urls TEXT[],
++    next_recommended_date TIMESTAMP WITH TIME ZONE,
++    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
++    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
++);
++
++-- Create indexes for performance
++CREATE INDEX idx_maintenance_schedules_resource_id ON maintenance_schedules(resource_id);
++CREATE INDEX idx_maintenance_schedules_next_due_date ON maintenance_schedules(next_due_date) WHERE is_active = true;
++CREATE INDEX idx_maintenance_schedules_assigned_to ON maintenance_schedules(assigned_to);
++CREATE INDEX idx_maintenance_schedules_active ON maintenance_schedules(is_active);
++
++CREATE INDEX idx_maintenance_logs_resource_id ON maintenance_logs(resource_id);
++CREATE INDEX idx_maintenance_logs_schedule_id ON maintenance_logs(schedule_id);
++CREATE INDEX idx_maintenance_logs_performed_by ON maintenance_logs(performed_by);
++CREATE INDEX idx_maintenance_logs_performed_at ON maintenance_logs(performed_at DESC);
++
++-- Create updated_at trigger function
++CREATE OR REPLACE FUNCTION update_maintenance_schedules_updated_at()
++RETURNS TRIGGER AS $$
++BEGIN
++    NEW.updated_at = NOW();
++    RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++
++-- Create trigger for maintenance_schedules
++CREATE TRIGGER maintenance_schedules_updated_at
++    BEFORE UPDATE ON maintenance_schedules
++    FOR EACH ROW
++    EXECUTE FUNCTION update_maintenance_schedules_updated_at();
++
++-- Create updated_at trigger for maintenance_logs
++CREATE OR REPLACE FUNCTION update_maintenance_logs_updated_at()
++RETURNS TRIGGER AS $$
++BEGIN
++    NEW.updated_at = NOW();
++    RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++
++CREATE TRIGGER maintenance_logs_updated_at
++    BEFORE UPDATE ON maintenance_logs
++    FOR EACH ROW
++    EXECUTE FUNCTION update_maintenance_logs_updated_at();
++
++-- Add comments for documentation
++COMMENT ON TABLE maintenance_schedules IS 'Stores maintenance schedules for resources with recurring and one-time maintenance tasks';
++COMMENT ON TABLE maintenance_logs IS 'Historical log of all maintenance activities performed on resources';

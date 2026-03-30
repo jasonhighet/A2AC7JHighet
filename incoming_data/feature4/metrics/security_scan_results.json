@@ -1,0 +1,32 @@
+{
+  "status": "SCHEDULED",
+  "scheduled_date": "2025-10-23",
+  "scheduled_time": "14:00 UTC",
+  "security_reviewer": {
+    "name": "David Kim",
+    "role": "Security Engineer",
+    "email": "david.kim@communityshare.io"
+  },
+  "preliminary_scan": {
+    "completed_at": "2025-10-12T16:00:00Z",
+    "scan_type": "automated_dependency_check",
+    "critical_vulnerabilities": 0,
+    "high_vulnerabilities": 0,
+    "medium_vulnerabilities": 0,
+    "low_vulnerabilities": 2,
+    "low_vulnerability_details": [
+      "Outdated dev dependency (eslint-plugin) - non-production",
+      "Minor logging library update available - low priority"
+    ],
+    "note": "Preliminary scan clean, no critical issues. Full manual review scheduled for next week."
+  },
+  "full_review_scope": [
+    "SQL injection vulnerability assessment",
+    "Authentication and authorization review",
+    "Input validation and sanitization",
+    "Credit balance manipulation prevention",
+    "Audit trail completeness",
+    "Data privacy compliance"
+  ],
+  "notes": "Security review not required for UAT deployment, but mandatory before production. Preliminary automated scan passed."
+}

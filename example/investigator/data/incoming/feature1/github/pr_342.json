@@ -1,0 +1,155 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "number": 342,
+        "title": "Maintenance Scheduling & Alert System",
+        "state": "MERGED",
+        "merged": true,
+        "mergedAt": "2025-10-10T16:55:14Z",
+        "createdAt": "2025-10-08T14:22:11Z",
+        "closedAt": "2025-10-10T16:55:14Z",
+        "url": "https://github.com/communityshare/platform/pull/342",
+        "author": {
+          "login": "sarah-chen",
+          "name": "Sarah Chen",
+          "email": "sarah.chen@communityshare.io",
+          "avatarUrl": "https://avatars.githubusercontent.com/u/12345"
+        },
+        "baseRefName": "main",
+        "headRefName": "feature/maintenance-scheduling",
+        "additions": 1847,
+        "deletions": 42,
+        "changedFiles": 23,
+        "commits": {
+          "totalCount": 6
+        },
+        "body": "## Description\n\nImplements automated maintenance tracking with configurable schedules, alert notifications, and maintenance history logging.\n\n## Changes\n\n- Added `maintenance_schedules` and `maintenance_logs` database tables\n- Implemented REST API endpoints for CRUD operations\n- Created background job using node-cron for daily maintenance checks\n- Integrated with Notification Service v2.3 for email/SMS alerts\n- Built React components with FullCalendar.js integration\n- Added comprehensive test coverage (87%)\n\n## Testing\n\n- [x] Unit tests pass (156/156)\n- [x] Integration tests pass (23/23)\n- [x] Manual testing completed\n- [x] Performance benchmarks met\n\n## Dependencies\n\n- Notification Service v2.3+\n- Resource Management v1.3+\n\n## Related Issues\n\n- Closes PLAT-1523\n- Depends on PLAT-1401 (Notification Service)\n- Depends on PLAT-1312 (Resource Management)\n\n## Deployment Notes\n\n- Feature flag: `maintenance_scheduling_enabled` (default: false)\n- Database migration required\n- Background job will start automatically when feature flag enabled\n\n## Screenshots\n\n[Calendar view and schedule form screenshots would be here]",
+        "reviews": {
+          "totalCount": 2,
+          "nodes": [
+            {
+              "id": "REV_001",
+              "author": {
+                "login": "sarah-chen",
+                "name": "Sarah Chen"
+              },
+              "state": "APPROVED",
+              "createdAt": "2025-10-10T14:32:18Z",
+              "submittedAt": "2025-10-10T14:32:18Z",
+              "body": "Great job on the background job implementation. Test coverage is excellent at 87%. The error handling in the notification integration is robust. Architecture aligns well with our existing patterns.\n\nA few minor suggestions addressed in comments, but overall this is production-ready code."
+            },
+            {
+              "id": "REV_002",
+              "author": {
+                "login": "james-wilson",
+                "name": "James Wilson"
+              },
+              "state": "APPROVED",
+              "createdAt": "2025-10-10T16:45:03Z",
+              "submittedAt": "2025-10-10T16:45:03Z",
+              "body": "Architecture aligns well with existing patterns. Good error handling throughout. The database schema is well-designed with appropriate indexes.\n\nThe rate limiting addition after my comment was a good catch. Performance benchmarks look solid. Approving for merge."
+            }
+          ]
+        },
+        "reviewDecision": "APPROVED",
+        "reviewRequests": {
+          "totalCount": 0,
+          "nodes": []
+        },
+        "labels": {
+          "nodes": [
+            {
+              "name": "feature",
+              "color": "0052CC"
+            },
+            {
+              "name": "backend",
+              "color": "5319E7"
+            },
+            {
+              "name": "frontend",
+              "color": "FBCA04"
+            },
+            {
+              "name": "ready-for-review",
+              "color": "0E8A16"
+            }
+          ]
+        },
+        "assignees": {
+          "nodes": [
+            {
+              "login": "sarah-chen",
+              "name": "Sarah Chen"
+            }
+          ]
+        },
+        "participants": {
+          "totalCount": 4,
+          "nodes": [
+            {
+              "login": "sarah-chen",
+              "name": "Sarah Chen"
+            },
+            {
+              "login": "james-wilson",
+              "name": "James Wilson"
+            },
+            {
+              "login": "emma-rodriguez",
+              "name": "Emma Rodriguez"
+            },
+            {
+              "login": "alex-thompson",
+              "name": "Alex Thompson"
+            }
+          ]
+        },
+        "checks": {
+          "nodes": [
+            {
+              "name": "CI / Unit Tests",
+              "conclusion": "SUCCESS",
+              "status": "COMPLETED",
+              "completedAt": "2025-10-10T14:28:42Z"
+            },
+            {
+              "name": "CI / Integration Tests",
+              "conclusion": "SUCCESS",
+              "status": "COMPLETED",
+              "completedAt": "2025-10-10T14:35:18Z"
+            },
+            {
+              "name": "CI / Lint & Format",
+              "conclusion": "SUCCESS",
+              "status": "COMPLETED",
+              "completedAt": "2025-10-10T14:25:03Z"
+            },
+            {
+              "name": "Security / SAST Scan",
+              "conclusion": "SUCCESS",
+              "status": "COMPLETED",
+              "completedAt": "2025-10-10T14:40:55Z"
+            },
+            {
+              "name": "Performance / Benchmarks",
+              "conclusion": "SUCCESS",
+              "status": "COMPLETED",
+              "completedAt": "2025-10-10T14:45:22Z"
+            }
+          ]
+        },
+        "mergedBy": {
+          "login": "sarah-chen",
+          "name": "Sarah Chen"
+        },
+        "milestone": {
+          "title": "2025 Q4 Release",
+          "dueOn": "2025-10-31T00:00:00Z",
+          "state": "OPEN"
+        }
+      }
+    }
+  }
+}

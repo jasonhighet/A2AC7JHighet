@@ -1,0 +1,311 @@
+diff --git a/src/services/alert.service.js b/src/services/alert.service.js
+index 7f3d2a1..c8e9f4d 100644
+--- a/src/services/alert.service.js
++++ b/src/services/alert.service.js
+@@ -1,8 +1,12 @@
+ const notificationService = require('./notification.service');
+ const db = require('../config/database');
+ const logger = require('../utils/logger');
++const { format } = require('date-fns');
+ 
+ class AlertService {
++  constructor() {
++    this.notificationServiceVersion = '2.3';
++  }
++
+   /**
+    * Create and send a maintenance alert
+    */
+@@ -14,6 +18,99 @@ class AlertService {
+     priority,
+     description
+   }) {
++    try {
++      // Get resource details
++      const resource = await db.query(
++        'SELECT name, location, type FROM resources WHERE id = $1',
++        [resourceId]
++      );
++
++      if (!resource.rows[0]) {
++        throw new Error(`Resource ${resourceId} not found`);
++      }
++
++      // Get user notification preferences
++      const preferences = await this.getUserNotificationPreferences(assignedTo);
++
++      const alertData = {
++        type: 'maintenance_due',
++        scheduleId,
++        resourceId,
++        resourceName: resource.rows[0].name,
++        resourceLocation: resource.rows[0].location,
++        dueDate: format(new Date(dueDate), 'MMMM dd, yyyy'),
++        priority,
++        description: description || 'Scheduled maintenance due'
++      };
++
++      // Send email notification if enabled
++      if (preferences.email_enabled) {
++        await this.sendEmailAlert(assignedTo, alertData);
++      }
++
++      // Send SMS notification if enabled and priority is high/critical
++      if (preferences.sms_enabled && ['high', 'critical'].includes(priority)) {
++        await this.sendSmsAlert(assignedTo, alertData);
++      }
++
++      // Record alert in database
++      await this.recordAlert({
++        scheduleId,
++        userId: assignedTo,
++        alertType: 'maintenance_due',
++        sentAt: new Date(),
++        channels: {
++          email: preferences.email_enabled,
++          sms: preferences.sms_enabled && ['high', 'critical'].includes(priority)
++        }
++      });
++
++      logger.info('Maintenance alert sent successfully', {
++        scheduleId,
++        resourceId,
++        userId: assignedTo
++      });
++
++      return true;
++    } catch (error) {
++      logger.error('Failed to create maintenance alert', {
++        error: error.message,
++        scheduleId,
++        resourceId
++      });
++      throw error;
++    }
++  }
++
++  /**
++   * Send email alert using Notification Service v2.3
++   */
++  async sendEmailAlert(userId, alertData) {
++    const user = await db.query(
++      'SELECT email, first_name, last_name FROM users WHERE id = $1',
++      [userId]
++    );
++
++    if (!user.rows[0] || !user.rows[0].email) {
++      throw new Error(`User ${userId} not found or has no email`);
++    }
++
++    const emailData = {
++      to: user.rows[0].email,
++      template: 'maintenance_alert',
++      subject: `Maintenance Due: ${alertData.resourceName}`,
++      variables: {
++        firstName: user.rows[0].first_name,
++        lastName: user.rows[0].last_name,
++        resourceName: alertData.resourceName,
++        resourceLocation: alertData.resourceLocation,
++        dueDate: alertData.dueDate,
++        priority: alertData.priority,
++        description: alertData.description
++      }
++    };
++
++    await notificationService.sendEmail(emailData);
++  }
++
++  /**
++   * Send SMS alert for urgent maintenance
++   */
++  async sendSmsAlert(userId, alertData) {
++    const user = await db.query(
++      'SELECT phone_number FROM users WHERE id = $1',
++      [userId]
++    );
++
++    if (!user.rows[0] || !user.rows[0].phone_number) {
++      logger.warn(`User ${userId} has no phone number, skipping SMS`);
++      return;
++    }
++
++    const smsMessage = `[${alertData.priority.toUpperCase()}] Maintenance Due: ${alertData.resourceName} on ${alertData.dueDate}. ${alertData.description}`;
++
++    const smsData = {
++      to: user.rows[0].phone_number,
++      message: smsMessage
++    };
++
++    await notificationService.sendSms(smsData);
++  }
++
++  /**
++   * Get user notification preferences
++   */
++  async getUserNotificationPreferences(userId) {
++    const result = await db.query(
++      `SELECT 
++        email_notifications_enabled as email_enabled,
++        sms_notifications_enabled as sms_enabled,
++        maintenance_alert_preference
++      FROM user_preferences
++      WHERE user_id = $1`,
++      [userId]
++    );
++
++    // Default preferences if not set
++    return result.rows[0] || {
++      email_enabled: true,
++      sms_enabled: false,
++      maintenance_alert_preference: 'all'
++    };
++  }
++
++  /**
++   * Check if an alert was already sent
++   */
++  async checkIfAlertSent(scheduleId, alertType, alertDate) {
++    const result = await db.query(
++      `SELECT id FROM alerts
++       WHERE schedule_id = $1 
++       AND alert_type = $2
++       AND DATE(sent_at) = DATE($3)`,
++      [scheduleId, alertType, alertDate]
++    );
++
++    return result.rows.length > 0;
++  }
++
++  /**
++   * Record alert in database for tracking
++   */
++  async recordAlert(alertData) {
++    await db.query(
++      `INSERT INTO alerts (
++        schedule_id, user_id, alert_type, sent_at, channels
++      ) VALUES ($1, $2, $3, $4, $5)`,
++      [
++        alertData.scheduleId,
++        alertData.userId,
++        alertData.alertType,
++        alertData.sentAt,
++        JSON.stringify(alertData.channels)
++      ]
++    );
+   }
+ }
+ 
+diff --git a/src/config/email-templates/maintenance_alert.html b/src/config/email-templates/maintenance_alert.html
+new file mode 100644
+index 0000000..9f2d3c1
+--- /dev/null
++++ b/src/config/email-templates/maintenance_alert.html
+@@ -0,0 +1,87 @@
++<!DOCTYPE html>
++<html>
++<head>
++  <meta charset="utf-8">
++  <meta name="viewport" content="width=device-width, initial-scale=1.0">
++  <title>Maintenance Alert</title>
++  <style>
++    body {
++      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
++      line-height: 1.6;
++      color: #333;
++      max-width: 600px;
++      margin: 0 auto;
++      padding: 20px;
++    }
++    .header {
++      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
++      color: white;
++      padding: 30px;
++      border-radius: 8px 8px 0 0;
++      text-align: center;
++    }
++    .content {
++      background: #f8f9fa;
++      padding: 30px;
++      border-radius: 0 0 8px 8px;
++    }
++    .alert-box {
++      background: white;
++      border-left: 4px solid #667eea;
++      padding: 20px;
++      margin: 20px 0;
++      border-radius: 4px;
++      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
++    }
++    .priority-high {
++      border-left-color: #f59e0b;
++    }
++    .priority-critical {
++      border-left-color: #ef4444;
++    }
++    .detail {
++      margin: 10px 0;
++    }
++    .label {
++      font-weight: 600;
++      color: #666;
++    }
++    .button {
++      display: inline-block;
++      background: #667eea;
++      color: white;
++      padding: 12px 24px;
++      text-decoration: none;
++      border-radius: 4px;
++      margin-top: 20px;
++    }
++    .footer {
++      text-align: center;
++      color: #666;
++      font-size: 14px;
++      margin-top: 30px;
++      padding-top: 20px;
++      border-top: 1px solid #ddd;
++    }
++  </style>
++</head>
++<body>
++  <div class="header">
++    <h1>🔧 Maintenance Alert</h1>
++  </div>
++  
++  <div class="content">
++    <p>Hello {{firstName}} {{lastName}},</p>
++    
++    <p>This is a reminder that maintenance is due for the following resource:</p>
++    
++    <div class="alert-box priority-{{priority}}">
++      <div class="detail"><span class="label">Resource:</span> {{resourceName}}</div>
++      <div class="detail"><span class="label">Location:</span> {{resourceLocation}}</div>
++      <div class="detail"><span class="label">Due Date:</span> {{dueDate}}</div>
++      <div class="detail"><span class="label">Priority:</span> {{priority}}</div>
++      <div class="detail"><span class="label">Description:</span> {{description}}</div>
++    </div>
++    
++    <p>Please ensure this maintenance is completed on or before the due date.</p>
++    
++    <a href="{{maintenanceUrl}}" class="button">View Maintenance Schedule</a>
++  </div>
++  
++  <div class="footer">
++    <p>CommunityShare Platform</p>
++    <p>To manage your notification preferences, visit your account settings.</p>
++  </div>
++</body>
++</html>
+diff --git a/package.json b/package.json
+index f8e9d3c..a3f7c1d 100644
+--- a/package.json
++++ b/package.json
+@@ -23,6 +23,7 @@
+     "bcryptjs": "^2.4.3",
+     "cors": "^2.8.5",
+     "dotenv": "^16.0.3",
++    "date-fns": "^2.30.0",
+     "express": "^4.18.2",
+     "express-rate-limit": "^6.7.0",
+     "helmet": "^7.0.0",

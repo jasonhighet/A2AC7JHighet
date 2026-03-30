@@ -1,0 +1,364 @@
+diff --git a/src/api/routes/maintenance.routes.js b/src/api/routes/maintenance.routes.js
+new file mode 100644
+index 0000000..c8f9a3d
+--- /dev/null
++++ b/src/api/routes/maintenance.routes.js
+@@ -0,0 +1,37 @@
++const express = require('express');
++const router = express.Router();
++const maintenanceController = require('../controllers/maintenance.controller');
++const { authenticate, authorize } = require('../middleware/auth');
++const { validateRequest } = require('../middleware/validation');
++const { maintenanceSchemas } = require('../validators/maintenance.validators');
++
++// Maintenance Schedules Routes
++router.post(
++  '/schedules',
++  authenticate,
++  authorize(['admin', 'coordinator']),
++  validateRequest(maintenanceSchemas.createSchedule),
++  maintenanceController.createSchedule
++);
++
++router.get(
++  '/schedules',
++  authenticate,
++  maintenanceController.getSchedules
++);
++
++router.get(
++  '/schedules/:id',
++  authenticate,
++  maintenanceController.getScheduleById
++);
++
++router.patch(
++  '/schedules/:id',
++  authenticate,
++  authorize(['admin', 'coordinator']),
++  validateRequest(maintenanceSchemas.updateSchedule),
++  maintenanceController.updateSchedule
++);
++
++module.exports = router;
+diff --git a/src/api/controllers/maintenance.controller.js b/src/api/controllers/maintenance.controller.js
+new file mode 100644
+index 0000000..7e3f2a1
+--- /dev/null
++++ b/src/api/controllers/maintenance.controller.js
+@@ -0,0 +1,247 @@
++const maintenanceService = require('../../services/maintenance.service');
++const { ApiError } = require('../../utils/errors');
++const { asyncHandler } = require('../../middleware/async');
++const logger = require('../../utils/logger');
++
++/**
++ * Create a new maintenance schedule
++ * POST /api/maintenance/schedules
++ */
++exports.createSchedule = asyncHandler(async (req, res) => {
++  const scheduleData = {
++    ...req.body,
++    created_by: req.user.id,
++    updated_by: req.user.id
++  };
++
++  const schedule = await maintenanceService.createSchedule(scheduleData);
++  
++  logger.info('Maintenance schedule created', {
++    scheduleId: schedule.id,
++    resourceId: schedule.resource_id,
++    userId: req.user.id
++  });
++
++  res.status(201).json({
++    success: true,
++    data: schedule
++  });
++});
++
++/**
++ * Get maintenance schedules with filtering
++ * GET /api/maintenance/schedules
++ */
++exports.getSchedules = asyncHandler(async (req, res) => {
++  const {
++    resource_id,
++    assigned_to,
++    is_active,
++    priority,
++    due_after,
++    due_before,
++    page = 1,
++    limit = 20,
++    sort_by = 'next_due_date',
++    sort_order = 'asc'
++  } = req.query;
++
++  const filters = {
++    resource_id,
++    assigned_to,
++    is_active: is_active === 'true',
++    priority,
++    due_after,
++    due_before
++  };
++
++  const options = {
++    page: parseInt(page),
++    limit: parseInt(limit),
++    sort_by,
++    sort_order
++  };
++
++  const result = await maintenanceService.getSchedules(filters, options);
++
++  res.json({
++    success: true,
++    data: result.schedules,
++    pagination: {
++      page: result.page,
++      limit: result.limit,
++      total: result.total,
++      pages: result.pages
++    }
++  });
++});
++
++/**
++ * Get a single maintenance schedule by ID
++ * GET /api/maintenance/schedules/:id
++ */
++exports.getScheduleById = asyncHandler(async (req, res) => {
++  const { id } = req.params;
++  const schedule = await maintenanceService.getScheduleById(id);
++
++  if (!schedule) {
++    throw new ApiError(404, 'Maintenance schedule not found');
++  }
++
++  res.json({
++    success: true,
++    data: schedule
++  });
++});
++
++/**
++ * Update a maintenance schedule
++ * PATCH /api/maintenance/schedules/:id
++ */
++exports.updateSchedule = asyncHandler(async (req, res) => {
++  const { id } = req.params;
++  const updateData = {
++    ...req.body,
++    updated_by: req.user.id
++  };
++
++  const schedule = await maintenanceService.updateSchedule(id, updateData);
++
++  if (!schedule) {
++    throw new ApiError(404, 'Maintenance schedule not found');
++  }
++
++  logger.info('Maintenance schedule updated', {
++    scheduleId: id,
++    userId: req.user.id
++  });
++
++  res.json({
++    success: true,
++    data: schedule
++  });
++});
++
++/**
++ * Delete a maintenance schedule
++ * DELETE /api/maintenance/schedules/:id
++ */
++exports.deleteSchedule = asyncHandler(async (req, res) => {
++  const { id } = req.params;
++  await maintenanceService.deleteSchedule(id);
++
++  logger.info('Maintenance schedule deleted', {
++    scheduleId: id,
++    userId: req.user.id
++  });
++
++  res.json({
++    success: true,
++    message: 'Maintenance schedule deleted successfully'
++  });
++});
++
++/**
++ * Create a maintenance log entry
++ * POST /api/maintenance/logs
++ */
++exports.createLog = asyncHandler(async (req, res) => {
++  const logData = {
++    ...req.body,
++    performed_by: req.user.id
++  };
++
++  const log = await maintenanceService.createLog(logData);
++
++  logger.info('Maintenance log created', {
++    logId: log.id,
++    resourceId: log.resource_id,
++    userId: req.user.id
++  });
++
++  res.status(201).json({
++    success: true,
++    data: log
++  });
++});
++
++/**
++ * Get maintenance logs with filtering
++ * GET /api/maintenance/logs
++ */
++exports.getLogs = asyncHandler(async (req, res) => {
++  const {
++    resource_id,
++    schedule_id,
++    performed_by,
++    completion_status,
++    date_from,
++    date_to,
++    page = 1,
++    limit = 20,
++    sort_by = 'performed_at',
++    sort_order = 'desc'
++  } = req.query;
++
++  const filters = {
++    resource_id,
++    schedule_id,
++    performed_by,
++    completion_status,
++    date_from,
++    date_to
++  };
++
++  const options = {
++    page: parseInt(page),
++    limit: parseInt(limit),
++    sort_by,
++    sort_order
++  };
++
++  const result = await maintenanceService.getLogs(filters, options);
++
++  res.json({
++    success: true,
++    data: result.logs,
++    pagination: {
++      page: result.page,
++      limit: result.limit,
++      total: result.total,
++      pages: result.pages
++    }
++  });
++});
++
++/**
++ * Get maintenance statistics for a resource
++ * GET /api/maintenance/stats/:resourceId
++ */
++exports.getMaintenanceStats = asyncHandler(async (req, res) => {
++  const { resourceId } = req.params;
++  const { period = '30d' } = req.query;
++
++  const stats = await maintenanceService.getMaintenanceStats(resourceId, period);
++
++  res.json({
++    success: true,
++    data: stats
++  });
++});
++
++diff --git a/src/api/validators/maintenance.validators.js b/src/api/validators/maintenance.validators.js
+new file mode 100644
+index 0000000..8d9f3a2
+--- /dev/null
++++ b/src/api/validators/maintenance.validators.js
+@@ -0,0 +1,85 @@
++const Joi = require('joi');
++
++const maintenanceSchemas = {
++  createSchedule: Joi.object({
++    resource_id: Joi.string().uuid().required(),
++    schedule_type: Joi.string()
++      .valid('one_time', 'recurring')
++      .required(),
++    frequency: Joi.string()
++      .valid('daily', 'weekly', 'monthly', 'quarterly', 'yearly')
++      .when('schedule_type', {
++        is: 'recurring',
++        then: Joi.required(),
++        otherwise: Joi.optional()
++      }),
++    interval_value: Joi.number().integer().min(1).default(1),
++    next_due_date: Joi.date().iso().required(),
++    description: Joi.string().max(1000).allow(''),
++    estimated_duration_minutes: Joi.number().integer().min(1).max(1440),
++    assigned_to: Joi.string().uuid().allow(null),
++    priority: Joi.string()
++      .valid('low', 'medium', 'high', 'critical')
++      .default('medium'),
++    alert_enabled: Joi.boolean().default(true),
++    alert_days_before: Joi.number().integer().min(0).max(90).default(7)
++  }),
++
++  updateSchedule: Joi.object({
++    schedule_type: Joi.string().valid('one_time', 'recurring'),
++    frequency: Joi.string().valid('daily', 'weekly', 'monthly', 'quarterly', 'yearly'),
++    interval_value: Joi.number().integer().min(1),
++    next_due_date: Joi.date().iso(),
++    description: Joi.string().max(1000).allow(''),
++    estimated_duration_minutes: Joi.number().integer().min(1).max(1440),
++    assigned_to: Joi.string().uuid().allow(null),
++    priority: Joi.string().valid('low', 'medium', 'high', 'critical'),
++    alert_enabled: Joi.boolean(),
++    alert_days_before: Joi.number().integer().min(0).max(90),
++    is_active: Joi.boolean()
++  }).min(1),
++
++  createLog: Joi.object({
++    resource_id: Joi.string().uuid().required(),
++    schedule_id: Joi.string().uuid().allow(null),
++    completion_status: Joi.string()
++      .valid('completed', 'partial', 'skipped', 'failed')
++      .required(),
++    notes: Joi.string().max(2000).allow(''),
++    issues_found: Joi.string().max(2000).allow(''),
++    parts_replaced: Joi.array().items(Joi.string().max(200)),
++    cost_amount: Joi.number().min(0).precision(2),
++    duration_minutes: Joi.number().integer().min(0),
++    photo_urls: Joi.array().items(Joi.string().uri()),
++    next_recommended_date: Joi.date().iso()
++  })
++};
++
++module.exports = { maintenanceSchemas };
+diff --git a/src/app.js b/src/app.js
+index 3f8a2c1..9e5d4f2 100644
+--- a/src/app.js
++++ b/src/app.js
+@@ -15,6 +15,7 @@ const authRoutes = require('./api/routes/auth.routes');
+ const userRoutes = require('./api/routes/user.routes');
+ const resourceRoutes = require('./api/routes/resource.routes');
+ const communityRoutes = require('./api/routes/community.routes');
++const maintenanceRoutes = require('./api/routes/maintenance.routes');
+ 
+ const app = express();
+ 
+@@ -42,6 +43,7 @@ app.use('/api/auth', authRoutes);
+ app.use('/api/users', userRoutes);
+ app.use('/api/resources', resourceRoutes);
+ app.use('/api/communities', communityRoutes);
++app.use('/api/maintenance', maintenanceRoutes);
+ 
+ // Error handling middleware
+ app.use(errorHandler);

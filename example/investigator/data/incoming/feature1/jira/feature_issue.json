@@ -1,0 +1,642 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "10342",
+  "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342",
+  "key": "PLAT-1523",
+  "fields": {
+    "summary": "Maintenance Scheduling & Alert System",
+    "description": {
+      "version": 1,
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Automated maintenance tracking with configurable schedules, alert notifications, and maintenance history logging. Integrates with existing resource management."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Overview"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The basic resource management is in place, but there's no way to track maintenance needs. This feature adds automated maintenance scheduling with configurable schedules, alert notifications via email/SMS, and maintenance history logging. This prevents resource deterioration and improves community resource quality."
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Key Features"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Create and manage maintenance schedules (one-time and recurring)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Background job checks due dates daily at 6 AM UTC"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Email and SMS alerts for upcoming maintenance"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Calendar view with FullCalendar.js"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Log completed maintenance with optional photos"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Maintenance history tracking"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "heading",
+          "attrs": {
+            "level": 2
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "Technical Implementation"
+            }
+          ]
+        },
+        {
+          "type": "bulletList",
+          "content": [
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "New PostgreSQL tables: maintenance_schedules, maintenance_logs"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Node-cron background job for due date checking"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "REST API endpoints for CRUD operations"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "Integration with Notification Service v2.3+"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "listItem",
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {
+                      "type": "text",
+                      "text": "React components with FullCalendar.js integration"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "issuetype": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/issuetype/10001",
+      "id": "10001",
+      "name": "Epic",
+      "subtask": false,
+      "hierarchyLevel": 1,
+      "iconUrl": "https://communityshare.atlassian.net/images/icons/issuetypes/epic.svg"
+    },
+    "project": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/project/10000",
+      "id": "10000",
+      "key": "PLAT",
+      "name": "CommunityShare Platform",
+      "projectTypeKey": "software",
+      "avatarUrls": {
+        "48x48": "https://communityshare.atlassian.net/images/project-avatars/platform.png"
+      }
+    },
+    "status": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/status/10008",
+      "description": "Ready for production deployment",
+      "iconUrl": "https://communityshare.atlassian.net/images/icons/statuses/done.png",
+      "name": "Production Ready",
+      "id": "10008",
+      "statusCategory": {
+        "self": "https://communityshare.atlassian.net/rest/api/3/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      }
+    },
+    "priority": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/priority/3",
+      "iconUrl": "https://communityshare.atlassian.net/images/icons/priorities/high.svg",
+      "name": "High",
+      "id": "3"
+    },
+    "assignee": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/user?accountId=5f7e8d9c1a2b3c4d5e6f7890",
+      "accountId": "5f7e8d9c1a2b3c4d5e6f7890",
+      "emailAddress": "emma.rodriguez@communityshare.io",
+      "displayName": "Emma Rodriguez",
+      "active": true,
+      "timeZone": "America/Los_Angeles",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "48x48": "https://avatar-management.services.atlassian.com/default/48"
+      }
+    },
+    "reporter": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/user?accountId=5f7e8d9c1a2b3c4d5e6f7890",
+      "accountId": "5f7e8d9c1a2b3c4d5e6f7890",
+      "emailAddress": "emma.rodriguez@communityshare.io",
+      "displayName": "Emma Rodriguez",
+      "active": true,
+      "timeZone": "America/Los_Angeles",
+      "accountType": "atlassian"
+    },
+    "created": "2025-08-01T10:00:00.000+0000",
+    "updated": "2025-10-15T14:22:11.000+0000",
+    "resolutiondate": null,
+    "labels": [
+      "feature",
+      "backend",
+      "frontend",
+      "production-ready",
+      "q4-2025",
+      "high-priority"
+    ],
+    "components": [
+      {
+        "self": "https://communityshare.atlassian.net/rest/api/3/component/10001",
+        "id": "10001",
+        "name": "Backend API"
+      },
+      {
+        "self": "https://communityshare.atlassian.net/rest/api/3/component/10002",
+        "id": "10002",
+        "name": "Frontend"
+      },
+      {
+        "self": "https://communityshare.atlassian.net/rest/api/3/component/10005",
+        "id": "10005",
+        "name": "Database"
+      },
+      {
+        "self": "https://communityshare.atlassian.net/rest/api/3/component/10008",
+        "id": "10008",
+        "name": "Background Jobs"
+      }
+    ],
+    "customfield_10001": "FEAT-MS-001",
+    "customfield_10002": "MEDIUM",
+    "customfield_10010": "2025-10-18",
+    "customfield_10015": {
+      "self": "https://communityshare.atlassian.net/rest/api/3/customFieldOption/10050",
+      "value": "Core Platform Team",
+      "id": "10050"
+    },
+    "customfield_10020": "https://github.com/communityshare/platform/pull/342",
+    "customfield_10030": 87.0,
+    "customfield_10031": 1847,
+    "customfield_10032": 42,
+    "customfield_10033": 23,
+    "issuelinks": [
+      {
+        "id": "10523",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issueLink/10523",
+        "type": {
+          "id": "10001",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issueLinkType/10001"
+        },
+        "outwardIssue": {
+          "id": "10289",
+          "key": "PLAT-1401",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10289",
+          "fields": {
+            "summary": "Notification Service v2.3",
+            "status": {
+              "name": "Done",
+              "statusCategory": {
+                "key": "done",
+                "colorName": "green"
+              }
+            },
+            "priority": {
+              "name": "High"
+            },
+            "issuetype": {
+              "name": "Story"
+            }
+          }
+        }
+      },
+      {
+        "id": "10524",
+        "self": "https://communityshare.atlassian.net/rest/api/3/issueLink/10524",
+        "type": {
+          "id": "10001",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issueLinkType/10001"
+        },
+        "outwardIssue": {
+          "id": "10245",
+          "key": "PLAT-1312",
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10245",
+          "fields": {
+            "summary": "Basic Resource Management v1.3",
+            "status": {
+              "name": "Done",
+              "statusCategory": {
+                "key": "done",
+                "colorName": "green"
+              }
+            },
+            "priority": {
+              "name": "Medium"
+            },
+            "issuetype": {
+              "name": "Story"
+            }
+          }
+        }
+      }
+    ],
+    "subtasks": [],
+    "fixVersions": [
+      {
+        "self": "https://communityshare.atlassian.net/rest/api/3/version/10025",
+        "id": "10025",
+        "name": "2025-Q4 Release",
+        "archived": false,
+        "released": false,
+        "releaseDate": "2025-10-31",
+        "userReleaseDate": "31/Oct/25",
+        "projectId": 10000
+      }
+    ],
+    "versions": [],
+    "attachment": [],
+    "comment": {
+      "comments": [
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10001",
+          "id": "10001",
+          "author": {
+            "displayName": "Emma Rodriguez"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Design review scheduled for 2025-08-15. All stakeholders confirmed attendance."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-08-05T14:22:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10002",
+          "id": "10002",
+          "author": {
+            "displayName": "Lisa Park"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Design review completed successfully. All designs approved. FullCalendar.js selected for calendar implementation."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-08-15T15:45:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10003",
+          "id": "10003",
+          "author": {
+            "displayName": "Sarah Chen"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "PR #342 opened: https://github.com/communityshare/platform/pull/342"
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-10-08T14:30:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10004",
+          "id": "10004",
+          "author": {
+            "displayName": "David Kim"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "Security review completed. Overall risk: LOW. Two medium-severity findings accepted as risks. Approved for production."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-09-10T18:45:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10005",
+          "id": "10005",
+          "author": {
+            "displayName": "James Wilson"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "PR #342 merged! Great work team. Test coverage at 87%, all tests passing."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-10-10T17:00:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10006",
+          "id": "10006",
+          "author": {
+            "displayName": "Emma Rodriguez"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "UAT completed successfully! All 5 testers approved. Zero blocking issues. User satisfaction: 8.8/10. NPS: 9.0/10."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-10-14T18:15:00.000+0000"
+        },
+        {
+          "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342/comment/10007",
+          "id": "10007",
+          "author": {
+            "displayName": "Alex Thompson"
+          },
+          "body": {
+            "type": "doc",
+            "version": 1,
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "All stakeholder approvals obtained. Production deployment authorized for 2025-10-18 02:00 UTC. Feature flag rollout strategy: 10% -> 50% -> 100% over 48 hours."
+                  }
+                ]
+              }
+            ]
+          },
+          "created": "2025-10-15T10:50:00.000+0000"
+        }
+      ],
+      "maxResults": 7,
+      "total": 7,
+      "startAt": 0
+    },
+    "worklog": {
+      "startAt": 0,
+      "maxResults": 20,
+      "total": 15,
+      "worklogs": [
+        {
+          "author": {
+            "displayName": "Emma Rodriguez"
+          },
+          "comment": "Planning and requirements gathering",
+          "created": "2025-08-05T10:00:00.000+0000",
+          "timeSpentSeconds": 14400
+        },
+        {
+          "author": {
+            "displayName": "Lisa Park"
+          },
+          "comment": "UI/UX design and mockups",
+          "created": "2025-08-12T09:00:00.000+0000",
+          "timeSpentSeconds": 28800
+        },
+        {
+          "author": {
+            "displayName": "Sarah Chen"
+          },
+          "comment": "Backend implementation - database schema and API",
+          "created": "2025-09-15T09:00:00.000+0000",
+          "timeSpentSeconds": 86400
+        },
+        {
+          "author": {
+            "displayName": "Sarah Chen"
+          },
+          "comment": "Frontend implementation - React components",
+          "created": "2025-09-28T09:00:00.000+0000",
+          "timeSpentSeconds": 57600
+        },
+        {
+          "author": {
+            "displayName": "David Kim"
+          },
+          "comment": "Security review and testing",
+          "created": "2025-09-10T14:00:00.000+0000",
+          "timeSpentSeconds": 16200
+        }
+      ]
+    },
+    "timetracking": {
+      "originalEstimate": "3w",
+      "remainingEstimate": "0h",
+      "timeSpent": "2w 6d",
+      "originalEstimateSeconds": 604800,
+      "remainingEstimateSeconds": 0,
+      "timeSpentSeconds": 554400
+    }
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "feature": "qr-code-checkin",
+  "feature_id": "FEAT-QR-002",
+  "report_date": "2025-10-15T14:23:00Z",
+  "tool": "Jest Coverage",
+  "version": "29.7.0",
+  "threshold_requirements": {
+    "statements": 80,
+    "branches": 80,
+    "functions": 80,
+    "lines": 80
+  },
+  "overall_coverage": {
+    "statements": {
+      "percentage": 78.4,
+      "covered": 489,
+      "total": 624,
+      "status": "BELOW_THRESHOLD"
+    },
+    "branches": {
+      "percentage": 71.2,
+      "covered": 142,
+      "total": 199,
+      "status": "BELOW_THRESHOLD"
+    },
+    "functions": {
+      "percentage": 76.8,
+      "covered": 96,
+      "total": 125,
+      "status": "BELOW_THRESHOLD"
+    },
+    "lines": {
+      "percentage": 78.9,
+      "covered": 478,
+      "total": 606,
+      "status": "BELOW_THRESHOLD"
+    }
+  },
+  "module_breakdown": {
+    "backend": {
+      "qr-generation-service": {
+        "statements": 82.1,
+        "branches": 75.3,
+        "functions": 85.7,
+        "lines": 83.2,
+        "status": "PASS",
+        "uncovered_lines": [
+          "src/services/qr-generation.service.ts:145-152",
+          "src/services/qr-generation.service.ts:188-191"
+        ]
+      },
+      "qr-validation-service": {
+        "statements": 68.4,
+        "branches": 58.9,
+        "functions": 70.0,
+        "lines": 69.1,
+        "status": "FAIL",
+        "critical_gaps": [
+          "Race condition handling in concurrent validation (lines 234-267)",
+          "Token expiry edge cases (lines 189-203)",
+          "Error recovery for database failures (lines 312-328)"
+        ]
+      },
+      "websocket-handler": {
+        "statements": 54.2,
+        "branches": 45.8,
+        "functions": 58.3,
+        "lines": 55.1,
+        "status": "FAIL",
+        "critical_gaps": [
+          "Connection pool overflow handling (lines 87-112)",
+          "Broadcast failure recovery (lines 156-178)",
+          "Client reconnection logic (lines 223-251)"
+        ]
+      },
+      "api-controllers": {
+        "statements": 88.7,
+        "branches": 82.4,
+        "functions": 90.0,
+        "lines": 89.2,
+        "status": "PASS"
+      }
+    },
+    "mobile_app": {
+      "qr-scanner-component": {
+        "statements": 72.3,
+        "branches": 65.1,
+        "functions": 68.0,
+        "lines": 71.8,
+        "status": "FAIL",
+        "critical_gaps": [
+          "Camera permission denied scenario",
+          "QR code malformed data handling",
+          "Network timeout recovery"
+        ]
+      },
+      "websocket-client": {
+        "statements": 61.5,
+        "branches": 52.3,
+        "functions": 60.0,
+        "lines": 62.1,
+        "status": "FAIL",
+        "critical_gaps": [
+          "Connection drop mid-transaction",
+          "Message queue overflow",
+          "Background/foreground state transitions"
+        ]
+      },
+      "checkout-screens": {
+        "statements": 85.2,
+        "branches": 78.6,
+        "functions": 83.3,
+        "lines": 84.9,
+        "status": "PASS"
+      }
+    }
+  },
+  "critical_untested_scenarios": [
+    {
+      "scenario": "Concurrent QR code validation race condition",
+      "risk": "HIGH",
+      "description": "Multiple simultaneous scans of same QR code could bypass single-use validation",
+      "affected_module": "qr-validation-service",
+      "line_range": "234-267"
+    },
+    {
+      "scenario": "WebSocket connection pool exhaustion",
+      "risk": "HIGH",
+      "description": "Under high load, connection pool overflow not properly handled",
+      "affected_module": "websocket-handler",
+      "line_range": "87-112"
+    },
+    {
+      "scenario": "Token expiry edge case during active transaction",
+      "risk": "MEDIUM",
+      "description": "QR code expiring exactly during check-in/out process not tested",
+      "affected_module": "qr-validation-service",
+      "line_range": "189-203"
+    },
+    {
+      "scenario": "Mobile app background state with active WebSocket",
+      "risk": "MEDIUM",
+      "description": "App backgrounding during check-in transaction not covered",
+      "affected_module": "websocket-client",
+      "line_range": "N/A"
+    }
+  ],
+  "blocker_assessment": {
+    "blocks_deployment": true,
+    "reason": "Coverage below 80% threshold for multiple critical modules",
+    "failing_modules": [
+      "qr-validation-service (68.4%)",
+      "websocket-handler (54.2%)",
+      "qr-scanner-component (72.3%)",
+      "websocket-client (61.5%)"
+    ],
+    "remediation_estimate": "3-4 days to add tests for critical paths",
+    "priority": "HIGH"
+  },
+  "trend_analysis": {
+    "previous_builds": [
+      {
+        "date": "2025-10-10",
+        "coverage": 81.2,
+        "status": "PASS"
+      },
+      {
+        "date": "2025-10-12",
+        "coverage": 79.8,
+        "status": "BELOW_THRESHOLD"
+      },
+      {
+        "date": "2025-10-14",
+        "coverage": 78.9,
+        "status": "BELOW_THRESHOLD"
+      },
+      {
+        "date": "2025-10-15",
+        "coverage": 78.4,
+        "status": "BELOW_THRESHOLD"
+      }
+    ],
+    "trend": "DECLINING",
+    "analysis": "Coverage has dropped 2.8% over 5 days as new WebSocket features added without corresponding tests"
+  },
+  "recommendations": [
+    "Add comprehensive tests for race condition handling in qr-validation-service",
+    "Implement WebSocket connection pool stress tests",
+    "Add mobile app state transition tests (background/foreground)",
+    "Consider temporarily disabling WebSocket features until test coverage improves",
+    "Block deployment until coverage returns to >80% threshold"
+  ],
+  "related_issues": [
+    "PLAT-1723: Race condition in QR validation",
+    "PLAT-1724: WebSocket connection pool overflow",
+    "PR-389: QR Code Check-in Feature (blocked by coverage)"
+  ]
+}

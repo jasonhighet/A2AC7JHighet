@@ -1,0 +1,28 @@
+{
+  "status": "NOT_YET_RUN",
+  "scheduled_date": "2025-10-19",
+  "reason": "Performance testing scheduled after UAT sign-off",
+  "planned_tests": [
+    {
+      "name": "Credit calculation job performance",
+      "description": "Test background job with 10,000 users",
+      "target": "< 5 minutes total execution time"
+    },
+    {
+      "name": "API response times",
+      "description": "Test all contribution endpoints under load",
+      "target": "p95 < 200ms, p99 < 500ms"
+    },
+    {
+      "name": "Database query performance",
+      "description": "Test priority queue sorting with 1000+ waitlist entries",
+      "target": "< 100ms query time"
+    },
+    {
+      "name": "Concurrent approval workflow",
+      "description": "Test 100 admins approving contributions simultaneously",
+      "target": "No database deadlocks, < 1% error rate"
+    }
+  ],
+  "notes": "Performance testing not required for UAT, but must complete before production deployment"
+}

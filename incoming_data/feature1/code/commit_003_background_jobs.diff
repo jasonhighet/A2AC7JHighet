@@ -1,0 +1,256 @@
+diff --git a/src/jobs/maintenance-checker.js b/src/jobs/maintenance-checker.js
+new file mode 100644
+index 0000000..e3d8f21
+--- /dev/null
++++ b/src/jobs/maintenance-checker.js
+@@ -0,0 +1,178 @@
++const cron = require('node-cron');
++const maintenanceService = require('../services/maintenance.service');
++const alertService = require('../services/alert.service');
++const logger = require('../utils/logger');
++const { addDays, isBefore, startOfDay } = require('date-fns');
++
++/**
++ * Check for upcoming maintenance and generate alerts
++ * Runs daily at 6:00 AM UTC
++ */
++class MaintenanceChecker {
++  constructor() {
++    this.jobName = 'maintenance-due-date-checker';
++    this.isRunning = false;
++    this.lastRunTime = null;
++    this.lastRunStatus = null;
++    this.cronExpression = '0 6 * * *'; // Daily at 6 AM UTC
++  }
++
++  /**
++   * Start the scheduled job
++   */
++  start() {
++    logger.info(`Starting ${this.jobName} job with schedule: ${this.cronExpression}`);
++    
++    this.job = cron.schedule(this.cronExpression, async () => {
++      await this.execute();
++    }, {
++      timezone: 'UTC'
++    });
++
++    logger.info(`${this.jobName} job started successfully`);
++  }
++
++  /**
++   * Stop the scheduled job
++   */
++  stop() {
++    if (this.job) {
++      this.job.stop();
++      logger.info(`${this.jobName} job stopped`);
++    }
++  }
++
++  /**
++   * Execute the maintenance check logic
++   */
++  async execute() {
++    if (this.isRunning) {
++      logger.warn(`${this.jobName} is already running, skipping this execution`);
++      return;
++    }
++
++    this.isRunning = true;
++    const startTime = Date.now();
++    
++    logger.info(`Starting ${this.jobName} execution`);
++
++    try {
++      // Get all active schedules
++      const schedules = await maintenanceService.getActiveSchedules();
++      logger.info(`Processing ${schedules.length} active maintenance schedules`);
++
++      let alertsGenerated = 0;
++      let schedulesProcessed = 0;
++      let errors = 0;
++
++      // Process each schedule
++      for (const schedule of schedules) {
++        try {
++          const shouldAlert = await this.checkIfAlertNeeded(schedule);
++          
++          if (shouldAlert) {
++            await this.generateAlert(schedule);
++            alertsGenerated++;
++          }
++
++          schedulesProcessed++;
++        } catch (error) {
++          errors++;
++          logger.error(`Error processing schedule ${schedule.id}`, {
++            error: error.message,
++            scheduleId: schedule.id,
++            resourceId: schedule.resource_id
++          });
++        }
++      }
++
++      const duration = Date.now() - startTime;
++      
++      this.lastRunTime = new Date();
++      this.lastRunStatus = 'success';
++
++      logger.info(`${this.jobName} completed successfully`, {
++        duration: `${duration}ms`,
++        schedulesProcessed,
++        alertsGenerated,
++        errors
++      });
++
++      // Record job execution metrics
++      await this.recordMetrics({
++        duration,
++        schedulesProcessed,
++        alertsGenerated,
++        errors,
++        status: 'success'
++      });
++
++    } catch (error) {
++      const duration = Date.now() - startTime;
++      
++      this.lastRunTime = new Date();
++      this.lastRunStatus = 'failed';
++
++      logger.error(`${this.jobName} failed`, {
++        error: error.message,
++        stack: error.stack,
++        duration: `${duration}ms`
++      });
++
++      // Record failure metrics
++      await this.recordMetrics({
++        duration,
++        status: 'failed',
++        error: error.message
++      });
++
++      // Retry logic - attempt to run again in 1 hour if failed
++      setTimeout(() => {
++        logger.info(`Retrying ${this.jobName} after failure`);
++        this.execute();
++      }, 3600000); // 1 hour
++
++    } finally {
++      this.isRunning = false;
++    }
++  }
++
++  /**
++   * Check if an alert should be generated for a schedule
++   */
++  async checkIfAlertNeeded(schedule) {
++    if (!schedule.alert_enabled) {
++      return false;
++    }
++
++    const today = startOfDay(new Date());
++    const dueDate = startOfDay(new Date(schedule.next_due_date));
++    const alertDate = addDays(dueDate, -schedule.alert_days_before);
++
++    // Check if today is the alert date or past it (but not past due date)
++    const shouldAlert = !isBefore(today, alertDate) && isBefore(today, dueDate);
++
++    // Check if alert was already sent
++    if (shouldAlert) {
++      const alertAlreadySent = await alertService.checkIfAlertSent(
++        schedule.id,
++        'maintenance_due',
++        alertDate
++      );
++      return !alertAlreadySent;
++    }
++
++    return false;
++  }
++
++  /**
++   * Generate and send an alert for a maintenance schedule
++   */
++  async generateAlert(schedule) {
++    await alertService.createMaintenanceAlert({
++      scheduleId: schedule.id,
++      resourceId: schedule.resource_id,
++      assignedTo: schedule.assigned_to,
++      dueDate: schedule.next_due_date,
++      priority: schedule.priority,
++      description: schedule.description
++    });
++
++    logger.info('Maintenance alert generated', {
++      scheduleId: schedule.id,
++      resourceId: schedule.resource_id,
++      dueDate: schedule.next_due_date
++    });
++  }
++
++  /**
++   * Record job execution metrics
++   */
++  async recordMetrics(metrics) {
++    try {
++      // Send metrics to monitoring system (e.g., CloudWatch, Datadog)
++      // Implementation depends on monitoring solution
++      logger.debug('Job metrics recorded', metrics);
++    } catch (error) {
++      logger.error('Failed to record job metrics', {
++        error: error.message
++      });
++    }
++  }
++
++  /**
++   * Get job status
++   */
++  getStatus() {
++    return {
++      jobName: this.jobName,
++      isRunning: this.isRunning,
++      lastRunTime: this.lastRunTime,
++      lastRunStatus: this.lastRunStatus,
++      schedule: this.cronExpression
++    };
++  }
++}
++
++// Create singleton instance
++const maintenanceChecker = new MaintenanceChecker();
++
++module.exports = maintenanceChecker;
+diff --git a/src/server.js b/src/server.js
+index 8f2a3d1..c9e5f3b 100644
+--- a/src/server.js
++++ b/src/server.js
+@@ -3,6 +3,7 @@ const app = require('./app');
+ const logger = require('./utils/logger');
+ const { connectDatabase } = require('./config/database');
+ const config = require('./config');
++const maintenanceChecker = require('./jobs/maintenance-checker');
+ 
+ const PORT = config.port || 3000;
+ 
+@@ -17,6 +18,9 @@ async function startServer() {
+     // Connect to database
+     await connectDatabase();
+     
++    // Start background jobs
++    maintenanceChecker.start();
++    
+     // Start server
+     server = app.listen(PORT, () => {
+       logger.info(`Server running on port ${PORT} in ${config.env} mode`);
+@@ -33,6 +37,7 @@ async function startServer() {
+ async function gracefulShutdown(signal) {
+   logger.info(`${signal} received, shutting down gracefully`);
+   
++  maintenanceChecker.stop();
+   server.close(() => {
+     logger.info('HTTP server closed');
+     process.exit(0);

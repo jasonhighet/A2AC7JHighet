@@ -1,0 +1,34 @@
+{
+  "uat_metadata": {
+    "feature_id": "FEAT-QR-002",
+    "uat_environment": "https://uat.communityshare.io",
+    "uat_period": {
+      "start_date": null,
+      "end_date": null,
+      "duration_days": 0
+    },
+    "test_plan_url": "https://docs.google.com/document/d/...",
+    "coordinator": {
+      "name": "Alex Thompson",
+      "email": "alex.thompson@communityshare.io",
+      "role": "QA Lead"
+    }
+  },
+  "overall_status": "BLOCKED",
+  "blocking_reason": "Integration tests failing (WebSocket scalability issues). Security review incomplete (3 critical/high findings). Cannot begin UAT until these are resolved.",
+  "scheduled_start_date": "2025-10-20",
+  "actual_start_date": null,
+  "testers": [],
+  "issues_found_total": 0,
+  "blockers": 5,
+  "blocker_details": [
+    "WebSocket server drops connections at >50 concurrent users (7 integration tests failing)",
+    "Critical security finding: QR token race condition (SEC-QR-001)",
+    "High security finding: QR code spoofing vulnerability (SEC-QR-002)",
+    "High security finding: WebSocket authentication insufficient (SEC-WS-001)",
+    "High security finding: Vulnerable dependency in mobile app (DEP-7821)"
+  ],
+  "signoff_date": null,
+  "signoff_by": null,
+  "notes": "UAT CANNOT START until integration tests pass and security review approves. Feature has been rolled back from UAT to DEVELOPMENT stage due to critical issues discovered during testing phase."
+}

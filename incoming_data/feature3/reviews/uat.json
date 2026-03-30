@@ -1,0 +1,399 @@
+{
+  "uat_id": "UAT-RES-2025-Q4",
+  "feature_id": "FEAT-RS-003",
+  "feature_name": "Advanced Resource Reservation System",
+  "uat_metadata": {
+    "uat_environment": "https://uat.communityshare.io",
+    "uat_period": {
+      "start_date": "2025-10-11",
+      "end_date": "2025-10-16",
+      "planned_duration_days": 7,
+      "actual_duration_days": 5,
+      "early_completion": false,
+      "notes": "UAT ongoing, formal sign-off expected by Oct 18"
+    },
+    "test_plan_url": "https://docs.google.com/document/d/uat-reservation-system-test-plan",
+    "coordinator": {
+      "name": "Alex Thompson",
+      "email": "alex.thompson@communityshare.io",
+      "role": "QA Lead"
+    },
+    "stakeholders": [
+      {
+        "name": "Emma Rodriguez",
+        "email": "emma.rodriguez@communityshare.io",
+        "role": "Product Manager",
+        "sign_off_required": true,
+        "sign_off_status": "APPROVED",
+        "sign_off_date": "2025-10-15T16:00:00Z"
+      },
+      {
+        "name": "Rachel Green",
+        "email": "rachel.green@communityshare.io",
+        "role": "Community Manager",
+        "sign_off_required": true,
+        "sign_off_status": "PENDING",
+        "sign_off_date": null,
+        "notes": "Reviewing UAT feedback, decision expected by Oct 18"
+      }
+    ]
+  },
+  "overall_status": "MIXED",
+  "overall_sentiment": "POSITIVE_WITH_RESERVATIONS",
+  "testers": [
+    {
+      "tester_id": "UAT-TESTER-011",
+      "name": "Alice Johnson",
+      "role": "Community Admin",
+      "community": "Portland Tool Library",
+      "community_size": "450 members",
+      "experience_level": "EXPERT",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-11",
+      "testing_end_date": "2025-10-15",
+      "hours_spent": 3.5,
+      "test_cases_assigned": 28,
+      "test_cases_executed": 28,
+      "test_cases_passed": 28,
+      "test_cases_failed": 0,
+      "verdict": "APPROVED",
+      "confidence_level": "HIGH",
+      "feedback": "Works great, easy to use! Calendar integration is intuitive. Booking flow is smooth. No issues encountered during testing. Would be happy to use this in production.",
+      "positive_feedback": [
+        "Calendar UI is clean and intuitive",
+        "Booking workflow is straightforward",
+        "Conflict detection works perfectly",
+        "Email confirmations arrive promptly"
+      ],
+      "negative_feedback": [],
+      "issues_found": [],
+      "suggestions": [
+        "Could add keyboard shortcuts for power users"
+      ],
+      "timestamp": "2025-10-15T14:22:11Z"
+    },
+    {
+      "tester_id": "UAT-TESTER-012",
+      "name": "Bob Martinez",
+      "role": "Community Admin",
+      "community": "Seattle Makerspace",
+      "community_size": "680 members",
+      "experience_level": "ADVANCED",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-11",
+      "testing_end_date": "2025-10-15",
+      "hours_spent": 2.5,
+      "test_cases_assigned": 22,
+      "test_cases_executed": 22,
+      "test_cases_passed": 22,
+      "test_cases_failed": 0,
+      "verdict": "APPROVED",
+      "confidence_level": "HIGH",
+      "feedback": "Calendar is intuitive, booking flow is smooth. No issues found. Tested various scenarios including concurrent bookings and cancellations. All worked as expected.",
+      "positive_feedback": [
+        "Fast and responsive",
+        "Easy to understand",
+        "Good mobile experience"
+      ],
+      "negative_feedback": [],
+      "issues_found": [],
+      "suggestions": [],
+      "timestamp": "2025-10-15T16:33:44Z"
+    },
+    {
+      "tester_id": "UAT-TESTER-013",
+      "name": "Carol Smith",
+      "role": "Community Admin",
+      "community": "Vancouver Community Garden",
+      "community_size": "220 members",
+      "experience_level": "INTERMEDIATE",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-12",
+      "testing_end_date": "2025-10-14",
+      "hours_spent": 2.0,
+      "test_cases_assigned": 18,
+      "test_cases_executed": 18,
+      "test_cases_passed": 18,
+      "test_cases_failed": 0,
+      "verdict": "APPROVED",
+      "confidence_level": "MEDIUM",
+      "feedback": "Working well, no issues. Straightforward to use. Meets our needs for garden plot reservations.",
+      "positive_feedback": [
+        "Simple and effective"
+      ],
+      "negative_feedback": [],
+      "issues_found": [],
+      "suggestions": [],
+      "timestamp": "2025-10-14T10:11:29Z"
+    },
+    {
+      "tester_id": "UAT-TESTER-014",
+      "name": "Dave Patel",
+      "role": "Workshop Coordinator",
+      "community": "Austin Maker Collective",
+      "community_size": "520 members",
+      "experience_level": "EXPERT",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-11",
+      "testing_end_date": "2025-10-14",
+      "hours_spent": 4.0,
+      "test_cases_assigned": 31,
+      "test_cases_executed": 31,
+      "test_cases_passed": 30,
+      "test_cases_failed": 1,
+      "verdict": "APPROVED_WITH_CONCERNS",
+      "confidence_level": "MEDIUM",
+      "feedback": "Overall works well but waitlist feature is confusing - not clear how it works or when users get notified. I had to dig through help docs to understand FIFO vs priority. Needs better UX explanation or tooltips. Also, there's no visible indication of your position in the waitlist.",
+      "positive_feedback": [
+        "Core booking functionality is solid",
+        "Calendar view is helpful"
+      ],
+      "negative_feedback": [
+        "Waitlist feature lacks clarity",
+        "No position indicator in waitlist queue",
+        "Notification timing unclear"
+      ],
+      "concerns": [
+        {
+          "concern_id": "UAT-CONCERN-001",
+          "severity": "MEDIUM",
+          "description": "Waitlist UX clarity - users don't understand FIFO vs priority",
+          "impact": "Users may be confused about how waitlist works, leading to support requests",
+          "blocking": false,
+          "recommendation": "Add tooltips explaining waitlist behavior, show position in queue"
+        },
+        {
+          "concern_id": "UAT-CONCERN-002",
+          "severity": "LOW",
+          "description": "No visible indication of waitlist position",
+          "impact": "Users don't know where they are in the queue",
+          "blocking": false,
+          "recommendation": "Display queue position in waitlist UI"
+        }
+      ],
+      "blocking": false,
+      "issues_found": [],
+      "suggestions": [
+        "Add waitlist position indicator",
+        "Add tooltips for waitlist feature",
+        "Consider onboarding tutorial for first-time users"
+      ],
+      "timestamp": "2025-10-14T13:55:17Z"
+    },
+    {
+      "tester_id": "UAT-TESTER-015",
+      "name": "Eve Brown",
+      "role": "Community Admin",
+      "community": "Denver Tool Share",
+      "community_size": "380 members",
+      "experience_level": "ADVANCED",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-11",
+      "testing_end_date": "2025-10-13",
+      "hours_spent": 3.5,
+      "test_cases_assigned": 26,
+      "test_cases_executed": 26,
+      "test_cases_passed": 25,
+      "test_cases_failed": 1,
+      "verdict": "APPROVED_WITH_MINOR_ISSUE",
+      "confidence_level": "HIGH",
+      "feedback": "Found a bug with overlapping bookings in a rare scenario. I tried to book the same resource twice within 1 minute by clicking the Book button rapidly, and it created overlapping reservations. Marked as minor since it's unlikely in real use - users won't typically double-click that fast. Everything else works perfectly.",
+      "positive_feedback": [
+        "Overall quality is high",
+        "Feature is very useful",
+        "UI is polished"
+      ],
+      "negative_feedback": [],
+      "concerns": [],
+      "blocking": false,
+      "issues_found": [
+        {
+          "bug_id": "BUG-RES-501",
+          "severity": "MINOR",
+          "priority": "LOW",
+          "title": "Rapid repeated bookings can create overlapping reservations",
+          "description": "If user clicks Book button twice within ~1 second, two overlapping reservations can be created for the same resource",
+          "affected_component": "Reservation creation endpoint",
+          "reproducibility": "LOW",
+          "reproduction_steps": [
+            "Navigate to calendar view",
+            "Select a resource and time slot",
+            "Click Book button",
+            "Immediately click Book button again (within 1 second)",
+            "Observe two overlapping reservations created"
+          ],
+          "expected_behavior": "Second booking should be rejected due to conflict",
+          "actual_behavior": "Both bookings succeed, creating overlapping reservations",
+          "workaround": "Wait a moment before re-booking, or delete duplicate reservation",
+          "root_cause_hypothesis": "Race condition in conflict detection - both requests check for conflicts before either commits",
+          "recommended_fix": "Add client-side debouncing to Book button (300ms), or add pessimistic database locking",
+          "estimated_fix_effort_hours": 2,
+          "blocking": false,
+          "notes": "Very unlikely to occur in real-world usage. Users don't typically double-click that fast."
+        }
+      ],
+      "suggestions": [
+        "Add debouncing to prevent accidental double-clicks"
+      ],
+      "timestamp": "2025-10-13T17:22:04Z"
+    },
+    {
+      "tester_id": "UAT-TESTER-016",
+      "name": "Frank Garcia",
+      "role": "Event Organizer",
+      "community": "Phoenix Community Space",
+      "community_size": "290 members",
+      "experience_level": "INTERMEDIATE",
+      "testing_completed": true,
+      "testing_start_date": "2025-10-11",
+      "testing_end_date": "2025-10-12",
+      "hours_spent": 2.5,
+      "test_cases_assigned": 20,
+      "test_cases_executed": 20,
+      "test_cases_passed": 20,
+      "test_cases_failed": 0,
+      "verdict": "APPROVED_WITH_CONCERNS",
+      "confidence_level": "MEDIUM",
+      "feedback": "Overall works well but have concerns about user experience. Calendar could be more intuitive for first-time users - I had to figure out how to navigate between months and views. Mobile experience feels a bit cramped on small phones. Not blocking though - with some training, users will be fine.",
+      "positive_feedback": [
+        "Feature is functional",
+        "Desktop experience is good"
+      ],
+      "negative_feedback": [
+        "Calendar navigation not immediately obvious",
+        "Mobile experience cramped on small screens",
+        "No onboarding or tutorial"
+      ],
+      "concerns": [
+        {
+          "concern_id": "UAT-CONCERN-003",
+          "severity": "MEDIUM",
+          "description": "Calendar UX could be improved - no onboarding for new users",
+          "impact": "First-time users may struggle to navigate calendar",
+          "blocking": false,
+          "recommendation": "Add brief onboarding tutorial or tooltips for first-time users"
+        },
+        {
+          "concern_id": "UAT-CONCERN-004",
+          "severity": "LOW",
+          "description": "Mobile experience feels cramped on small phones",
+          "impact": "Reduced usability on phones with screens < 5 inches",
+          "blocking": false,
+          "recommendation": "Consider mobile-specific optimizations for small screens"
+        }
+      ],
+      "blocking": false,
+      "issues_found": [],
+      "suggestions": [
+        "Add welcome tutorial for new users",
+        "Optimize mobile layout for small screens",
+        "Add more obvious navigation hints"
+      ],
+      "timestamp": "2025-10-12T11:44:37Z"
+    }
+  ],
+  "summary_statistics": {
+    "total_testers": 6,
+    "testers_completed": 6,
+    "total_test_cases": 145,
+    "test_cases_passed": 143,
+    "test_cases_failed": 2,
+    "pass_rate": 98.62,
+    "total_hours_spent": 18.0,
+    "average_hours_per_tester": 3.0,
+    "verdict_breakdown": {
+      "approved": 3,
+      "approved_with_concerns": 2,
+      "approved_with_minor_issue": 1,
+      "rejected": 0
+    },
+    "confidence_breakdown": {
+      "high": 3,
+      "medium": 3,
+      "low": 0
+    }
+  },
+  "issues_summary": {
+    "total_issues": 1,
+    "critical": 0,
+    "major": 0,
+    "minor": 1,
+    "blockers": 0,
+    "issues": [
+      {
+        "bug_id": "BUG-RES-501",
+        "severity": "MINOR",
+        "title": "Rapid repeated bookings can create overlapping reservations",
+        "reported_by": "Eve Brown (UAT-TESTER-015)",
+        "status": "OPEN",
+        "blocking": false
+      }
+    ]
+  },
+  "concerns_summary": {
+    "total_concerns": 4,
+    "blocking_concerns": 0,
+    "non_blocking_concerns": 4,
+    "concerns": [
+      {
+        "concern_id": "UAT-CONCERN-001",
+        "severity": "MEDIUM",
+        "description": "Waitlist UX clarity",
+        "raised_by": "Dave Patel (UAT-TESTER-014)",
+        "blocking": false
+      },
+      {
+        "concern_id": "UAT-CONCERN-002",
+        "severity": "LOW",
+        "description": "No visible waitlist position indicator",
+        "raised_by": "Dave Patel (UAT-TESTER-014)",
+        "blocking": false
+      },
+      {
+        "concern_id": "UAT-CONCERN-003",
+        "severity": "MEDIUM",
+        "description": "Calendar UX - no onboarding for new users",
+        "raised_by": "Frank Garcia (UAT-TESTER-016)",
+        "blocking": false
+      },
+      {
+        "concern_id": "UAT-CONCERN-004",
+        "severity": "LOW",
+        "description": "Mobile experience cramped on small screens",
+        "raised_by": "Frank Garcia (UAT-TESTER-016)",
+        "blocking": false
+      }
+    ]
+  },
+  "positive_themes": [
+    "Core functionality works well",
+    "Calendar UI is intuitive (for most testers)",
+    "Booking flow is smooth",
+    "Fast and responsive",
+    "No critical bugs found"
+  ],
+  "negative_themes": [
+    "Waitlist feature needs UX improvements",
+    "First-time user experience could be better",
+    "Mobile optimization needed for small screens",
+    "Minor race condition bug in booking"
+  ],
+  "signoff_status": "PENDING",
+  "signoff_required_from": [
+    "Rachel Green (Community Manager) - PENDING"
+  ],
+  "signoff_completed_from": [
+    "Emma Rodriguez (Product Manager) - APPROVED on 2025-10-15"
+  ],
+  "recommendation": "PROCEED WITH CAUTION",
+  "recommendation_rationale": "UAT shows strong core functionality with no critical issues. 3/6 testers gave clear approval, 3/6 approved with non-blocking concerns. Main concerns are UX polish items (waitlist clarity, onboarding, mobile optimization) and one minor race condition bug. These are improvements, not blockers. Feature is functional and safe for production, but team should plan UX improvements for next iteration.",
+  "next_steps": [
+    "Obtain Community Manager sign-off by Oct 18",
+    "Create tickets for UX improvements (waitlist clarity, onboarding)",
+    "Create ticket for race condition bug fix",
+    "Plan UX improvements for post-launch iteration",
+    "Proceed to performance testing"
+  ],
+  "notes": "UAT completed with mixed but generally positive results. No blockers identified. Main feedback is around UX polish and minor bugs that don't affect core functionality. 98.6% test pass rate indicates high quality. Concerns are valid but non-blocking. Agent must evaluate: Are UX concerns sufficient to delay production? Or should feature launch with plan to address feedback in next iteration?",
+  "ambiguity_factor": "MODERATE - Clear approval from 50% of testers, approval with non-blocking concerns from other 50%. No one rejected the feature. Is this enough consensus to proceed? Or should all concerns be addressed first?"
+}

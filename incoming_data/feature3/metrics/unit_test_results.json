@@ -1,0 +1,80 @@
+{
+  "test_suites": 10,
+  "tests_total": 167,
+  "tests_passed": 167,
+  "tests_failed": 0,
+  "tests_skipped": 0,
+  "execution_time_seconds": 14.1,
+  "test_breakdown": {
+    "backend": {
+      "reservation_service": {
+        "total": 42,
+        "passed": 42,
+        "failed": 0,
+        "execution_time_seconds": 3.2
+      },
+      "conflict_detector": {
+        "total": 38,
+        "passed": 38,
+        "failed": 0,
+        "execution_time_seconds": 2.9
+      },
+      "waitlist_service": {
+        "total": 29,
+        "passed": 29,
+        "failed": 0,
+        "execution_time_seconds": 2.1
+      },
+      "api_controllers": {
+        "total": 31,
+        "passed": 31,
+        "failed": 0,
+        "execution_time_seconds": 2.8
+      }
+    },
+    "frontend": {
+      "calendar_component": {
+        "total": 15,
+        "passed": 15,
+        "failed": 0,
+        "execution_time_seconds": 1.4
+      },
+      "booking_modal": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "execution_time_seconds": 0.9
+      },
+      "waitlist_ui": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "execution_time_seconds": 0.8
+      }
+    }
+  },
+  "flaky_tests": [],
+  "slow_tests": [
+    {
+      "name": "ReservationService: should handle concurrent booking attempts",
+      "execution_time_seconds": 2.1,
+      "threshold_seconds": 2.0,
+      "reason": "Tests database transaction locking"
+    }
+  ],
+  "test_metadata": {
+    "framework": "Jest 29.5.0",
+    "node_version": "20.11.0",
+    "ci_environment": "GitHub Actions",
+    "runner_os": "ubuntu-22.04",
+    "timestamp": "2025-10-11T09:33:17Z",
+    "branch": "feature/reservation-system",
+    "commit_sha": "a7f3e9c2d1b4"
+  },
+  "quality_gate": {
+    "threshold_pass_rate": 95,
+    "actual_pass_rate": 100,
+    "passed": true
+  },
+  "notes": "All unit tests passing. No flaky tests detected. One slow test within acceptable range. Quality gate: PASSED."
+}

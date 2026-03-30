@@ -1,0 +1,199 @@
+commit 3a7e9f2d1c4b6a8e0f2a1b3c5d7e9f1a2b4c6d8e
+Author: Sarah Chen <sarah.chen@communityshare.io>
+Date:   Wed Oct 9 14:22:15 2025 -0700
+
+    Add API endpoints for contribution management
+
+    - POST /api/contributions (create)
+    - GET /api/contributions (list with filters)
+    - PATCH /api/contributions/:id/approve (admin)
+    - PATCH /api/contributions/:id/reject (admin)
+    - Validation middleware for each contribution type
+
+diff --git a/src/api/routes/contributions.routes.ts b/src/api/routes/contributions.routes.ts
+new file mode 100644
+index 0000000..a1b2c3d
+--- /dev/null
++++ b/src/api/routes/contributions.routes.ts
+@@ -0,0 +1,25 @@
++import { Router } from 'express';
++import { ContributionController } from '../controllers/contribution.controller';
++import { authenticate, authorize, validateRequest } from '../middleware';
++import { contributionSchema } from '../validation/contribution.schema';
++
++const router = Router();
++const controller = new ContributionController();
++
++// Member endpoints
++router.post(
++  '/',
++  authenticate,
++  validateRequest(contributionSchema),
++  controller.create
++);
++
++router.get('/', authenticate, controller.list);
++
++// Admin endpoints
++router.patch('/:id/approve', authenticate, authorize('admin'), controller.approve);
++router.patch('/:id/reject', authenticate, authorize('admin'), controller.reject);
++
++export default router;
+
+diff --git a/src/api/controllers/contribution.controller.ts b/src/api/controllers/contribution.controller.ts
+new file mode 100644
+index 0000000..e1f2a3b
+--- /dev/null
++++ b/src/api/controllers/contribution.controller.ts
+@@ -0,0 +1,98 @@
++import { Request, Response } from 'express';
++import { ContributionService } from '../../services/contribution.service';
++import { CreditService } from '../../services/credit.service';
++
++export class ContributionController {
++  private contributionService: ContributionService;
++  private creditService: CreditService;
++
++  constructor() {
++    this.contributionService = new ContributionService();
++    this.creditService = new CreditService();
++  }
++
++  async create(req: Request, res: Response) {
++    try {
++      const userId = req.user.id;
++      const { type, data } = req.body;
++
++      // Calculate credits based on type
++      const credits = this.creditService.calculateCredits(type, data);
++
++      const contribution = await this.contributionService.create({
++        user_id: userId,
++        type,
++        value_json: data,
++        calculated_credits: credits,
++      });
++
++      // Emit event for notifications
++      this.eventBus.emit('contribution.created', {
++        contribution_id: contribution.id,
++        user_id: userId,
++        type,
++      });
++
++      res.status(201).json(contribution);
++    } catch (error) {
++      res.status(500).json({ error: 'Failed to create contribution' });
++    }
++  }
++
++  async list(req: Request, res: Response) {
++    try {
++      const { user_id, status, limit = 20, offset = 0 } = req.query;
++
++      const contributions = await this.contributionService.list({
++        user_id: user_id || req.user.id,
++        status,
++        limit: Number(limit),
++        offset: Number(offset),
++      });
++
++      res.json(contributions);
++    } catch (error) {
++      res.status(500).json({ error: 'Failed to list contributions' });
++    }
++  }
++
++  async approve(req: Request, res: Response) {
++    try {
++      const { id } = req.params;
++      const { adjusted_credits, notes } = req.body;
++      const adminId = req.user.id;
++
++      const contribution = await this.contributionService.approve({
++        id,
++        approved_by: adminId,
++        adjusted_credits,
++        notes,
++      });
++
++      // Get updated balance
++      const balance = await this.creditService.getBalance(contribution.user_id);
++
++      // Emit event for notifications
++      this.eventBus.emit('contribution.approved', {
++        contribution_id: id,
++        user_id: contribution.user_id,
++        credits_added: contribution.calculated_credits,
++        new_balance: balance.balance,
++        new_tier: balance.tier,
++      });
++
++      res.json({ contribution, balance });
++    } catch (error) {
++      res.status(500).json({ error: 'Failed to approve contribution' });
++    }
++  }
++
++  async reject(req: Request, res: Response) {
++    try {
++      const { id } = req.params;
++      const { reason } = req.body;
++
++      await this.contributionService.reject(id, reason);
++      res.json({ success: true });
++    } catch (error) {
++      res.status(500).json({ error: 'Failed to reject contribution' });
++    }
++  }
++}
+
+diff --git a/src/api/validation/contribution.schema.ts b/src/api/validation/contribution.schema.ts
+new file mode 100644
+index 0000000..f3a4b5c
+--- /dev/null
++++ b/src/api/validation/contribution.schema.ts
+@@ -0,0 +1,55 @@
++import Joi from 'joi';
++
++const itemDonationSchema = Joi.object({
++  description: Joi.string().min(10).max(500).required(),
++  estimated_value: Joi.number().min(10).required(),
++  condition: Joi.string().valid('new', 'like_new', 'good', 'fair').required(),
++  photos: Joi.array().items(Joi.string().uri()).max(3).optional(),
++  notes: Joi.string().max(1000).optional(),
++});
++
++const moneySchema = Joi.object({
++  amount: Joi.number().min(5).required(),
++  currency: Joi.string().default('USD'),
++  payment_method: Joi.string().valid('cash', 'check', 'online_transfer').required(),
++  receipt_url: Joi.string().uri().optional(),
++  transaction_id: Joi.string().optional(),
++});
++
++const volunteerHoursSchema = Joi.object({
++  activity: Joi.string().min(10).max(200).required(),
++  hours: Joi.number().min(0.5).max(24).required(),
++  date: Joi.date().max('now').required(),
++  supervisor: Joi.string().max(100).optional(),
++  notes: Joi.string().max(1000).optional(),
++});
++
++export const contributionSchema = Joi.object({
++  type: Joi.string()
++    .valid('item_donation', 'money', 'volunteer_hours')
++    .required(),
++  data: Joi.when('type', {
++    is: 'item_donation',
++    then: itemDonationSchema,
++  })
++    .when('type', {
++      is: 'money',
++      then: moneySchema,
++    })
++    .when('type', {
++      is: 'volunteer_hours',
++      then: volunteerHoursSchema,
++    }),
++});

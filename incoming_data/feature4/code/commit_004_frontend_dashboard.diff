@@ -1,0 +1,103 @@
+commit 2e4f6a8c0d2e4f6a8c0d2e4f6a8c0d2e4f6a8c0d
+Author: Priya Sharma <priya.sharma@communityshare.io>
+Date:   Fri Oct 11 16:30:22 2025 -0700
+
+    Add frontend contribution dashboard components
+
+    - ContributionDashboard main view
+    - ContributionHistory with filtering
+    - CreditBalance visualization
+    - ContributionForm for submissions
+    - TypeScript interfaces and API client
+
+diff --git a/src/components/member/ContributionDashboard.tsx b/src/components/member/ContributionDashboard.tsx
+new file mode 100644
++++ b/src/components/member/ContributionDashboard.tsx
+@@ -0,0 +1,45 @@
++import React, { useEffect, useState } from 'react';
++import { CreditBalanceCard } from './CreditBalanceCard';
++import { ContributionHistory } from './ContributionHistory';
++import { ContributionForm } from './ContributionForm';
++import { api } from '../../services/api';
++
++export function ContributionDashboard() {
++  const [balance, setBalance] = useState(null);
++  const [showForm, setShowForm] = useState(false);
++
++  useEffect(() => {
++    loadBalance();
++  }, []);
++
++  async function loadBalance() {
++    const data = await api.get('/contributions/credits/me');
++    setBalance(data);
++  }
++
++  return (
++    <div className="contribution-dashboard">
++      <div className="header">
++        <h1>My Contributions</h1>
++        <button onClick={() => setShowForm(true)}>+ Add Contribution</button>
++      </div>
++
++      {balance && <CreditBalanceCard balance={balance} />}
++
++      <ContributionHistory />
++
++      {showForm && (
++        <ContributionForm
++          onClose={() => setShowForm(false)}
++          onSuccess={() => {
++            setShowForm(false);
++            loadBalance();
++          }}
++        />
++      )}
++    </div>
++  );
++}
+
+diff --git a/src/components/member/CreditBalanceCard.tsx b/src/components/member/CreditBalanceCard.tsx
+new file mode 100644
++++ b/src/components/member/CreditBalanceCard.tsx
+@@ -0,0 +1,38 @@
++import React from 'react';
++
++interface Props {
++  balance: {
++    balance: number;
++    tier: string;
++    breakdown: any;
++  };
++}
++
++export function CreditBalanceCard({ balance }: Props) {
++  const tierEmoji = {
++    bronze: '🥉',
++    silver: '🥈',
++    gold: '🥇',
++    platinum: '💎',
++  };
++
++  const progress = Math.min((balance.balance / 100) * 100, 100);
++
++  return (
++    <div className="credit-balance-card">
++      <div className="balance-header">
++        <span className="tier-emoji">{tierEmoji[balance.tier]}</span>
++        <h2>{balance.balance} Credits</h2>
++        <span className="tier-label">{balance.tier} Member</span>
++      </div>
++
++      <div className="progress-bar">
++        <div className="progress-fill" style={{ width: `${progress}%` }} />
++      </div>
++
++      <div className="breakdown">
++        <p>Items: {balance.breakdown.item_donations.credits} ({balance.breakdown.item_donations.percentage}%)</p>
++        <p>Money: {balance.breakdown.money.credits} ({balance.breakdown.money.percentage}%)</p>
++        <p>Volunteer: {balance.breakdown.volunteer_hours.credits} ({balance.breakdown.volunteer_hours.percentage}%)</p>
++      </div>
++    </div>
++  );
++}

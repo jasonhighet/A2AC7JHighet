@@ -1,0 +1,29 @@
+commit 4e7d1a9f3c6b2e5d8a1f4c7e9b2d5a8f3c6e1b4d
+Author: Sarah Chen <sarah.chen@communityshare.io>
+Date:   Mon Oct 7 09:17:44 2025 -0700
+
+    Attempt to fix DST edge case bugs
+    
+    Addresses daylight saving time transition issues reported in integration tests.
+    Changes:
+    - Added Luxon.js library for timezone-aware datetime handling
+    - Implemented DST transition detection logic
+    - Added handling for "spring forward" (invalid times)
+    - Added handling for "fall back" (ambiguous times)
+    - Updated duration calculation to account for DST
+    
+    Status: Partial fix
+    - Spring forward detection working
+    - Fall back handling improved
+    - 3 integration tests still failing (rare edge cases)
+    - Non-blocking for initial release
+
+---
+ src/utils/datetimeHandler.js           | 156 ++++++++++++++++++++++++++++
+ src/services/reservation-service.js    |  42 ++++++--
+ tests/integration/reservation-dst.test.js | 89 ++++++++++++++++
+ package.json                            |   1 +
+ 4 files changed, 282 insertions(+), 6 deletions(-)
+
+[Implementation includes Luxon integration for DST handling, but edge cases remain.
+Tests show improvement but 3 scenarios still fail at DST boundaries]

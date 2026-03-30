@@ -1,0 +1,68 @@
+{
+  "timestamp": "2025-10-15T08:23:14Z",
+  "test_suites": 8,
+  "tests_total": 156,
+  "tests_passed": 156,
+  "tests_failed": 0,
+  "tests_skipped": 0,
+  "execution_time_seconds": 12.4,
+  "flaky_tests": [],
+  "test_suites_detail": [
+    {
+      "suite": "MaintenanceScheduleController",
+      "tests": 24,
+      "passed": 24,
+      "failed": 0,
+      "duration_seconds": 2.1
+    },
+    {
+      "suite": "MaintenanceLogController",
+      "tests": 18,
+      "passed": 18,
+      "failed": 0,
+      "duration_seconds": 1.8
+    },
+    {
+      "suite": "MaintenanceScheduleService",
+      "tests": 32,
+      "passed": 32,
+      "failed": 0,
+      "duration_seconds": 2.7
+    },
+    {
+      "suite": "MaintenanceLogService",
+      "tests": 28,
+      "passed": 28,
+      "failed": 0,
+      "duration_seconds": 2.3
+    },
+    {
+      "suite": "MaintenanceAlertService",
+      "tests": 22,
+      "passed": 22,
+      "failed": 0,
+      "duration_seconds": 1.9
+    },
+    {
+      "suite": "MaintenanceCheckerJob",
+      "tests": 16,
+      "passed": 16,
+      "failed": 0,
+      "duration_seconds": 1.4
+    },
+    {
+      "suite": "MaintenanceCalendar Component",
+      "tests": 10,
+      "passed": 10,
+      "failed": 0,
+      "duration_seconds": 0.8
+    },
+    {
+      "suite": "ScheduleForm Component",
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "duration_seconds": 0.4
+    }
+  ]
+}

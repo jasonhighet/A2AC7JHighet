@@ -1,0 +1,30 @@
+commit 9a3e6f2d8c5b1a4e7f9c2d6b8a3e5f1c7d9b4e6a
+Author: Sarah Chen <sarah.chen@communityshare.io>
+Date:   Thu Oct 3 14:55:11 2025 -0700
+
+    Implement waitlist management feature
+    
+    Adds FIFO queue system for unavailable time slots with features:
+    - Join waitlist when time slot unavailable
+    - Position tracking (queue number)
+    - Notification system when slot becomes available (2-hour window)
+    - Admin priority override capability
+    - Automatic queue advancement on expiration
+    
+    API endpoints:
+    - POST /api/waitlist
+    - GET /api/waitlist/my-queue
+    - DELETE /api/waitlist/:id
+    
+    Includes email notification trigger and waitlist UI components.
+
+---
+ src/services/waitlist-service.js        | 198 +++++++++++++++++++++++++++++++
+ src/controllers/waitlist-controller.js  | 134 +++++++++++++++++++++
+ src/routes/waitlist.js                  |  78 +++++++++++++
+ src/components/Waitlist/JoinWaitlist.jsx | 123 +++++++++++++++++++
+ src/components/Waitlist/WaitlistQueue.jsx | 89 ++++++++++++++
+ 5 files changed, 622 insertions(+)
+
+[Waitlist implementation with FIFO queue management, notification system,
+and React components for joining/viewing waitlist]

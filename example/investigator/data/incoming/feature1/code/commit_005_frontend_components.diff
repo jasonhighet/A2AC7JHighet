@@ -1,0 +1,526 @@
+diff --git a/frontend/src/components/maintenance/MaintenanceCalendar.tsx b/frontend/src/components/maintenance/MaintenanceCalendar.tsx
+new file mode 100644
+index 0000000..e3f8d1f
+--- /dev/null
++++ b/frontend/src/components/maintenance/MaintenanceCalendar.tsx
+@@ -0,0 +1,156 @@
++import React, { useState, useEffect } from 'react';
++import FullCalendar from '@fullcalendar/react';
++import dayGridPlugin from '@fullcalendar/daygrid';
++import timeGridPlugin from '@fullcalendar/timegrid';
++import interactionPlugin from '@fullcalendar/interaction';
++import { maintenanceApi } from '../../api/maintenance';
++import { MaintenanceSchedule } from '../../types/maintenance';
++import { ScheduleForm } from './ScheduleForm';
++import { Modal } from '../common/Modal';
++import { format } from 'date-fns';
++
++interface CalendarEvent {
++  id: string;
++  title: string;
++  start: Date;
++  backgroundColor: string;
++  borderColor: string;
++  extendedProps: {
++    schedule: MaintenanceSchedule;
++  };
++}
++
++export const MaintenanceCalendar: React.FC = () => {
++  const [events, setEvents] = useState<CalendarEvent[]>([]);
++  const [loading, setLoading] = useState(true);
++  const [selectedSchedule, setSelectedSchedule] = useState<MaintenanceSchedule | null>(null);
++  const [isFormOpen, setIsFormOpen] = useState(false);
++  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
++
++  useEffect(() => {
++    loadSchedules();
++  }, []);
++
++  const loadSchedules = async () => {
++    try {
++      setLoading(true);
++      const response = await maintenanceApi.getSchedules({
++        is_active: true
++      });
++      
++      const calendarEvents = response.data.map(schedule => ({
++        id: schedule.id,
++        title: `${schedule.resource_name} - ${schedule.description || 'Maintenance'}`,
++        start: new Date(schedule.next_due_date),
++        backgroundColor: getPriorityColor(schedule.priority),
++        borderColor: getPriorityColor(schedule.priority),
++        extendedProps: {
++          schedule
++        }
++      }));
++
++      setEvents(calendarEvents);
++    } catch (error) {
++      console.error('Failed to load maintenance schedules:', error);
++    } finally {
++      setLoading(false);
++    }
++  };
++
++  const getPriorityColor = (priority: string): string => {
++    const colors = {
++      low: '#10b981',
++      medium: '#3b82f6',
++      high: '#f59e0b',
++      critical: '#ef4444'
++    };
++    return colors[priority as keyof typeof colors] || colors.medium;
++  };
++
++  const handleEventClick = (info: any) => {
++    setSelectedSchedule(info.event.extendedProps.schedule);
++    setIsFormOpen(true);
++  };
++
++  const handleDateClick = (info: any) => {
++    setSelectedDate(info.date);
++    setSelectedSchedule(null);
++    setIsFormOpen(true);
++  };
++
++  const handleFormClose = () => {
++    setIsFormOpen(false);
++    setSelectedSchedule(null);
++    setSelectedDate(null);
++  };
++
++  const handleFormSubmit = async () => {
++    await loadSchedules();
++    handleFormClose();
++  };
++
++  if (loading) {
++    return (
++      <div className="flex items-center justify-center h-96">
++        <div className="text-gray-600">Loading maintenance calendar...</div>
++      </div>
++    );
++  }
++
++  return (
++    <div className="p-6">
++      <div className="mb-6">
++        <h2 className="text-2xl font-bold text-gray-900">Maintenance Calendar</h2>
++        <p className="text-gray-600 mt-1">
++          Click on a date to schedule new maintenance or click on an event to view details
++        </p>
++      </div>
++
++      <div className="bg-white rounded-lg shadow p-4">
++        <FullCalendar
++          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
++          initialView="dayGridMonth"
++          headerToolbar={{
++            left: 'prev,next today',
++            center: 'title',
++            right: 'dayGridMonth,timeGridWeek,timeGridDay'
++          }}
++          events={events}
++          eventClick={handleEventClick}
++          dateClick={handleDateClick}
++          editable={false}
++          selectable={true}
++          selectMirror={true}
++          dayMaxEvents={3}
++          weekends={true}
++          height="auto"
++        />
++      </div>
++
++      <div className="mt-4 flex gap-4 text-sm">
++        <div className="flex items-center gap-2">
++          <div className="w-4 h-4 rounded" style={{ backgroundColor: '#10b981' }}></div>
++          <span>Low Priority</span>
++        </div>
++        <div className="flex items-center gap-2">
++          <div className="w-4 h-4 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
++          <span>Medium Priority</span>
++        </div>
++        <div className="flex items-center gap-2">
++          <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f59e0b' }}></div>
++          <span>High Priority</span>
++        </div>
++        <div className="flex items-center gap-2">
++          <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ef4444' }}></div>
++          <span>Critical Priority</span>
++        </div>
++      </div>
++
++      <Modal isOpen={isFormOpen} onClose={handleFormClose} title={selectedSchedule ? 'Edit Maintenance Schedule' : 'Create Maintenance Schedule'}>
++        <ScheduleForm
++          schedule={selectedSchedule}
++          initialDate={selectedDate}
++          onSubmit={handleFormSubmit}
++          onCancel={handleFormClose}
++        />
++      </Modal>
++    </div>
++  );
++};
+diff --git a/frontend/src/components/maintenance/ScheduleForm.tsx b/frontend/src/components/maintenance/ScheduleForm.tsx
+new file mode 100644
+index 0000000..d8b3f1a
+--- /dev/null
++++ b/frontend/src/components/maintenance/ScheduleForm.tsx
+@@ -0,0 +1,234 @@
++import React, { useState, useEffect } from 'react';
++import { MaintenanceSchedule, CreateSchedulePayload } from '../../types/maintenance';
++import { maintenanceApi } from '../../api/maintenance';
++import { resourceApi } from '../../api/resources';
++
++interface ScheduleFormProps {
++  schedule?: MaintenanceSchedule | null;
++  initialDate?: Date | null;
++  onSubmit: () => void;
++  onCancel: () => void;
++}
++
++export const ScheduleForm: React.FC<ScheduleFormProps> = ({
++  schedule,
++  initialDate,
++  onSubmit,
++  onCancel
++}) => {
++  const [formData, setFormData] = useState<CreateSchedulePayload>({
++    resource_id: schedule?.resource_id || '',
++    schedule_type: schedule?.schedule_type || 'one_time',
++    frequency: schedule?.frequency || 'monthly',
++    interval_value: schedule?.interval_value || 1,
++    next_due_date: schedule?.next_due_date || initialDate?.toISOString() || '',
++    description: schedule?.description || '',
++    estimated_duration_minutes: schedule?.estimated_duration_minutes || 60,
++    assigned_to: schedule?.assigned_to || null,
++    priority: schedule?.priority || 'medium',
++    alert_enabled: schedule?.alert_enabled ?? true,
++    alert_days_before: schedule?.alert_days_before || 7
++  });
++
++  const [resources, setResources] = useState([]);
++  const [users, setUsers] = useState([]);
++  const [loading, setLoading] = useState(false);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => {
++    loadResources();
++    loadUsers();
++  }, []);
++
++  const loadResources = async () => {
++    try {
++      const response = await resourceApi.getResources();
++      setResources(response.data);
++    } catch (err) {
++      console.error('Failed to load resources:', err);
++    }
++  };
++
++  const loadUsers = async () => {
++    try {
++      const response = await resourceApi.getUsers({ roles: ['admin', 'coordinator', 'staff'] });
++      setUsers(response.data);
++    } catch (err) {
++      console.error('Failed to load users:', err);
++    }
++  };
++
++  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
++    const { name, value, type } = e.target;
++    
++    setFormData(prev => ({
++      ...prev,
++      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
++    }));
++  };
++
++  const handleSubmit = async (e: React.FormEvent) => {
++    e.preventDefault();
++    setLoading(true);
++    setError(null);
++
++    try {
++      if (schedule) {
++        await maintenanceApi.updateSchedule(schedule.id, formData);
++      } else {
++        await maintenanceApi.createSchedule(formData);
++      }
++      onSubmit();
++    } catch (err: any) {
++      setError(err.response?.data?.message || 'Failed to save maintenance schedule');
++    } finally {
++      setLoading(false);
++    }
++  };
++
++  return (
++    <form onSubmit={handleSubmit} className="space-y-6">
++      {error && (
++        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
++          {error}
++        </div>
++      )}
++
++      <div>
++        <label htmlFor="resource_id" className="block text-sm font-medium text-gray-700">
++          Resource *
++        </label>
++        <select
++          id="resource_id"
++          name="resource_id"
++          value={formData.resource_id}
++          onChange={handleChange}
++          required
++          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++        >
++          <option value="">Select a resource</option>
++          {resources.map((resource: any) => (
++            <option key={resource.id} value={resource.id}>
++              {resource.name} - {resource.location}
++            </option>
++          ))}
++        </select>
++      </div>
++
++      <div>
++        <label htmlFor="schedule_type" className="block text-sm font-medium text-gray-700">
++          Schedule Type *
++        </label>
++        <select
++          id="schedule_type"
++          name="schedule_type"
++          value={formData.schedule_type}
++          onChange={handleChange}
++          required
++          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++        >
++          <option value="one_time">One Time</option>
++          <option value="recurring">Recurring</option>
++        </select>
++      </div>
++
++      {formData.schedule_type === 'recurring' && (
++        <div className="grid grid-cols-2 gap-4">
++          <div>
++            <label htmlFor="frequency" className="block text-sm font-medium text-gray-700">
++              Frequency *
++            </label>
++            <select
++              id="frequency"
++              name="frequency"
++              value={formData.frequency}
++              onChange={handleChange}
++              required={formData.schedule_type === 'recurring'}
++              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++            >
++              <option value="daily">Daily</option>
++              <option value="weekly">Weekly</option>
++              <option value="monthly">Monthly</option>
++              <option value="quarterly">Quarterly</option>
++              <option value="yearly">Yearly</option>
++            </select>
++          </div>
++
++          <div>
++            <label htmlFor="interval_value" className="block text-sm font-medium text-gray-700">
++              Every
++            </label>
++            <input
++              type="number"
++              id="interval_value"
++              name="interval_value"
++              value={formData.interval_value}
++              onChange={handleChange}
++              min="1"
++              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++            />
++          </div>
++        </div>
++      )}
++
++      <div>
++        <label htmlFor="next_due_date" className="block text-sm font-medium text-gray-700">
++          Next Due Date *
++        </label>
++        <input
++          type="datetime-local"
++          id="next_due_date"
++          name="next_due_date"
++          value={formData.next_due_date ? new Date(formData.next_due_date).toISOString().slice(0, 16) : ''}
++          onChange={handleChange}
++          required
++          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++        />
++      </div>
++
++      <div>
++        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
++          Description
++        </label>
++        <textarea
++          id="description"
++          name="description"
++          value={formData.description}
++          onChange={handleChange}
++          rows={3}
++          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++        />
++      </div>
++
++      <div className="grid grid-cols-2 gap-4">
++        <div>
++          <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
++            Priority
++          </label>
++          <select
++            id="priority"
++            name="priority"
++            value={formData.priority}
++            onChange={handleChange}
++            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++          >
++            <option value="low">Low</option>
++            <option value="medium">Medium</option>
++            <option value="high">High</option>
++            <option value="critical">Critical</option>
++          </select>
++        </div>
++
++        <div>
++          <label htmlFor="estimated_duration_minutes" className="block text-sm font-medium text-gray-700">
++            Duration (minutes)
++          </label>
++          <input
++            type="number"
++            id="estimated_duration_minutes"
++            name="estimated_duration_minutes"
++            value={formData.estimated_duration_minutes}
++            onChange={handleChange}
++            min="1"
++            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++          />
++        </div>
++      </div>
++
++      <div className="flex items-center">
++        <input
++          type="checkbox"
++          id="alert_enabled"
++          name="alert_enabled"
++          checked={formData.alert_enabled}
++          onChange={handleChange}
++          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
++        />
++        <label htmlFor="alert_enabled" className="ml-2 block text-sm text-gray-900">
++          Enable alerts
++        </label>
++      </div>
++
++      {formData.alert_enabled && (
++        <div>
++          <label htmlFor="alert_days_before" className="block text-sm font-medium text-gray-700">
++            Alert Days Before Due
++          </label>
++          <input
++            type="number"
++            id="alert_days_before"
++            name="alert_days_before"
++            value={formData.alert_days_before}
++            onChange={handleChange}
++            min="0"
++            max="90"
++            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
++          />
++        </div>
++      )}
++
++      <div className="flex justify-end gap-3 pt-4 border-t">
++        <button
++          type="button"
++          onClick={onCancel}
++          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
++        >
++          Cancel
++        </button>
++        <button
++          type="submit"
++          disabled={loading}
++          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
++        >
++          {loading ? 'Saving...' : schedule ? 'Update Schedule' : 'Create Schedule'}
++        </button>
++      </div>
++    </form>
++  );
++};
+diff --git a/frontend/src/types/maintenance.ts b/frontend/src/types/maintenance.ts
+new file mode 100644
+index 0000000..f3d8c9f
+--- /dev/null
++++ b/frontend/src/types/maintenance.ts
+@@ -0,0 +1,45 @@
++export interface MaintenanceSchedule {
++  id: string;
++  resource_id: string;
++  resource_name?: string;
++  schedule_type: 'one_time' | 'recurring';
++  frequency?: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
++  interval_value: number;
++  next_due_date: string;
++  last_completed_date?: string;
++  description?: string;
++  estimated_duration_minutes?: number;
++  assigned_to?: string;
++  priority: 'low' | 'medium' | 'high' | 'critical';
++  alert_enabled: boolean;
++  alert_days_before: number;
++  is_active: boolean;
++  created_at: string;
++  updated_at: string;
++  created_by: string;
++  updated_by?: string;
++}
++
++export interface CreateSchedulePayload {
++  resource_id: string;
++  schedule_type: 'one_time' | 'recurring';
++  frequency?: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
++  interval_value?: number;
++  next_due_date: string;
++  description?: string;
++  estimated_duration_minutes?: number;
++  assigned_to?: string | null;
++  priority?: 'low' | 'medium' | 'high' | 'critical';
++  alert_enabled?: boolean;
++  alert_days_before?: number;
++}
++
++export interface MaintenanceLog {
++  id: string;
++  resource_id: string;
++  schedule_id?: string;
++  performed_by: string;
++  performed_at: string;
++  completion_status: 'completed' | 'partial' | 'skipped' | 'failed';
++  notes?: string;
++}
+diff --git a/frontend/package.json b/frontend/package.json
+index d7c8f22..9e4f3d1 100644
+--- a/frontend/package.json
++++ b/frontend/package.json
+@@ -12,6 +12,9 @@
+   },
+   "dependencies": {
+     "react": "^18.2.0",
+     "react-dom": "^18.2.0",
++    "@fullcalendar/react": "^6.1.8",
++    "@fullcalendar/daygrid": "^6.1.8",
++    "@fullcalendar/timegrid": "^6.1.8",
++    "@fullcalendar/interaction": "^6.1.8",
+     "date-fns": "^2.30.0"
+   }
+ }

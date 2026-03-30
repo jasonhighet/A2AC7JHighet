@@ -1,0 +1,349 @@
+diff --git a/mobile/package.json b/mobile/package.json
+new file mode 100644
+index 0000000..e8c3f9a
+--- /dev/null
++++ b/mobile/package.json
+@@ -0,0 +1,43 @@
++{
++  "name": "equipment-tracker-mobile",
++  "version": "1.0.0",
++  "main": "node_modules/expo/AppEntry.js",
++  "scripts": {
++    "start": "expo start",
++    "android": "expo start --android",
++    "ios": "expo start --ios",
++    "web": "expo start --web"
++  },
++  "dependencies": {
++    "@react-navigation/native": "^6.1.6",
++    "@react-navigation/native-stack": "^6.9.12",
++    "@react-navigation/bottom-tabs": "^6.5.7",
++    "axios": "^1.4.0",
++    "expo": "~48.0.15",
++    "expo-barcode-scanner": "~12.3.2",
++    "expo-camera": "~13.2.1",
++    "expo-location": "~15.1.1",
++    "expo-secure-store": "~12.1.1",
++    "expo-status-bar": "~1.4.4",
++    "react": "18.2.0",
++    "react-native": "0.71.8",
++    "react-native-safe-area-context": "4.5.0",
++    "react-native-screens": "~3.20.0",
++    "socket.io-client": "^4.6.1"
++  },
++  "devDependencies": {
++    "@babel/core": "^7.20.0"
++  },
++  "private": true
++}
+diff --git a/mobile/App.js b/mobile/App.js
+new file mode 100644
+index 0000000..1a3c2f5
+--- /dev/null
++++ b/mobile/App.js
+@@ -0,0 +1,48 @@
++import React from 'react';
++import { NavigationContainer } from '@react-navigation/native';
++import { createNativeStackNavigator } from '@react-navigation/native-stack';
++import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
++import { StatusBar } from 'expo-status-bar';
++
++import { AuthProvider } from './src/context/AuthContext';
++import LoginScreen from './src/screens/LoginScreen';
++import HomeScreen from './src/screens/HomeScreen';
++import QRScannerScreen from './src/screens/QRScannerScreen';
++import CheckoutsScreen from './src/screens/CheckoutsScreen';
++import ProfileScreen from './src/screens/ProfileScreen';
++
++const Stack = createNativeStackNavigator();
++const Tab = createBottomTabNavigator();
++
++function MainTabs() {
++  return (
++    <Tab.Navigator>
++      <Tab.Screen name="Home" component={HomeScreen} />
++      <Tab.Screen name="Scan QR" component={QRScannerScreen} />
++      <Tab.Screen name="Checkouts" component={CheckoutsScreen} />
++      <Tab.Screen name="Profile" component={ProfileScreen} />
++    </Tab.Navigator>
++  );
++}
++
++export default function App() {
++  return (
++    <AuthProvider>
++      <NavigationContainer>
++        <Stack.Navigator 
++          initialRouteName="Login"
++          screenOptions={{
++            headerShown: false
++          }}
++        >
++          <Stack.Screen 
++            name="Login" 
++            component={LoginScreen} 
++          />
++          <Stack.Screen name="Main" component={MainTabs} />
++        </Stack.Navigator>
++        <StatusBar style="auto" />
++      </NavigationContainer>
++    </AuthProvider>
++  );
++}
+diff --git a/mobile/src/context/AuthContext.js b/mobile/src/context/AuthContext.js
+new file mode 100644
+index 0000000..f8a9e3c
+--- /dev/null
++++ b/mobile/src/context/AuthContext.js
+@@ -0,0 +1,89 @@
++import React, { createContext, useState, useContext, useEffect } from 'react';
++import * as SecureStore from 'expo-secure-store';
++import axios from 'axios';
++
++const AuthContext = createContext();
++
++const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
++
++export function AuthProvider({ children }) {
++  const [user, setUser] = useState(null);
++  const [token, setToken] = useState(null);
++  const [loading, setLoading] = useState(true);
++
++  useEffect(() => {
++    loadStoredAuth();
++  }, []);
++
++  const loadStoredAuth = async () => {
++    try {
++      const storedToken = await SecureStore.getItemAsync('authToken');
++      const storedUser = await SecureStore.getItemAsync('user');
++      
++      if (storedToken && storedUser) {
++        setToken(storedToken);
++        setUser(JSON.parse(storedUser));
++        
++        // Set default authorization header
++        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
++      }
++    } catch (error) {
++      console.error('Error loading stored auth:', error);
++    } finally {
++      setLoading(false);
++    }
++  };
++
++  const login = async (email, password) => {
++    try {
++      const response = await axios.post(`${API_URL}/auth/login`, {
++        email,
++        password
++      });
++
++      const { token: newToken, user: newUser } = response.data;
++
++      // Store auth data
++      await SecureStore.setItemAsync('authToken', newToken);
++      await SecureStore.setItemAsync('user', JSON.stringify(newUser));
++
++      // Set state
++      setToken(newToken);
++      setUser(newUser);
++
++      // Set default authorization header
++      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
++
++      return { success: true };
++    } catch (error) {
++      console.error('Login error:', error);
++      return { 
++        success: false, 
++        error: error.response?.data?.message || 'Login failed' 
++      };
++    }
++  };
++
++  const logout = async () => {
++    try {
++      await SecureStore.deleteItemAsync('authToken');
++      await SecureStore.deleteItemAsync('user');
++      
++      setToken(null);
++      setUser(null);
++      
++      delete axios.defaults.headers.common['Authorization'];
++    } catch (error) {
++      console.error('Logout error:', error);
++    }
++  };
++
++  return (
++    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
++      {children}
++    </AuthContext.Provider>
++  );
++}
++
++export const useAuth = () => useContext(AuthContext);
+diff --git a/mobile/src/screens/LoginScreen.js b/mobile/src/screens/LoginScreen.js
+new file mode 100644
+index 0000000..7f3a9b5
+--- /dev/null
++++ b/mobile/src/screens/LoginScreen.js
+@@ -0,0 +1,102 @@
++import React, { useState } from 'react';
++import {
++  View,
++  Text,
++  TextInput,
++  TouchableOpacity,
++  StyleSheet,
++  ActivityIndicator,
++  Alert
++} from 'react-native';
++import { useAuth } from '../context/AuthContext';
++
++export default function LoginScreen({ navigation }) {
++  const [email, setEmail] = useState('');
++  const [password, setPassword] = useState('');
++  const [loading, setLoading] = useState(false);
++  const { login } = useAuth();
++
++  const handleLogin = async () => {
++    if (!email || !password) {
++      Alert.alert('Error', 'Please enter both email and password');
++      return;
++    }
++
++    setLoading(true);
++    const result = await login(email, password);
++    setLoading(false);
++
++    if (result.success) {
++      navigation.replace('Main');
++    } else {
++      Alert.alert('Login Failed', result.error);
++    }
++  };
++
++  return (
++    <View style={styles.container}>
++      <Text style={styles.title}>Equipment Tracker</Text>
++      <Text style={styles.subtitle}>Sign in to continue</Text>
++
++      <TextInput
++        style={styles.input}
++        placeholder="Email"
++        value={email}
++        onChangeText={setEmail}
++        keyboardType="email-address"
++        autoCapitalize="none"
++        editable={!loading}
++      />
++
++      <TextInput
++        style={styles.input}
++        placeholder="Password"
++        value={password}
++        onChangeText={setPassword}
++        secureTextEntry
++        editable={!loading}
++      />
++
++      <TouchableOpacity
++        style={[styles.button, loading && styles.buttonDisabled]}
++        onPress={handleLogin}
++        disabled={loading}
++      >
++        {loading ? (
++          <ActivityIndicator color="#fff" />
++        ) : (
++          <Text style={styles.buttonText}>Sign In</Text>
++        )}
++      </TouchableOpacity>
++    </View>
++  );
++}
++
++const styles = StyleSheet.create({
++  container: {
++    flex: 1,
++    justifyContent: 'center',
++    padding: 20,
++    backgroundColor: '#f5f5f5'
++  },
++  title: {
++    fontSize: 32,
++    fontWeight: 'bold',
++    textAlign: 'center',
++    marginBottom: 10
++  },
++  subtitle: {
++    fontSize: 16,
++    textAlign: 'center',
++    color: '#666',
++    marginBottom: 40
++  },
++  input: {
++    backgroundColor: '#fff',
++    padding: 15,
++    borderRadius: 8,
++    marginBottom: 15,
++    fontSize: 16,
++    borderWidth: 1,
++    borderColor: '#ddd'
++  },
++  button: {
++    backgroundColor: '#007AFF',
++    padding: 15,
++    borderRadius: 8,
++    alignItems: 'center',
++    marginTop: 10
++  },
++  buttonDisabled: {
++    opacity: 0.6
++  },
++  buttonText: {
++    color: '#fff',
++    fontSize: 18,
++    fontWeight: '600'
++  }
++});
+diff --git a/mobile/app.json b/mobile/app.json
+new file mode 100644
+index 0000000..b8f3c89
+--- /dev/null
++++ b/mobile/app.json
+@@ -0,0 +1,32 @@
++{
++  "expo": {
++    "name": "Equipment Tracker",
++    "slug": "equipment-tracker",
++    "version": "1.0.0",
++    "orientation": "portrait",
++    "icon": "./assets/icon.png",
++    "userInterfaceStyle": "light",
++    "splash": {
++      "image": "./assets/splash.png",
++      "resizeMode": "contain",
++      "backgroundColor": "#ffffff"
++    },
++    "assetBundlePatterns": [
++      "**/*"
++    ],
++    "ios": {
++      "supportsTablet": true,
++      "bundleIdentifier": "com.equipmenttracker.app"
++    },
++    "android": {
++      "adaptiveIcon": {
++        "foregroundImage": "./assets/adaptive-icon.png",
++        "backgroundColor": "#ffffff"
++      },
++      "package": "com.equipmenttracker.app",
++      "permissions": ["CAMERA", "ACCESS_FINE_LOCATION"]
++    },
++    "web": {
++      "favicon": "./assets/favicon.png"
++    }
++  }
++}

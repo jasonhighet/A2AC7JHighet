@@ -1,0 +1,109 @@
+diff --git a/backend/services/qrCodeService.js b/backend/services/qrCodeService.js
+index 7c4d2e5..9f8e4d2 100644
+--- a/backend/services/qrCodeService.js
++++ b/backend/services/qrCodeService.js
+@@ -29,16 +29,31 @@ async function generateQRCode(equipmentId, userId) {
+       throw new Error('Equipment not found');
+     }
+ 
+-    // Invalidate any existing active QR codes for this equipment
+-    await QRCode.updateMany(
+-      { equipmentId, isActive: true },
+-      { 
+-        isActive: false, 
+-        invalidatedAt: new Date(),
+-        invalidatedBy: userId
++    // BUGFIX ATTEMPT: Add transaction to prevent race condition
++    const session = await mongoose.startSession();
++    session.startTransaction();
++
++    try {
++      // Invalidate any existing active QR codes for this equipment within transaction
++      await QRCode.updateMany(
++        { equipmentId, isActive: true },
++        { 
++          isActive: false, 
++          invalidatedAt: new Date(),
++          invalidatedBy: userId
++        },
++        { session }
++      );
++
++      // Small delay to ensure invalidation completes
++      // WARNING: This is not a proper fix for race conditions!
++      await new Promise(resolve => setTimeout(resolve, 100));
++
++      await session.commitTransaction();
++    } catch (error) {
++      await session.abortTransaction();
++      throw error;
++    } finally {
++      session.endSession();
+     }
+-    );
+ 
+     // Generate new token
+     const token = generateToken();
+@@ -90,7 +105,24 @@ async function generateQRCode(equipmentId, userId) {
+  */
+ async function validateToken(token) {
+   try {
++    // BUGFIX ATTEMPT: Add additional validation
++    // Check if token format is valid before querying
++    if (!token || typeof token !== 'string' || token.length !== 32) {
++      logger.warn('Invalid token format', { token });
++      return null;
++    }
++
++    // Query with explicit sort to ensure we get the most recent if duplicates exist
++    // NOTE: This doesn't actually fix the underlying race condition issue
+     const qrCodeRecord = await QRCode.findOne({
+       token,
+       isActive: true,
+       expiresAt: { $gt: new Date() }
+-    }).populate('equipmentId');
++    })
++    .sort({ generatedAt: -1 }) // Get most recent if multiple exist
++    .populate('equipmentId');
+ 
+     if (!qrCodeRecord) {
+       logger.warn('Invalid or expired QR code token', { token });
+@@ -105,6 +137,16 @@ async function validateToken(token) {
+     qrCodeRecord.lastScannedAt = new Date();
+     await qrCodeRecord.save();
+ 
++    // BUGFIX ATTEMPT: Double-check that code is still active after save
++    // This doesn't actually prevent the race condition
++    const doubleCheck = await QRCode.findById(qrCodeRecord._id);
++    if (!doubleCheck || !doubleCheck.isActive) {
++      logger.error('QR code became invalid during validation', { 
++        token,
++        originalActive: qrCodeRecord.isActive,
++        doubleCheckActive: doubleCheck?.isActive 
++      });
++      return null;
++    }
++
+     logger.info('QR code validated', { 
+       token, 
+       equipmentId: qrCodeRecord.equipmentId._id,
+diff --git a/backend/models/qrCode.js b/backend/models/qrCode.js
+index 8f3a9c5..4f2e8f3 100644
+--- a/backend/models/qrCode.js
++++ b/backend/models/qrCode.js
+@@ -58,5 +58,14 @@ const qrCodeSchema = new mongoose.Schema({
+ // Compound index for active code lookups
+ qrCodeSchema.index({ token: 1, isActive: 1, expiresAt: 1 });
+ qrCodeSchema.index({ equipmentId: 1, isActive: 1 });
++
++// BUGFIX ATTEMPT: Add unique compound index to prevent multiple active codes
++// WARNING: This can cause insert failures if timing issue occurs
++qrCodeSchema.index(
++  { equipmentId: 1, isActive: 1 }, 
++  { 
++    unique: true, 
++    partialFilterExpression: { isActive: true }
++  }
++);
+ 
+ module.exports = mongoose.model('QRCode', qrCodeSchema);

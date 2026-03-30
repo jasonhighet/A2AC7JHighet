@@ -1,0 +1,544 @@
+{
+  "expand": "changelog",
+  "id": "10342",
+  "self": "https://communityshare.atlassian.net/rest/api/3/issue/10342",
+  "key": "PLAT-1523",
+  "changelog": {
+    "startAt": 0,
+    "maxResults": 100,
+    "total": 23,
+    "histories": [
+      {
+        "id": "100821",
+        "author": {
+          "self": "https://communityshare.atlassian.net/rest/api/3/user?accountId=5f7e8d9c1a2b3c4d5e6f7890",
+          "accountId": "5f7e8d9c1a2b3c4d5e6f7890",
+          "emailAddress": "emma.rodriguez@communityshare.io",
+          "displayName": "Emma Rodriguez",
+          "active": true,
+          "timeZone": "America/Los_Angeles"
+        },
+        "created": "2025-08-01T10:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": null,
+            "fromString": null,
+            "to": "10001",
+            "toString": "Planning"
+          }
+        ]
+      },
+      {
+        "id": "100822",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-08-01T10:05:00.000+0000",
+        "items": [
+          {
+            "field": "priority",
+            "fieldtype": "jira",
+            "fieldId": "priority",
+            "from": "4",
+            "fromString": "Medium",
+            "to": "3",
+            "toString": "High"
+          }
+        ]
+      },
+      {
+        "id": "100823",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-08-01T10:10:00.000+0000",
+        "items": [
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "feature backend frontend q4-2025"
+          }
+        ]
+      },
+      {
+        "id": "100824",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-08-01T10:15:00.000+0000",
+        "items": [
+          {
+            "field": "Fix Version",
+            "fieldtype": "jira",
+            "fieldId": "fixVersions",
+            "from": null,
+            "fromString": null,
+            "to": "10025",
+            "toString": "2025-Q4 Release"
+          }
+        ]
+      },
+      {
+        "id": "100912",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-08-05T14:30:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10001",
+            "toString": "Design review scheduled for 2025-08-15"
+          }
+        ]
+      },
+      {
+        "id": "101033",
+        "author": {
+          "displayName": "Lisa Park"
+        },
+        "created": "2025-08-15T15:50:00.000+0000",
+        "items": [
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10002",
+            "toString": "Design review completed - all approved"
+          }
+        ]
+      },
+      {
+        "id": "101034",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-08-15T16:00:00.000+0000",
+        "items": [
+          {
+            "field": "customfield_10001",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10001",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "FEAT-MS-001"
+          }
+        ]
+      },
+      {
+        "id": "102145",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-08-25T09:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10001",
+            "fromString": "Planning",
+            "to": "10002",
+            "toString": "In Development"
+          }
+        ]
+      },
+      {
+        "id": "102146",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-08-25T09:05:00.000+0000",
+        "items": [
+          {
+            "field": "assignee",
+            "fieldtype": "jira",
+            "fieldId": "assignee",
+            "from": "5f7e8d9c1a2b3c4d5e6f7890",
+            "fromString": "Emma Rodriguez",
+            "to": "5a1b2c3d4e5f6a7b8c9d0e1f",
+            "toString": "Sarah Chen"
+          }
+        ]
+      },
+      {
+        "id": "102544",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-09-15T16:22:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10003",
+            "toString": "Database schema and initial API endpoints complete"
+          }
+        ]
+      },
+      {
+        "id": "103122",
+        "author": {
+          "displayName": "David Kim"
+        },
+        "created": "2025-09-10T18:50:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10004",
+            "toString": "Security review completed - approved for production"
+          }
+        ]
+      },
+      {
+        "id": "103445",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-09-28T17:15:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10005",
+            "toString": "Frontend components complete, integration with FullCalendar.js working well"
+          }
+        ]
+      },
+      {
+        "id": "103889",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-10-05T14:20:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10002",
+            "fromString": "In Development",
+            "to": "10003",
+            "toString": "Code Review"
+          }
+        ]
+      },
+      {
+        "id": "103890",
+        "author": {
+          "displayName": "Sarah Chen"
+        },
+        "created": "2025-10-05T14:25:00.000+0000",
+        "items": [
+          {
+            "field": "customfield_10020",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10020",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "https://github.com/communityshare/platform/pull/342"
+          }
+        ]
+      },
+      {
+        "id": "104123",
+        "author": {
+          "displayName": "James Wilson"
+        },
+        "created": "2025-10-07T14:30:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10003",
+            "fromString": "Code Review",
+            "to": "10007",
+            "toString": "UAT"
+          }
+        ]
+      },
+      {
+        "id": "104124",
+        "author": {
+          "displayName": "James Wilson"
+        },
+        "created": "2025-10-07T14:35:00.000+0000",
+        "items": [
+          {
+            "field": "assignee",
+            "fieldtype": "jira",
+            "fieldId": "assignee",
+            "from": "5a1b2c3d4e5f6a7b8c9d0e1f",
+            "fromString": "Sarah Chen",
+            "to": "5f7e8d9c1a2b3c4d5e6f7890",
+            "toString": "Emma Rodriguez"
+          }
+        ]
+      },
+      {
+        "id": "104522",
+        "author": {
+          "displayName": "James Wilson"
+        },
+        "created": "2025-10-10T17:05:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10005",
+            "toString": "PR #342 merged - great work!"
+          }
+        ]
+      },
+      {
+        "id": "104523",
+        "author": {
+          "displayName": "James Wilson"
+        },
+        "created": "2025-10-10T17:10:00.000+0000",
+        "items": [
+          {
+            "field": "customfield_10030",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10030",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "87.0"
+          },
+          {
+            "field": "customfield_10031",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10031",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "1847"
+          },
+          {
+            "field": "customfield_10032",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10032",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "42"
+          },
+          {
+            "field": "customfield_10033",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10033",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "23"
+          }
+        ]
+      },
+      {
+        "id": "105344",
+        "author": {
+          "displayName": "Emma Rodriguez"
+        },
+        "created": "2025-10-14T18:20:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10006",
+            "toString": "UAT completed successfully - all testers approved"
+          }
+        ]
+      },
+      {
+        "id": "105876",
+        "author": {
+          "displayName": "Alex Thompson"
+        },
+        "created": "2025-10-14T18:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10007",
+            "fromString": "UAT",
+            "to": "10008",
+            "toString": "Production Ready"
+          }
+        ]
+      },
+      {
+        "id": "105877",
+        "author": {
+          "displayName": "Alex Thompson"
+        },
+        "created": "2025-10-14T18:05:00.000+0000",
+        "items": [
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "feature backend frontend q4-2025",
+            "to": null,
+            "toString": "feature backend frontend production-ready q4-2025 high-priority"
+          }
+        ]
+      },
+      {
+        "id": "105878",
+        "author": {
+          "displayName": "Alex Thompson"
+        },
+        "created": "2025-10-14T18:10:00.000+0000",
+        "items": [
+          {
+            "field": "customfield_10010",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10010",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "2025-10-18"
+          }
+        ]
+      },
+      {
+        "id": "106023",
+        "author": {
+          "displayName": "Alex Thompson"
+        },
+        "created": "2025-10-15T10:55:00.000+0000",
+        "items": [
+          {
+            "field": "Comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "10007",
+            "toString": "All stakeholder approvals obtained - production deployment authorized"
+          }
+        ]
+      }
+    ]
+  },
+  "transition_summary": {
+    "total_transitions": 5,
+    "transitions": [
+      {
+        "sequence": 1,
+        "from_status": null,
+        "to_status": "Planning",
+        "date": "2025-08-01T10:00:00.000+0000",
+        "duration_days": 0,
+        "changed_by": "Emma Rodriguez"
+      },
+      {
+        "sequence": 2,
+        "from_status": "Planning",
+        "to_status": "In Development",
+        "date": "2025-08-25T09:00:00.000+0000",
+        "duration_days": 24,
+        "changed_by": "Sarah Chen"
+      },
+      {
+        "sequence": 3,
+        "from_status": "In Development",
+        "to_status": "Code Review",
+        "date": "2025-10-05T14:20:00.000+0000",
+        "duration_days": 41,
+        "changed_by": "Sarah Chen"
+      },
+      {
+        "sequence": 4,
+        "from_status": "Code Review",
+        "to_status": "UAT",
+        "date": "2025-10-07T14:30:00.000+0000",
+        "duration_days": 2,
+        "changed_by": "James Wilson"
+      },
+      {
+        "sequence": 5,
+        "from_status": "UAT",
+        "to_status": "Production Ready",
+        "date": "2025-10-14T18:00:00.000+0000",
+        "duration_days": 7,
+        "changed_by": "Alex Thompson"
+      }
+    ],
+    "total_duration_days": 74,
+    "phase_durations": {
+      "planning": 24,
+      "development": 41,
+      "code_review": 2,
+      "uat": 7,
+      "production_ready": 1
+    }
+  },
+  "key_milestones": {
+    "created": "2025-08-01T10:00:00.000+0000",
+    "planning_started": "2025-08-01T10:00:00.000+0000",
+    "design_review_completed": "2025-08-15T15:50:00.000+0000",
+    "development_started": "2025-08-25T09:00:00.000+0000",
+    "security_review_completed": "2025-09-10T18:50:00.000+0000",
+    "code_review_started": "2025-10-05T14:20:00.000+0000",
+    "pr_merged": "2025-10-10T17:05:00.000+0000",
+    "uat_started": "2025-10-07T14:30:00.000+0000",
+    "uat_completed": "2025-10-14T18:20:00.000+0000",
+    "production_ready": "2025-10-14T18:00:00.000+0000",
+    "all_approvals_obtained": "2025-10-15T10:55:00.000+0000",
+    "scheduled_deployment": "2025-10-18T02:00:00.000+0000"
+  },
+  "velocity_metrics": {
+    "time_to_develop": {
+      "days": 41,
+      "business_days": 29
+    },
+    "time_to_review": {
+      "days": 2,
+      "business_days": 2
+    },
+    "time_to_uat": {
+      "days": 7,
+      "business_days": 5
+    },
+    "total_time_to_production_ready": {
+      "days": 74,
+      "business_days": 53
+    }
+  }
+}

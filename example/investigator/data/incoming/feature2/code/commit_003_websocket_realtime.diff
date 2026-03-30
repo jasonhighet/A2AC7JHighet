@@ -1,0 +1,238 @@
+diff --git a/backend/server.js b/backend/server.js
+index 3c8e9e3..7f4d2e5 100644
+--- a/backend/server.js
++++ b/backend/server.js
+@@ -1,9 +1,11 @@
+ const app = require('./app');
+ const mongoose = require('mongoose');
++const http = require('http');
++const socketio = require('socket.io');
+ const logger = require('./utils/logger');
++const { initializeSocketHandlers } = require('./sockets/socketHandlers');
+ 
+ const PORT = process.env.PORT || 3000;
+-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/equipment-tracker';
+ 
+ // Connect to MongoDB
+ mongoose.connect(process.env.MONGODB_URI)
+@@ -14,8 +16,16 @@ mongoose.connect(process.env.MONGODB_URI)
+     process.exit(1);
+   });
+ 
+-// Start server
+-app.listen(PORT, () => {
++// Create HTTP server and initialize Socket.IO
++const server = http.createServer(app);
++const io = socketio(server, {
++  cors: {
++    origin: process.env.CLIENT_URLS?.split(',') || ['http://localhost:3000'],
++    credentials: true
++  }
++});
++
++// Initialize WebSocket handlers
++initializeSocketHandlers(io);
++
++// Start server
++server.listen(PORT, () => {
+   logger.info(`Server running on port ${PORT}`);
+ });
+diff --git a/backend/sockets/socketHandlers.js b/backend/sockets/socketHandlers.js
+new file mode 100644
+index 0000000..c5a8d3f
+--- /dev/null
++++ b/backend/sockets/socketHandlers.js
+@@ -0,0 +1,132 @@
++const jwt = require('jsonwebtoken');
++const logger = require('../utils/logger');
++const User = require('../models/user');
++
++// Store active connections
++const activeConnections = new Map();
++
++/**
++ * Authenticate socket connection using JWT token
++ */
++async function authenticateSocket(socket, next) {
++  try {
++    const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
++    
++    if (!token) {
++      return next(new Error('Authentication token required'));
++    }
++
++    const decoded = jwt.verify(token, process.env.JWT_SECRET);
++    const user = await User.findById(decoded.userId);
++
++    if (!user) {
++      return next(new Error('User not found'));
++    }
++
++    socket.userId = user._id.toString();
++    socket.userRole = user.role;
++    next();
++  } catch (error) {
++    logger.error('Socket authentication error', { error: error.message });
++    next(new Error('Authentication failed'));
++  }
++}
++
++/**
++ * Initialize Socket.IO event handlers
++ */
++function initializeSocketHandlers(io) {
++  // Apply authentication middleware
++  io.use(authenticateSocket);
++
++  io.on('connection', (socket) => {
++    const userId = socket.userId;
++    logger.info('Client connected', { socketId: socket.id, userId });
++
++    // Store connection
++    activeConnections.set(socket.id, {
++      userId,
++      connectedAt: new Date()
++    });
++
++    // Join user's personal room
++    socket.join(`user:${userId}`);
++
++    // Handle equipment room subscriptions
++    socket.on('subscribe:equipment', (equipmentId) => {
++      logger.info('Client subscribed to equipment', { socketId: socket.id, equipmentId });
++      socket.join(`equipment:${equipmentId}`);
++    });
++
++    socket.on('unsubscribe:equipment', (equipmentId) => {
++      logger.info('Client unsubscribed from equipment', { socketId: socket.id, equipmentId });
++      socket.leave(`equipment:${equipmentId}`);
++    });
++
++    // Handle disconnect
++    socket.on('disconnect', () => {
++      logger.info('Client disconnected', { socketId: socket.id, userId });
++      activeConnections.delete(socket.id);
++    });
++
++    // Send connection confirmation
++    socket.emit('connected', {
++      message: 'Successfully connected to real-time updates',
++      userId
++    });
++  });
++
++  // Store io instance globally for use in services
++  global.io = io;
++}
++
++/**
++ * Emit checkout event to relevant clients
++ */
++function emitCheckoutEvent(checkoutData) {
++  if (!global.io) {
++    logger.warn('Socket.IO not initialized');
++    return;
++  }
++
++  const { equipmentId, userId, action, checkout } = checkoutData;
++
++  // Emit to equipment room (all users watching this equipment)
++  global.io.to(`equipment:${equipmentId}`).emit('checkout:update', {
++    action, // 'checkout' or 'checkin'
++    equipment: checkout.equipmentId,
++    user: checkout.userId,
++    checkout: {
++      id: checkout._id,
++      status: checkout.status,
++      checkoutDate: checkout.checkoutDate,
++      checkinDate: checkout.checkinDate,
++      location: checkout.location
++    },
++    timestamp: new Date()
++  });
++
++  // Emit to user's personal room
++  global.io.to(`user:${userId}`).emit('checkout:personal', {
++    action,
++    checkout: {
++      id: checkout._id,
++      equipment: checkout.equipmentId,
++      status: checkout.status,
++      checkoutDate: checkout.checkoutDate,
++      checkinDate: checkout.checkinDate
++    },
++    timestamp: new Date()
++  });
++
++  logger.info('Checkout event emitted', { equipmentId, userId, action });
++}
++
++/**
++ * Get active connection statistics
++ */
++function getConnectionStats() {
++  return {
++    totalConnections: activeConnections.size,
++    connections: Array.from(activeConnections.entries())
++  };
++}
++
++module.exports = {
++  initializeSocketHandlers,
++  emitCheckoutEvent,
++  getConnectionStats
++};
+diff --git a/backend/services/checkoutService.js b/backend/services/checkoutService.js
+index 6c8b2f5..8e3f7d1 100644
+--- a/backend/services/checkoutService.js
++++ b/backend/services/checkoutService.js
+@@ -2,6 +2,7 @@ const Checkout = require('../models/checkout');
+ const Equipment = require('../models/equipment');
+ const User = require('../models/user');
+ const logger = require('../utils/logger');
++const { emitCheckoutEvent } = require('../sockets/socketHandlers');
+ 
+ /**
+  * Create a new equipment checkout
+@@ -36,6 +37,14 @@ async function createCheckout({ equipmentId, userId, location, method = 'manual
+ 
+     logger.info('Checkout created', { checkoutId: newCheckout._id, equipmentId, userId });
+ 
++    // Emit real-time event
++    emitCheckoutEvent({
++      equipmentId,
++      userId,
++      action: 'checkout',
++      checkout: newCheckout
++    });
++
+     return {
+       checkout: newCheckout,
+       equipment
+@@ -78,6 +87,14 @@ async function checkinEquipment({ equipmentId, userId, location, method = 'manu
+     await equipment.save();
+ 
+     logger.info('Equipment checked in', { checkoutId: checkout._id, equipmentId });
++
++    // Emit real-time event
++    emitCheckoutEvent({
++      equipmentId,
++      userId,
++      action: 'checkin',
++      checkout
++    });
+ 
+     return {
+       checkout,
+diff --git a/backend/package.json b/backend/package.json
+index 9d4e2c1..5f3e9c1 100644
+--- a/backend/package.json
++++ b/backend/package.json
+@@ -16,6 +16,7 @@
+     "mongoose": "^7.0.3",
+     "morgan": "^1.10.0",
+     "qrcode": "^1.5.3",
++    "socket.io": "^4.6.1",
+     "validator": "^13.9.0"
+   },
+   "devDependencies": {

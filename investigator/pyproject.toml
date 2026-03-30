@@ -1,0 +1,24 @@
+[project]
+name = "investigator"
+version = "0.1.0"
+description = "Investigator Agent — Feature Readiness Assessor for the CommunityShare platform"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain>=1.2.13",
+    "langchain-core>=1.2.23",
+    "langchain-openai>=1.1.12",
+    "langgraph>=1.1.3",
+    "langsmith>=0.7.22",
+    "opentelemetry-api>=1.40.0",
+    "opentelemetry-sdk>=1.40.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.13.1",
+    "pytest>=9.0.2",
+    "python-dotenv>=1.2.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["src", "tests"]
+python_files = ["*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

@@ -1,0 +1,511 @@
+{
+  "review_metadata": {
+    "review_id": "SEC-2025-1010-QR",
+    "feature_id": "FEAT-QR-002",
+    "jira_issue": "PLAT-1687",
+    "review_date": "2025-10-10T09:00:00Z",
+    "status": "IN_PROGRESS",
+    "severity": "BLOCKING",
+    "reviewer": {
+      "name": "David Thompson",
+      "role": "Senior Security Engineer",
+      "email": "david.thompson@library.org"
+    },
+    "review_type": "Pre-Production Security Review",
+    "triggered_by": "Pull Request #389"
+  },
+  "review_status": {
+    "overall_status": "IN_PROGRESS",
+    "started_at": "2025-10-10T09:00:00Z",
+    "expected_completion": "2025-10-17T17:00:00Z",
+    "actual_completion": null,
+    "blocking_production": true,
+    "requires_fixes": true
+  },
+  "scope": {
+    "components_reviewed": [
+      "Backend API (QR generation and validation)",
+      "Mobile application (iOS and Android)",
+      "WebSocket real-time communication",
+      "Database schema and access patterns",
+      "Authentication and authorization flows"
+    ],
+    "review_methods": [
+      "Automated security scanning (SAST/DAST)",
+      "Manual code review",
+      "Threat modeling",
+      "Penetration testing (planned)",
+      "Dependency vulnerability scanning"
+    ]
+  },
+  "findings": {
+    "summary": {
+      "critical": 1,
+      "high": 3,
+      "medium": 4,
+      "low": 2,
+      "total": 10
+    },
+    "critical_findings": [
+      {
+        "finding_id": "SEC-QR-001-CRITICAL",
+        "title": "Race Condition in QR Code Validation Allows Token Reuse",
+        "severity": "CRITICAL",
+        "cvss_score": 9.1,
+        "status": "OPEN",
+        "category": "Authentication / Access Control",
+        "description": "The QR code validation process contains a critical race condition that allows the same QR token to be used multiple times by concurrent requests. This enables unauthorized users to check out equipment they don't have permission to access.",
+        "technical_details": {
+          "vulnerable_code": "backend/src/services/QRCodeService.ts:127-132",
+          "issue": "The validation check and token invalidation are not atomic. Between the database query checking if a token is unused and the update marking it as used, another request can validate the same token.",
+          "attack_scenario": [
+            "Attacker intercepts or photographs legitimate user's QR code",
+            "Attacker sends multiple rapid parallel requests to validate the same token",
+            "Due to race condition, multiple requests pass validation before any marks the token as used",
+            "Attacker successfully checks out equipment without authorization"
+          ],
+          "proof_of_concept": "Reproduced in load testing with 10 concurrent requests to same QR token. 8 out of 10 requests successfully validated the token."
+        },
+        "impact": {
+          "confidentiality": "LOW",
+          "integrity": "HIGH",
+          "availability": "LOW",
+          "business_impact": "Unauthorized access to equipment, potential theft, liability issues, loss of trust"
+        },
+        "affected_components": [
+          "backend/src/services/QRCodeService.ts",
+          "backend/src/api/routes/equipment.ts"
+        ],
+        "remediation": {
+          "priority": "IMMEDIATE",
+          "recommendation": "Implement database-level atomic operations using one of:\n1. SELECT FOR UPDATE within a transaction\n2. Optimistic locking with version column\n3. Unique constraint with INSERT/UPDATE pattern\n4. Database-level check constraint",
+          "code_example": "const qrCode = await sequelize.transaction(async (t) => {\n  const code = await QRCode.findOne({ \n    where: { token, used: false },\n    lock: t.LOCK.UPDATE,\n    transaction: t \n  });\n  if (!code) return null;\n  code.used = true;\n  await code.save({ transaction: t });\n  return code;\n});",
+          "effort_estimate": "4-8 hours",
+          "testing_required": [
+            "Unit test with concurrent validation attempts",
+            "Load test with 100+ concurrent requests",
+            "Verify exactly one request succeeds"
+          ]
+        },
+        "references": [
+          "CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization",
+          "OWASP: Race Conditions"
+        ],
+        "discovered_at": "2025-10-10T10:15:33Z",
+        "discovered_by": "Manual code review + load testing",
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-14T17:00:00Z"
+      }
+    ],
+    "high_findings": [
+      {
+        "finding_id": "SEC-QR-002-HIGH",
+        "title": "Insufficient Rate Limiting on QR Code Generation Endpoint",
+        "severity": "HIGH",
+        "cvss_score": 7.5,
+        "status": "OPEN",
+        "category": "Denial of Service / Resource Exhaustion",
+        "description": "The QR code generation endpoint lacks rate limiting, allowing authenticated users to generate unlimited QR codes rapidly. This can lead to database bloat, performance degradation, and denial of service.",
+        "technical_details": {
+          "vulnerable_endpoint": "POST /api/equipment/:id/qr-code",
+          "issue": "No rate limiting middleware applied to this endpoint",
+          "attack_scenario": [
+            "Attacker authenticates with valid credentials",
+            "Attacker sends automated requests to generate QR codes",
+            "Database fills with millions of unused QR tokens",
+            "Database performance degrades, affecting all users",
+            "System becomes unavailable due to resource exhaustion"
+          ],
+          "proof_of_concept": "Scripted test generated 10,000 QR codes in 2 minutes without throttling"
+        },
+        "impact": {
+          "confidentiality": "NONE",
+          "integrity": "LOW",
+          "availability": "HIGH",
+          "business_impact": "System downtime, degraded performance for all users, increased infrastructure costs"
+        },
+        "affected_components": [
+          "backend/src/api/routes/equipment.ts:78"
+        ],
+        "remediation": {
+          "priority": "HIGH",
+          "recommendation": "Implement rate limiting using express-rate-limit or similar:\n- Limit: 50 requests per minute per user\n- Sliding window to prevent burst attacks\n- Return 429 status with Retry-After header\n- Make limit configurable via environment variable",
+          "code_example": "const qrGenerationLimiter = rateLimit({\n  windowMs: 60 * 1000,\n  max: 50,\n  standardHeaders: true,\n  legacyHeaders: false,\n  message: 'Too many QR codes generated, please try again later'\n});\n\nrouter.post('/equipment/:id/qr-code', qrGenerationLimiter, handler);",
+          "effort_estimate": "2-3 hours",
+          "testing_required": [
+            "Verify rate limit enforced",
+            "Verify legitimate use cases still work",
+            "Test limit reset after window expires"
+          ]
+        },
+        "references": [
+          "CWE-770: Allocation of Resources Without Limits or Throttling",
+          "OWASP: Denial of Service"
+        ],
+        "discovered_at": "2025-10-10T11:22:18Z",
+        "discovered_by": "Manual code review",
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-15T17:00:00Z"
+      },
+      {
+        "finding_id": "SEC-QR-003-HIGH",
+        "title": "Insecure Storage of Authentication Tokens on Mobile Devices",
+        "severity": "HIGH",
+        "cvss_score": 7.2,
+        "status": "OPEN",
+        "category": "Cryptography / Data Protection",
+        "description": "Mobile application stores authentication tokens and QR code data in AsyncStorage, which is not encrypted on Android devices. This exposes sensitive data to malware or device compromise.",
+        "technical_details": {
+          "vulnerable_code": "mobile/src/utils/SecureStorage.ts:23",
+          "issue": "Uses AsyncStorage for token storage. AsyncStorage is plaintext on Android, encrypted only on iOS 10+",
+          "attack_scenario": [
+            "User device infected with malware or physically compromised",
+            "Attacker extracts AsyncStorage data from device",
+            "Attacker obtains authentication tokens and active QR codes",
+            "Attacker impersonates user or steals equipment via QR codes"
+          ],
+          "affected_platforms": "Android (all versions), iOS < 10"
+        },
+        "impact": {
+          "confidentiality": "HIGH",
+          "integrity": "MEDIUM",
+          "availability": "NONE",
+          "business_impact": "Account compromise, unauthorized equipment access, potential theft, privacy violation"
+        },
+        "affected_components": [
+          "mobile/src/utils/SecureStorage.ts",
+          "mobile/src/services/AuthService.ts"
+        ],
+        "remediation": {
+          "priority": "HIGH",
+          "recommendation": "Use platform-specific secure storage:\n- iOS: Keychain Services\n- Android: Android Keystore System\n\nRecommended libraries:\n- react-native-keychain (preferred)\n- react-native-encrypted-storage\n- expo-secure-store (if using Expo)",
+          "code_example": "import * as Keychain from 'react-native-keychain';\n\n// Store\nawait Keychain.setGenericPassword('auth_token', token, {\n  service: 'library_app',\n  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED\n});\n\n// Retrieve  \nconst credentials = await Keychain.getGenericPassword({ service: 'library_app' });\nconst token = credentials.password;",
+          "effort_estimate": "8-12 hours (including testing on both platforms)",
+          "testing_required": [
+            "Verify tokens encrypted at rest on both platforms",
+            "Test token persistence across app restarts",
+            "Verify tokens cleared on logout",
+            "Test biometric authentication integration if applicable"
+          ]
+        },
+        "references": [
+          "CWE-311: Missing Encryption of Sensitive Data",
+          "CWE-312: Cleartext Storage of Sensitive Information",
+          "OWASP Mobile: Insecure Data Storage"
+        ],
+        "discovered_at": "2025-10-10T13:45:27Z",
+        "discovered_by": "Automated SAST scan + manual verification",
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-16T17:00:00Z"
+      },
+      {
+        "finding_id": "SEC-QR-004-HIGH",
+        "title": "WebSocket Messages Not Encrypted in Development/Testing Environments",
+        "severity": "HIGH",
+        "cvss_score": 6.8,
+        "status": "OPEN",
+        "category": "Cryptography / Network Security",
+        "description": "WebSocket connections use unencrypted ws:// protocol in non-production environments. While production uses wss://, the development/testing code paths allow unencrypted communications that could be exploited if deployed incorrectly.",
+        "technical_details": {
+          "vulnerable_code": "backend/src/websocket/server.ts:45, mobile/src/services/WebSocketService.ts:28",
+          "issue": "WebSocket protocol determined by environment variable with fallback to ws:// in non-production",
+          "attack_scenario": [
+            "Configuration error deploys dev/test code to production",
+            "WebSocket connection established over ws:// instead of wss://",
+            "Attacker on network path intercepts WebSocket traffic",
+            "Attacker reads sensitive equipment status, user actions, QR codes in transit",
+            "Potential for man-in-the-middle modification of messages"
+          ],
+          "risk": "While unlikely, misconfiguration could expose production traffic"
+        },
+        "impact": {
+          "confidentiality": "MEDIUM",
+          "integrity": "MEDIUM",
+          "availability": "LOW",
+          "business_impact": "Data leakage, potential for message tampering, privacy violation"
+        },
+        "affected_components": [
+          "backend/src/websocket/server.ts",
+          "mobile/src/services/WebSocketService.ts"
+        ],
+        "remediation": {
+          "priority": "HIGH",
+          "recommendation": "1. Always use wss:// in all environments\n2. Fail-safe: Reject ws:// connections in production builds\n3. Remove fallback to unencrypted protocol\n4. Add runtime check that throws error if ws:// detected in production",
+          "code_example": "const protocol = process.env.NODE_ENV === 'production' ? 'wss' : 'wss'; // Always wss\n\nif (process.env.NODE_ENV === 'production' && !wsUrl.startsWith('wss://')) {\n  throw new Error('Production must use encrypted WebSocket (wss://)');\n}",
+          "effort_estimate": "2-3 hours",
+          "testing_required": [
+            "Verify wss:// used in all environments",
+            "Test production deploy fails if ws:// configured",
+            "Verify certificate validation works correctly"
+          ]
+        },
+        "references": [
+          "CWE-319: Cleartext Transmission of Sensitive Information",
+          "OWASP: Insufficient Transport Layer Protection"
+        ],
+        "discovered_at": "2025-10-10T14:15:42Z",
+        "discovered_by": "Code review",
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-15T17:00:00Z"
+      }
+    ],
+    "medium_findings": [
+      {
+        "finding_id": "SEC-QR-005-MEDIUM",
+        "title": "QR Code Expiration Edge Case Allows Brief Token Reuse Window",
+        "severity": "MEDIUM",
+        "cvss_score": 5.3,
+        "status": "OPEN",
+        "category": "Authentication / Timing Issues",
+        "description": "QR codes can be validated for approximately 500ms after their expiration time due to clock precision and validation logic timing.",
+        "remediation": {
+          "priority": "MEDIUM",
+          "recommendation": "Add 1-second buffer to expiration check or use high-precision timestamps",
+          "effort_estimate": "1-2 hours"
+        },
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-17T17:00:00Z"
+      },
+      {
+        "finding_id": "SEC-QR-006-MEDIUM",
+        "title": "Missing Audit Logging for Security Events",
+        "severity": "MEDIUM",
+        "cvss_score": 5.0,
+        "status": "OPEN",
+        "category": "Logging & Monitoring",
+        "description": "Insufficient logging of security-relevant events such as failed QR validations, rate limit hits, and suspicious patterns.",
+        "remediation": {
+          "priority": "MEDIUM",
+          "recommendation": "Implement comprehensive audit logging for all security events with structured logging format",
+          "effort_estimate": "6-8 hours"
+        },
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-17T17:00:00Z"
+      },
+      {
+        "finding_id": "SEC-QR-007-MEDIUM",
+        "title": "No Anomaly Detection for Suspicious QR Activity",
+        "severity": "MEDIUM",
+        "cvss_score": 4.5,
+        "status": "OPEN",
+        "category": "Logging & Monitoring",
+        "description": "System lacks monitoring and alerting for suspicious patterns like rapid QR generation, multiple failed validations, or unusual access patterns.",
+        "remediation": {
+          "priority": "MEDIUM",
+          "recommendation": "Implement anomaly detection and alerting using existing monitoring infrastructure",
+          "effort_estimate": "12-16 hours"
+        },
+        "assigned_to": "tom.jenkins",
+        "due_date": "2025-10-20T17:00:00Z"
+      },
+      {
+        "finding_id": "SEC-QR-008-MEDIUM",
+        "title": "QR Code Token Entropy Could Be Improved",
+        "severity": "MEDIUM",
+        "cvss_score": 4.2,
+        "status": "OPEN",
+        "category": "Cryptography",
+        "description": "QR tokens use 32 characters which provides good entropy, but tokens are URL-safe base64 which reduces effective entropy slightly. Consider using longer tokens or pure random bytes.",
+        "remediation": {
+          "priority": "LOW",
+          "recommendation": "Increase to 48 characters or use hex encoding for maximum entropy",
+          "effort_estimate": "2-3 hours"
+        },
+        "assigned_to": "sarah.chen",
+        "due_date": "2025-10-20T17:00:00Z"
+      }
+    ],
+    "low_findings": [
+      {
+        "finding_id": "SEC-QR-009-LOW",
+        "title": "Missing Security Headers in API Responses",
+        "severity": "LOW",
+        "cvss_score": 3.1,
+        "status": "OPEN",
+        "category": "Configuration",
+        "description": "API responses missing some recommended security headers like X-Content-Type-Options, X-Frame-Options",
+        "remediation": {
+          "priority": "LOW",
+          "recommendation": "Add helmet.js middleware to set all recommended security headers",
+          "effort_estimate": "1 hour"
+        },
+        "assigned_to": "sarah.chen"
+      },
+      {
+        "finding_id": "SEC-QR-010-LOW",
+        "title": "Mobile App Debug Mode Logs Sensitive Information",
+        "severity": "LOW",
+        "cvss_score": 2.5,
+        "status": "OPEN",
+        "category": "Information Disclosure",
+        "description": "Mobile app debug logging includes QR tokens and API responses. Ensure this is disabled in production builds.",
+        "remediation": {
+          "priority": "LOW",
+          "recommendation": "Verify production builds have logging disabled, add build-time check",
+          "effort_estimate": "1 hour"
+        },
+        "assigned_to": "sarah.chen"
+      }
+    ]
+  },
+  "blocking_issues": [
+    {
+      "finding_id": "SEC-QR-001-CRITICAL",
+      "reason": "Critical security vulnerability allowing unauthorized access",
+      "must_fix_before": "production_deployment",
+      "estimated_fix_time": "4-8 hours",
+      "complexity": "medium"
+    },
+    {
+      "finding_id": "SEC-QR-002-HIGH",
+      "reason": "Could lead to denial of service affecting all users",
+      "must_fix_before": "production_deployment",
+      "estimated_fix_time": "2-3 hours",
+      "complexity": "low"
+    },
+    {
+      "finding_id": "SEC-QR-003-HIGH",
+      "reason": "Exposes user credentials and sensitive data on mobile devices",
+      "must_fix_before": "production_deployment",
+      "estimated_fix_time": "8-12 hours",
+      "complexity": "medium"
+    },
+    {
+      "finding_id": "SEC-QR-004-HIGH",
+      "reason": "Configuration error could expose traffic in production",
+      "must_fix_before": "production_deployment",
+      "estimated_fix_time": "2-3 hours",
+      "complexity": "low"
+    }
+  ],
+  "dependencies_vulnerabilities": {
+    "summary": {
+      "critical": 0,
+      "high": 2,
+      "medium": 5,
+      "low": 8
+    },
+    "high_severity": [
+      {
+        "package": "socket.io",
+        "version": "4.6.1",
+        "vulnerability": "CVE-2023-XXXX",
+        "severity": "HIGH",
+        "description": "Denial of service in WebSocket handshake",
+        "remediation": "Update to socket.io 4.6.2 or later",
+        "status": "OPEN"
+      },
+      {
+        "package": "react-native-camera",
+        "version": "4.2.1",
+        "vulnerability": "CVE-2023-YYYY",
+        "severity": "HIGH",
+        "description": "Path traversal in saved photos",
+        "remediation": "Update to react-native-camera 4.2.3 or later",
+        "status": "OPEN"
+      }
+    ]
+  },
+  "test_results": {
+    "automated_scans": {
+      "sast": {
+        "tool": "Snyk Code",
+        "completed_at": "2025-10-10T08:30:00Z",
+        "findings": 8,
+        "false_positives": 2
+      },
+      "dependency_scan": {
+        "tool": "npm audit + Snyk",
+        "completed_at": "2025-10-10T08:45:00Z",
+        "findings": 15,
+        "actionable": 7
+      },
+      "dast": {
+        "tool": "OWASP ZAP",
+        "completed_at": "2025-10-10T12:00:00Z",
+        "findings": 4,
+        "status": "In Progress - API endpoints only"
+      }
+    },
+    "manual_testing": {
+      "code_review": {
+        "completed_at": "2025-10-10T16:00:00Z",
+        "lines_reviewed": 8234,
+        "findings": 6,
+        "reviewer": "David Thompson"
+      },
+      "penetration_test": {
+        "status": "SCHEDULED",
+        "scheduled_for": "2025-10-14T09:00:00Z",
+        "note": "Blocked until critical findings resolved"
+      }
+    }
+  },
+  "recommendations": {
+    "immediate_actions": [
+      "Fix critical race condition (SEC-QR-001) before any further testing",
+      "Implement rate limiting (SEC-QR-002)",
+      "Switch to secure storage on mobile (SEC-QR-003)",
+      "Enforce wss:// in all environments (SEC-QR-004)"
+    ],
+    "before_production": [
+      "Complete penetration testing",
+      "Update vulnerable dependencies",
+      "Implement audit logging",
+      "Add anomaly detection monitoring",
+      "Conduct security training for support team"
+    ],
+    "post_production": [
+      "Monitor security metrics and alerts",
+      "Conduct security review after 30 days",
+      "Schedule annual penetration testing",
+      "Plan for Redis pub/sub security review in Phase 2"
+    ]
+  },
+  "timeline": {
+    "review_started": "2025-10-10T09:00:00Z",
+    "critical_findings_deadline": "2025-10-14T17:00:00Z",
+    "high_findings_deadline": "2025-10-16T17:00:00Z",
+    "penetration_test_scheduled": "2025-10-14T09:00:00Z",
+    "expected_review_completion": "2025-10-17T17:00:00Z",
+    "production_deployment_earliest": "2025-10-21T00:00:00Z"
+  },
+  "approval_status": {
+    "approved_for_production": false,
+    "approved_for_staging": false,
+    "approved_for_development": true,
+    "conditions_for_approval": [
+      "All CRITICAL findings must be resolved",
+      "All HIGH findings must be resolved",
+      "Penetration test must be completed and passed",
+      "All medium findings should be resolved or risk accepted in writing",
+      "Security team final approval required"
+    ]
+  },
+  "sign_off": {
+    "security_reviewer": {
+      "name": "David Thompson",
+      "role": "Senior Security Engineer",
+      "status": "REVIEW_IN_PROGRESS",
+      "signed_at": null,
+      "comments": "Multiple blocking issues identified. Cannot approve until critical and high findings are resolved. Feature shows promise but needs security hardening before production."
+    },
+    "security_manager": {
+      "name": "Lisa Martinez",
+      "role": "Information Security Manager",
+      "status": "PENDING",
+      "signed_at": null,
+      "comments": null
+    }
+  },
+  "metadata": {
+    "generated_at": "2025-10-16T08:30:00Z",
+    "review_version": "1.0",
+    "feature_id": "FEAT-QR-002",
+    "related_documents": [
+      "ARCHITECTURE.md",
+      "SECURITY_CONSIDERATIONS.md",
+      "github/pull_request_389.json"
+    ]
+  }
+}

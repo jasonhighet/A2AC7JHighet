@@ -1,0 +1,226 @@
+{
+  "metadata": {
+    "feature": "qr-code-checkin",
+    "feature_id": "FEAT-QR-002",
+    "jira_ticket": "PLAT-1687",
+    "report_date": "2025-10-15T16:00:00Z",
+    "time_range": {
+      "start": "2025-10-01T00:00:00Z",
+      "end": "2025-10-15T16:00:00Z"
+    },
+    "total_runs": 47,
+    "ci_platform": "GitHub Actions"
+  },
+  "summary": {
+    "total_runs": 47,
+    "successful": 9,
+    "failed": 36,
+    "cancelled": 2,
+    "success_rate": 19.1,
+    "status": "CRITICAL",
+    "threshold": {
+      "minimum_acceptable": 80.0,
+      "current": 19.1,
+      "gap": -60.9
+    }
+  },
+  "recent_runs": [
+    {
+      "run_id": "7834092341",
+      "run_number": 47,
+      "timestamp": "2025-10-15T15:45:00Z",
+      "branch": "feature/qr-checkin",
+      "commit": "a7f3d89e2c4b1f6d8e9a0b3c5d7e8f9a1b2c3d4e",
+      "commit_message": "fix: Attempt to fix race condition in QR validation",
+      "status": "FAILED",
+      "duration_minutes": 12.3,
+      "failed_stages": ["unit-tests"],
+      "failure_reason": "2 unit tests failed (race condition, expiry edge case)"
+    },
+    {
+      "run_id": "7833541289",
+      "run_number": 46,
+      "timestamp": "2025-10-15T11:20:00Z",
+      "branch": "feature/qr-checkin",
+      "commit": "e9f8c7b6a5d4c3b2a1f0e9d8c7b6a5d4c3b2a1f0",
+      "commit_message": "test: Add more race condition test coverage",
+      "status": "FAILED",
+      "duration_minutes": 13.1,
+      "failed_stages": ["unit-tests", "integration-tests"],
+      "failure_reason": "Unit tests failed + 7 integration tests failed"
+    },
+    {
+      "run_id": "7832890123",
+      "run_number": 45,
+      "timestamp": "2025-10-14T16:45:00Z",
+      "branch": "feature/qr-checkin",
+      "commit": "d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9",
+      "commit_message": "fix: Update WebSocket connection pool logic",
+      "status": "FAILED",
+      "duration_minutes": 11.8,
+      "failed_stages": ["integration-tests"],
+      "failure_reason": "7 WebSocket scalability integration tests failed"
+    },
+    {
+      "run_id": "7831234567",
+      "run_number": 44,
+      "timestamp": "2025-10-14T09:30:00Z",
+      "branch": "feature/qr-checkin",
+      "commit": "c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "commit_message": "chore: Update dependencies",
+      "status": "SUCCESS",
+      "duration_minutes": 10.2,
+      "failed_stages": []
+    },
+    {
+      "run_id": "7829876543",
+      "run_number": 43,
+      "timestamp": "2025-10-13T14:15:00Z",
+      "branch": "feature/qr-checkin",
+      "commit": "b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7",
+      "commit_message": "feat: Add QR scanner mobile UI improvements",
+      "status": "FAILED",
+      "duration_minutes": 15.7,
+      "failed_stages": ["integration-tests", "mobile-build"],
+      "failure_reason": "Integration tests + iOS build failed"
+    }
+  ],
+  "failure_trends": {
+    "last_7_days": {
+      "total_runs": 18,
+      "failed": 15,
+      "success_rate": 16.7
+    },
+    "last_14_days": {
+      "total_runs": 35,
+      "failed": 28,
+      "success_rate": 20.0
+    },
+    "last_30_days": {
+      "total_runs": 47,
+      "failed": 36,
+      "success_rate": 19.1
+    }
+  },
+  "failure_categories": {
+    "unit_tests": {
+      "count": 14,
+      "percentage": 38.9,
+      "description": "Unit test failures, primarily race condition and edge cases"
+    },
+    "integration_tests": {
+      "count": 18,
+      "percentage": 50.0,
+      "description": "Integration test failures, primarily WebSocket scalability"
+    },
+    "build_failures": {
+      "count": 3,
+      "percentage": 8.3,
+      "description": "Mobile app build failures (iOS signing issues)"
+    },
+    "lint_failures": {
+      "count": 1,
+      "percentage": 2.8,
+      "description": "Code style violations"
+    }
+  },
+  "stage_statistics": {
+    "lint": {
+      "total_runs": 47,
+      "passed": 46,
+      "failed": 1,
+      "success_rate": 97.9,
+      "average_duration_minutes": 1.2
+    },
+    "unit_tests": {
+      "total_runs": 47,
+      "passed": 33,
+      "failed": 14,
+      "success_rate": 70.2,
+      "average_duration_minutes": 3.8
+    },
+    "integration_tests": {
+      "total_runs": 47,
+      "passed": 29,
+      "failed": 18,
+      "success_rate": 61.7,
+      "average_duration_minutes": 5.4
+    },
+    "mobile_build_ios": {
+      "total_runs": 47,
+      "passed": 43,
+      "failed": 3,
+      "cancelled": 1,
+      "success_rate": 91.5,
+      "average_duration_minutes": 8.2
+    },
+    "mobile_build_android": {
+      "total_runs": 47,
+      "passed": 46,
+      "failed": 0,
+      "cancelled": 1,
+      "success_rate": 97.9,
+      "average_duration_minutes": 6.7
+    }
+  },
+  "most_common_failures": [
+    {
+      "description": "Integration tests: WebSocket connection pool overflow under load",
+      "occurrences": 18,
+      "first_seen": "2025-10-05T10:15:00Z",
+      "last_seen": "2025-10-15T11:20:00Z",
+      "status": "UNRESOLVED"
+    },
+    {
+      "description": "Unit test: Race condition in QR validation",
+      "occurrences": 12,
+      "first_seen": "2025-10-10T09:23:00Z",
+      "last_seen": "2025-10-15T15:45:00Z",
+      "status": "UNRESOLVED"
+    },
+    {
+      "description": "Unit test: QR expiry edge case at midnight UTC",
+      "occurrences": 8,
+      "first_seen": "2025-10-12T18:45:00Z",
+      "last_seen": "2025-10-15T15:45:00Z",
+      "status": "UNRESOLVED"
+    },
+    {
+      "description": "iOS build: Code signing issue",
+      "occurrences": 3,
+      "first_seen": "2025-10-08T14:30:00Z",
+      "last_seen": "2025-10-13T14:15:00Z",
+      "status": "RESOLVED"
+    }
+  ],
+  "quality_gates": {
+    "success_rate_acceptable": false,
+    "no_persistent_failures": false,
+    "build_stability": false,
+    "acceptable_duration": true
+  },
+  "blocker_status": {
+    "is_blocker": true,
+    "reason": "CI success rate at 19.1% is far below 80% minimum threshold",
+    "can_deploy": false,
+    "must_fix": [
+      "Resolve race condition causing unit test failures (12 consecutive failures)",
+      "Fix WebSocket scalability issues causing integration test failures (18 occurrences)",
+      "Address QR expiry edge case (8 consecutive failures)"
+    ]
+  },
+  "recommendations": [
+    "CRITICAL: Fix race condition in QR validation - blocking 38.9% of builds",
+    "CRITICAL: Resolve WebSocket connection pool issues - blocking 50% of builds",
+    "HIGH: Fix timezone handling in QR expiry logic",
+    "HIGH: Consider feature flag rollback until critical issues resolved",
+    "MEDIUM: Investigate why issues persist across multiple attempted fixes",
+    "MEDIUM: Add more robust error handling and retry logic for WebSocket tests"
+  ],
+  "deployment_readiness": {
+    "ready": false,
+    "confidence_level": "VERY_LOW",
+    "risk_assessment": "CRITICAL",
+    "blocker_count": 3
+  }
+}

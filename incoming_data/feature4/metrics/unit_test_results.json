@@ -1,0 +1,20 @@
+{
+  "test_run_id": "run-2025-10-14-081533",
+  "timestamp": "2025-10-14T08:15:33Z",
+  "environment": "CI",
+  "test_suites": 14,
+  "tests_total": 203,
+  "tests_passed": 203,
+  "tests_failed": 0,
+  "tests_skipped": 0,
+  "execution_time_seconds": 17.2,
+  "flaky_tests": [],
+  "by_category": {
+    "api_tests": {"passed": 67, "failed": 0, "skipped": 0},
+    "service_tests": {"passed": 45, "failed": 0, "skipped": 0},
+    "frontend_tests": {"passed": 78, "failed": 0, "skipped": 0},
+    "validation_tests": {"passed": 13, "failed": 0, "skipped": 0}
+  },
+  "status": "PASSED",
+  "notes": "All 203 unit tests passed successfully"
+}

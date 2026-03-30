@@ -1,0 +1,27 @@
+{
+  "scan_type": "SAST and dependency check",
+  "vulnerabilities": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 5,
+    "info": 12
+  },
+  "medium_severity_details": [
+    {
+      "id": "DEP-2341",
+      "description": "lodash version has potential prototype pollution (CVE-2023-XXXX)",
+      "status": "accepted_risk",
+      "justification": "Not exploitable in our usage pattern, upgrade planned for next release"
+    },
+    {
+      "id": "SAST-5521",
+      "description": "Potential SQL injection in dynamic query (false positive)",
+      "status": "accepted_risk",
+      "justification": "Using parameterized queries, false positive from static analysis"
+    }
+  ],
+  "secrets_found": 0,
+  "passed": true,
+  "timestamp": "2025-10-15T02:15:33Z"
+}

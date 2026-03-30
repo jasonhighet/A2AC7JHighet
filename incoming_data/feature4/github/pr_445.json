@@ -1,0 +1,25 @@
+{
+  "number": 445,
+  "title": "TODO: PR title",
+  "state": "open",
+  "created_at": "TODO: YYYY-MM-DDTHH:MM:SSZ",
+  "updated_at": "TODO: YYYY-MM-DDTHH:MM:SSZ",
+  "merged_at": null,
+  "author": {
+    "username": "TODO",
+    "name": "TODO"
+  },
+  "base": {
+    "ref": "main"
+  },
+  "head": {
+    "ref": "TODO: feature-branch-name"
+  },
+  "description": "TODO: PR description",
+  "commits_count": 0,
+  "changed_files_count": 0,
+  "additions": 0,
+  "deletions": 0,
+  "reviewers": [],
+  "labels": []
+}

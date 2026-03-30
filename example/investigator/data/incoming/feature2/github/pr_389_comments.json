@@ -1,0 +1,330 @@
+{
+  "pull_request_number": 389,
+  "review_threads": [
+    {
+      "thread_id": "rt-389-001",
+      "status": "resolved",
+      "file": "backend/src/services/QRCodeService.ts",
+      "line": 45,
+      "created_at": "2025-10-03T09:15:22Z",
+      "resolved_at": "2025-10-04T10:32:18Z",
+      "comments": [
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-03T09:15:22Z",
+          "body": "Should we add an index on the `token` field in the qr_codes table? This will be queried frequently during scans."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-03T11:23:45Z",
+          "body": "Good catch! Added index in the migration file. Updated in commit b3f7d9e."
+        },
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-04T10:32:18Z",
+          "body": "Perfect, looks good now."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-002",
+      "status": "unresolved",
+      "file": "backend/src/services/QRCodeService.ts",
+      "line": 127,
+      "created_at": "2025-10-05T14:22:11Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-05T14:22:11Z",
+          "body": "⚠️ SECURITY CONCERN: The `validateAndInvalidateQRCode` method has a race condition. Between checking if the QR code is valid and marking it as used, another request could validate the same code.\n\n```typescript\n// Current implementation:\nconst qrCode = await QRCode.findOne({ token, used: false });\nif (!qrCode) return null;\nqrCode.used = true;\nawait qrCode.save();\n```\n\nThis needs to be atomic. Consider using a database transaction with SELECT FOR UPDATE or a unique constraint."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-06T08:45:33Z",
+          "body": "You're absolutely right. I'll implement database-level locking. Working on a fix."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-08T16:12:48Z",
+          "body": "Attempted fix in commit 006 using SELECT FOR UPDATE. However, still seeing failures under high concurrent load in tests. The lock might be timing out or there's another issue. Need more investigation."
+        },
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-10T09:15:27Z",
+          "body": "This is still a critical issue. The test failures show the race condition persists. This could allow unauthorized access to equipment. **Cannot approve merge until this is fully resolved.**"
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-003",
+      "status": "unresolved",
+      "file": "backend/src/api/routes/equipment.ts",
+      "line": 78,
+      "created_at": "2025-10-06T11:30:45Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-06T11:30:45Z",
+          "body": "Missing rate limiting on the QR code generation endpoint. A user could spam this endpoint to generate thousands of QR codes, potentially causing:\n1. Database bloat\n2. Performance degradation\n3. DoS conditions\n\nRecommend adding rate limit of 10 requests per minute per user."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-07T09:18:22Z",
+          "body": "Good point. Will add rate limiting middleware."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-09T13:42:15Z",
+          "body": "Actually, thinking about this more - legitimate use cases might need more than 10/min. For example, a librarian setting up multiple equipment stations. Should we make this configurable or increase the limit?"
+        },
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-10T09:18:44Z",
+          "body": "Even with legitimate use cases, we need some limit. Suggest 50/min for now and make it configurable via environment variable. Still needs to be implemented though."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-004",
+      "status": "resolved",
+      "file": "mobile/src/screens/QRScannerScreen.tsx",
+      "line": 92,
+      "created_at": "2025-10-07T15:18:33Z",
+      "resolved_at": "2025-10-08T14:25:11Z",
+      "comments": [
+        {
+          "author": "jessica.park",
+          "created_at": "2025-10-07T15:18:33Z",
+          "body": "Camera permission handling looks good, but what happens if the user denies permission? Should we show a message explaining why we need it and how to enable it in settings?"
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-08T10:15:27Z",
+          "body": "Added permission rationale dialog and instructions for re-enabling in settings. Updated in commit d8e2f3a."
+        },
+        {
+          "author": "jessica.park",
+          "created_at": "2025-10-08T14:25:11Z",
+          "body": "Perfect! Much better UX now."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-005",
+      "status": "unresolved",
+      "file": "mobile/src/services/WebSocketService.ts",
+      "line": 156,
+      "created_at": "2025-10-08T16:45:22Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "jessica.park",
+          "created_at": "2025-10-08T16:45:22Z",
+          "body": "The WebSocket reconnection logic needs work. Currently it tries to reconnect immediately on disconnect, which could cause issues if the server is down or under load. Suggest implementing exponential backoff:\n\n- 1st retry: 1 second\n- 2nd retry: 2 seconds\n- 3rd retry: 4 seconds\n- Max: 30 seconds\n\nAlso add a max retry count before giving up and showing an error to the user."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-09T11:20:18Z",
+          "body": "Agreed. This is related to the WebSocket scalability issues we're seeing in integration tests. Will implement exponential backoff."
+        },
+        {
+          "author": "jessica.park",
+          "created_at": "2025-10-13T10:15:44Z",
+          "body": "Still seeing this as TODO in the code. Needs to be implemented before we can go to production."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-006",
+      "status": "unresolved",
+      "file": "backend/src/websocket/handlers.ts",
+      "line": 234,
+      "created_at": "2025-10-09T09:30:15Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-09T09:30:15Z",
+          "body": "WebSocket broadcast is happening in-memory which won't scale across multiple server instances. With 7 integration tests failing related to WebSocket load, this is clearly an issue.\n\nOptions:\n1. Redis pub/sub for message broadcasting\n2. Sticky sessions (not ideal)\n3. Dedicated WebSocket server cluster\n\nI'd recommend option 1 - Redis pub/sub. It's the most scalable and we already use Redis for caching."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-09T14:18:32Z",
+          "body": "I like option 1 as well. However, this is a significant architectural change. Should we:\na) Block this PR and implement Redis pub/sub first\nb) Ship this PR with WebSocket disabled for multi-instance deployments\nc) Create a follow-up ticket and merge this with known limitations\n\nGiven the timeline pressure, leaning towards option b or c."
+        },
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-10T08:45:29Z",
+          "body": "I'd say option b. We can enable it once Redis pub/sub is implemented. But this needs to be clearly communicated - QR feature won't work properly in production without it."
+        },
+        {
+          "author": "emma.wilson",
+          "created_at": "2025-10-12T15:22:18Z",
+          "body": "From QA perspective, we cannot approve a feature that \"won't work properly in production.\" This needs to be resolved or the feature scope needs to be reduced to not include real-time updates."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-007",
+      "status": "unresolved",
+      "file": "mobile/src/utils/SecureStorage.ts",
+      "line": 23,
+      "created_at": "2025-10-10T09:25:33Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-10T09:25:33Z",
+          "body": "🚨 HIGH SEVERITY: Authentication tokens and QR codes are being stored in AsyncStorage which is NOT encrypted on Android devices. This violates our security policy.\n\nMust use:\n- iOS: Keychain\n- Android: Android Keystore\n\nRecommend using `react-native-keychain` or `react-native-encrypted-storage` library."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-10T11:42:27Z",
+          "body": "Oh no, I thought AsyncStorage was encrypted by default. Will switch to react-native-encrypted-storage immediately."
+        },
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-11T08:15:44Z",
+          "body": "Any update on this? This is a blocking security issue."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-14T16:33:21Z",
+          "body": "Working on it but hitting issues with iOS Keychain integration. Need more time to test properly."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-008",
+      "status": "resolved",
+      "file": "backend/src/services/QRCodeService.ts",
+      "line": 67,
+      "created_at": "2025-10-11T10:15:28Z",
+      "resolved_at": "2025-10-12T09:42:33Z",
+      "comments": [
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-11T10:15:28Z",
+          "body": "QR code expiration is set to 5 minutes. Is this enough time? What if a user generates a code but is interrupted before they can scan it?"
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-11T14:20:15Z",
+          "body": "Good question. Based on user research from the design doc, typical checkout flow is 30-60 seconds. 5 minutes gives plenty of buffer. Also, users can easily generate a new code if it expires."
+        },
+        {
+          "author": "michael.rodriguez",
+          "created_at": "2025-10-12T09:42:33Z",
+          "body": "Makes sense. Thanks for clarifying."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-009",
+      "status": "unresolved",
+      "file": "backend/tests/integration/websocket.test.ts",
+      "line": 445,
+      "created_at": "2025-10-13T11:30:42Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "emma.wilson",
+          "created_at": "2025-10-13T11:30:42Z",
+          "body": "7 out of 25 WebSocket integration tests are failing consistently:\n\n1. `test_concurrent_connections_500_users` - FAILED\n2. `test_message_broadcast_under_load` - FAILED\n3. `test_connection_cleanup_on_server_restart` - FAILED\n4. `test_websocket_reconnection_after_disconnect` - FAILED\n5. `test_message_ordering_under_high_throughput` - FAILED\n6. `test_duplicate_connection_handling` - FAILED\n7. `test_graceful_degradation_on_connection_limit` - FAILED\n\nThese are not edge cases - these are production scenarios. We cannot ship with 28% of WebSocket tests failing."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-13T14:15:27Z",
+          "body": "I know, I know. Most of these are related to the scalability issues with in-memory WebSocket handling that Michael pointed out. The Redis pub/sub solution would fix most of these."
+        },
+        {
+          "author": "emma.wilson",
+          "created_at": "2025-10-14T09:20:18Z",
+          "body": "Then we need to implement Redis pub/sub before merging. Or scope the feature to not include real-time updates. But we can't ship known failures."
+        }
+      ]
+    },
+    {
+      "thread_id": "rt-389-010",
+      "status": "unresolved",
+      "file": "backend/tests/unit/QRCodeService.test.ts",
+      "line": 178,
+      "created_at": "2025-10-14T10:45:15Z",
+      "resolved_at": null,
+      "comments": [
+        {
+          "author": "emma.wilson",
+          "created_at": "2025-10-14T10:45:15Z",
+          "body": "Two unit tests failing:\n\n1. `should handle race condition when multiple users scan same QR code` - FAILED\n   - Expected: Only one user gets access\n   - Actual: Both users can complete checkout\n\n2. `should reject QR code exactly at expiration time` - FAILED\n   - Expected: Code rejected at exact expiration timestamp\n   - Actual: Code accepted for ~500ms after expiration\n\nFirst failure is the critical race condition issue. Second is an edge case but still needs fixing."
+        },
+        {
+          "author": "sarah.chen",
+          "created_at": "2025-10-14T15:28:44Z",
+          "body": "The race condition test failure confirms what David found. Working on it but it's proving tricky to solve completely. The expiration edge case is due to clock precision issues - I can add a buffer to make the test pass but it doesn't really fix the underlying timing issue."
+        },
+        {
+          "author": "david.thompson",
+          "created_at": "2025-10-15T08:30:22Z",
+          "body": "The race condition is the critical one. The expiration edge case is minor in comparison. Let's focus on solving the race condition first."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_threads": 10,
+    "resolved": 3,
+    "unresolved": 7,
+    "comments_by_author": {
+      "sarah.chen": 15,
+      "michael.rodriguez": 6,
+      "jessica.park": 5,
+      "david.thompson": 7,
+      "emma.wilson": 5
+    },
+    "critical_unresolved_threads": [
+      "rt-389-002",
+      "rt-389-003",
+      "rt-389-006",
+      "rt-389-007",
+      "rt-389-009",
+      "rt-389-010"
+    ]
+  },
+  "blocking_issues": [
+    {
+      "thread_id": "rt-389-002",
+      "severity": "CRITICAL",
+      "issue": "QR code race condition allows unauthorized access",
+      "owner": "sarah.chen",
+      "status": "In Progress"
+    },
+    {
+      "thread_id": "rt-389-003",
+      "severity": "HIGH",
+      "issue": "Missing rate limiting on QR generation endpoint",
+      "owner": "sarah.chen",
+      "status": "Not Started"
+    },
+    {
+      "thread_id": "rt-389-006",
+      "severity": "CRITICAL",
+      "issue": "WebSocket won't scale in production (7 tests failing)",
+      "owner": "sarah.chen",
+      "status": "Design Discussion"
+    },
+    {
+      "thread_id": "rt-389-007",
+      "severity": "HIGH",
+      "issue": "Insecure token storage on mobile devices",
+      "owner": "sarah.chen",
+      "status": "In Progress"
+    }
+  ],
+  "metadata": {
+    "generated_at": "2025-10-16T08:30:00Z",
+    "pull_request": 389,
+    "feature_id": "FEAT-QR-002"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "signoff_id": "UAT-CONTRIB-SIGNOFF",
+  "feature": "contribution-tracking",
+  "uat_start_date": "2025-10-15",
+  "uat_end_date": null,
+  "status": "IN_PROGRESS",
+  "planned_duration_days": 5,
+  "expected_completion_date": "2025-10-19",
+  "testers": [
+    {
+      "name": "Alice Johnson",
+      "role": "Power User",
+      "status": "testing",
+      "progress": "25%",
+      "sign_off_status": "PENDING"
+    },
+    {
+      "name": "Bob Martinez",
+      "role": "Admin Tester",
+      "status": "testing",
+      "progress": "30%",
+      "sign_off_status": "PENDING"
+    },
+    {
+      "name": "Carol Smith",
+      "role": "Regular Member",
+      "status": "testing",
+      "progress": "10%",
+      "sign_off_status": "PENDING"
+    }
+  ],
+  "test_scenarios": {
+    "total": 30,
+    "completed": 7,
+    "passed": 7,
+    "failed": 0,
+    "blocked": 0
+  },
+  "formal_signoff": "NOT_YET_AVAILABLE",
+  "signoff_criteria": [
+    {
+      "criterion": "All test scenarios passed",
+      "status": "IN_PROGRESS",
+      "completion": "23%"
+    },
+    {
+      "criterion": "No critical or major issues",
+      "status": "MET"
+    },
+    {
+      "criterion": "User satisfaction >= 4.0/5.0",
+      "status": "PENDING",
+      "note": "Survey after testing completes"
+    },
+    {
+      "criterion": "All testers sign off",
+      "status": "PENDING"
+    }
+  ],
+  "notes": "UAT just started yesterday. Too early for formal sign-off. Early feedback is positive with no issues reported so far."
+}

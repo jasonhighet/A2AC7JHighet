@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "feature": "qr-code-checkin",
+    "feature_id": "FEAT-QR-002",
+    "jira_ticket": "PLAT-1687",
+    "test_run_date": "2025-10-15T15:45:00Z",
+    "test_framework": "jest",
+    "test_framework_version": "29.7.0",
+    "test_suite": "unit-tests",
+    "environment": "ci",
+    "git_commit": "a7f3d89e2c4b1f6d8e9a0b3c5d7e8f9a1b2c3d4e"
+  },
+  "summary": {
+    "total_tests": 487,
+    "passed": 485,
+    "failed": 2,
+    "skipped": 0,
+    "success_rate": 99.59,
+    "duration_seconds": 124.3,
+    "status": "FAILED"
+  },
+  "failed_tests": [
+    {
+      "test_id": "qr-validation-race-001",
+      "name": "QRValidationService.validateAndMarkUsed() should handle concurrent validation attempts",
+      "file": "tests/unit/services/qrValidation.test.js",
+      "line": 234,
+      "suite": "QR Validation Service",
+      "error_type": "AssertionError",
+      "error_message": "Expected only one validation to succeed, but both succeeded",
+      "stack_trace": "AssertionError: Expected only one validation to succeed, but both succeeded\n    at Object.<anonymous> (tests/unit/services/qrValidation.test.js:234:7)\n    at Promise.then.completed (node_modules/jest-circus/build/utils.js:391:28)",
+      "duration_ms": 2847,
+      "severity": "HIGH",
+      "category": "race_condition",
+      "description": "When two devices simultaneously scan the same QR code, both validations succeed and both check-ins are recorded. This is a critical race condition in the database transaction logic.",
+      "reproduction_steps": [
+        "Generate a valid QR code for equipment ID 'TOOL-12345'",
+        "Simulate two concurrent API calls to POST /api/qr/validate",
+        "Both calls use the same QR token within 50ms of each other",
+        "Expected: Only first call succeeds, second gets 'QR_ALREADY_USED' error",
+        "Actual: Both calls return success, database shows duplicate check-ins"
+      ],
+      "related_issue": "PLAT-1823",
+      "related_bug": "Critical race condition allows duplicate check-ins",
+      "first_failed": "2025-10-10T09:23:00Z",
+      "failure_count": 12,
+      "intermittent": false
+    },
+    {
+      "test_id": "qr-expiry-edge-001",
+      "name": "QRValidationService.isExpired() should correctly handle midnight UTC boundary",
+      "file": "tests/unit/services/qrValidation.test.js",
+      "line": 389,
+      "suite": "QR Validation Service",
+      "error_type": "AssertionError",
+      "error_message": "Expected QR to be expired at 00:00:01 UTC but was still valid",
+      "stack_trace": "AssertionError: Expected QR to be expired at 00:00:01 UTC but was still valid\n    at Object.<anonymous> (tests/unit/services/qrValidation.test.js:389:7)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)",
+      "duration_ms": 156,
+      "severity": "MEDIUM",
+      "category": "edge_case",
+      "description": "QR codes generated just before midnight UTC don't properly expire at the 24-hour mark when crossing the UTC midnight boundary. The expiry calculation has a timezone-related edge case.",
+      "reproduction_steps": [
+        "Set system time to 2025-10-14 23:59:50 UTC",
+        "Generate QR code with 24-hour expiry (expires 2025-10-15 23:59:50 UTC)",
+        "Advance system time to 2025-10-15 00:00:01 UTC",
+        "Call isExpired() method",
+        "Expected: QR still valid (23 hours 59 minutes remaining)",
+        "Actual: QR marked as expired (off by ~24 hours due to date math error)"
+      ],
+      "related_issue": "PLAT-1891",
+      "related_bug": "QR expiry calculation fails at midnight UTC",
+      "first_failed": "2025-10-12T18:45:00Z",
+      "failure_count": 8,
+      "intermittent": false
+    }
+  ],
+  "passed_test_categories": {
+    "qr_generation": {
+      "total": 45,
+      "passed": 45,
+      "description": "QR code generation, token creation, database storage"
+    },
+    "qr_validation_basic": {
+      "total": 78,
+      "passed": 78,
+      "description": "Basic validation, expiry checks (non-edge cases), format validation"
+    },
+    "api_endpoints": {
+      "total": 92,
+      "passed": 92,
+      "description": "REST API endpoint logic, request validation, response formatting"
+    },
+    "websocket_handlers": {
+      "total": 67,
+      "passed": 67,
+      "description": "WebSocket event handlers, message broadcasting, connection management"
+    },
+    "database_operations": {
+      "total": 89,
+      "passed": 89,
+      "description": "Database queries, transactions, data integrity"
+    },
+    "mobile_app_logic": {
+      "total": 116,
+      "passed": 116,
+      "description": "React Native components, navigation, state management"
+    }
+  },
+  "performance_metrics": {
+    "average_test_duration_ms": 255,
+    "slowest_tests": [
+      {
+        "name": "QRValidationService.validateAndMarkUsed() race condition",
+        "duration_ms": 2847,
+        "file": "tests/unit/services/qrValidation.test.js"
+      },
+      {
+        "name": "WebSocketManager.broadcastToRoom() with 1000 connections",
+        "duration_ms": 1234,
+        "file": "tests/unit/websockets/manager.test.js"
+      }
+    ],
+    "fastest_tests": [
+      {
+        "name": "QRToken.generate() creates valid token format",
+        "duration_ms": 12,
+        "file": "tests/unit/models/qrToken.test.js"
+      }
+    ]
+  },
+  "quality_gates": {
+    "all_tests_passed": false,
+    "no_critical_failures": false,
+    "acceptable_duration": true,
+    "no_flaky_tests": true
+  },
+  "blocker_status": {
+    "is_blocker": true,
+    "reason": "2 failed tests including 1 HIGH severity race condition",
+    "can_deploy": false,
+    "must_fix": [
+      "PLAT-1823: Race condition in QR validation allows duplicate check-ins",
+      "PLAT-1891: QR expiry calculation fails at midnight UTC"
+    ]
+  },
+  "recommendations": [
+    "Fix race condition by implementing proper database locking or optimistic concurrency control (priority: CRITICAL)",
+    "Review and fix timezone handling in expiry calculation logic (priority: HIGH)",
+    "Add more concurrent testing scenarios to catch similar race conditions (priority: HIGH)",
+    "Consider using database-level unique constraints to prevent duplicate check-ins (priority: HIGH)"
+  ]
+}

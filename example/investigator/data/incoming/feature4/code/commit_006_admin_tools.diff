@@ -1,0 +1,56 @@
+commit 9f1b3d5e7a9b1c3d5e7f9a1b3c5d7e9f1a2b3c4
+Author: Priya Sharma <priya.sharma@communityshare.io>
+Date:   Tue Oct 15 09:15:40 2025 -0700
+
+    Add admin tools for contribution management
+
+    - ContributionApprovalQueue component
+    - CreditAdjustmentTool component
+    - CommunityStatsReport component
+    - Approval workflow with audit trail
+
+diff --git a/src/components/admin/ContributionApprovalQueue.tsx b/src/components/admin/ContributionApprovalQueue.tsx
+new file mode 100644
++++ b/src/components/admin/ContributionApprovalQueue.tsx
+@@ -0,0 +1,62 @@
++import React, { useEffect, useState } from 'react';
++import { api } from '../../services/api';
++
++export function ContributionApprovalQueue() {
++  const [pending, setPending] = useState([]);
++
++  useEffect(() => {
++    loadPending();
++  }, []);
++
++  async function loadPending() {
++    const data = await api.get('/contributions?status=pending');
++    setPending(data.contributions);
++  }
++
++  async function approve(id: string, credits: number) {
++    await api.patch(`/contributions/${id}/approve`, {
++      adjusted_credits: credits,
++    });
++    loadPending();
++  }
++
++  async function reject(id: string, reason: string) {
++    await api.patch(`/contributions/${id}/reject`, { reason });
++    loadPending();
++  }
++
++  return (
++    <div className="approval-queue">
++      <h2>Pending Contributions ({pending.length})</h2>
++      {pending.map(contrib => (
++        <ContributionCard
++          key={contrib.id}
++          contribution={contrib}
++          onApprove={approve}
++          onReject={reject}
++        />
++      ))}
++    </div>
++  );
++}

@@ -1,0 +1,206 @@
+{
+  "id": "10389",
+  "key": "PLAT-1687",
+  "self": "https://communityshare.atlassian.net/rest/api/3/issue/10389",
+  "fields": {
+    "summary": "QR Code Check-in/out with Mobile App",
+    "description": {
+      "type": "doc",
+      "version": 1,
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Generate unique QR codes for each resource. Allow members to scan via React Native mobile app for instant check-in/out. Real-time availability sync via WebSockets. Includes offline mode with background sync."
+            }
+          ]
+        }
+      ]
+    },
+    "issuetype": {
+      "id": "10001",
+      "name": "Epic",
+      "subtask": false,
+      "hierarchyLevel": 1
+    },
+    "project": {
+      "id": "10000",
+      "key": "PLAT",
+      "name": "CommunityShare Platform"
+    },
+    "status": {
+      "id": "10002",
+      "name": "Development",
+      "statusCategory": {
+        "id": 2,
+        "key": "indeterminate",
+        "colorName": "yellow",
+        "name": "In Progress"
+      }
+    },
+    "priority": {
+      "id": "2",
+      "name": "High"
+    },
+    "assignee": {
+      "accountId": "5d5e8c7f8e4b3a0001234567",
+      "displayName": "Emma Rodriguez",
+      "emailAddress": "emma.rodriguez@communityshare.io"
+    },
+    "reporter": {
+      "accountId": "5d5e8c7f8e4b3a0001234567",
+      "displayName": "Emma Rodriguez",
+      "emailAddress": "emma.rodriguez@communityshare.io"
+    },
+    "created": "2025-08-05T09:00:00.000+0000",
+    "updated": "2025-10-16T08:44:22.000+0000",
+    "resolutiondate": null,
+    "labels": [
+      "feature",
+      "mobile",
+      "backend",
+      "high-complexity",
+      "blocked",
+      "security-review-required",
+      "q4-2025"
+    ],
+    "components": [
+      {"id": "10021", "name": "Backend"},
+      {"id": "10025", "name": "Mobile App"},
+      {"id": "10022", "name": "Notifications"},
+      {"id": "10027", "name": "Real-time Services"}
+    ],
+    "customfield_10001": "FEAT-QR-002",
+    "customfield_10002": "HIGH",
+    "customfield_10010": "2025-11-15",
+    "customfield_10015": {
+      "id": "10102",
+      "value": "Mobile & Platform Team"
+    },
+    "customfield_10020": "https://github.com/communityshare/platform/pull/389",
+    "issuelinks": [
+      {
+        "id": "10678",
+        "type": {
+          "id": "10000",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by"
+        },
+        "outwardIssue": {
+          "id": "10201",
+          "key": "PLAT-1312",
+          "fields": {
+            "summary": "Basic Resource Management v1.3",
+            "status": {"name": "Done"}
+          }
+        }
+      },
+      {
+        "id": "10679",
+        "type": {
+          "id": "10000",
+          "name": "Depends",
+          "inward": "depends on",
+          "outward": "is depended on by"
+        },
+        "outwardIssue": {
+          "id": "10289",
+          "key": "PLAT-1401",
+          "fields": {
+            "summary": "Notification Service v2.3",
+            "status": {"name": "Done"}
+          }
+        }
+      },
+      {
+        "id": "10680",
+        "type": {
+          "id": "10001",
+          "name": "Blocks",
+          "inward": "is blocked by",
+          "outward": "blocks"
+        },
+        "inwardIssue": {
+          "id": "10447",
+          "key": "PLAT-1744",
+          "fields": {
+            "summary": "BUG: QR code invalidation race condition (SEC-QR-001)",
+            "status": {"name": "In Progress"},
+            "priority": {"name": "Critical"}
+          }
+        }
+      },
+      {
+        "id": "10681",
+        "type": {
+          "id": "10001",
+          "name": "Blocks",
+          "inward": "is blocked by",
+          "outward": "blocks"
+        },
+        "inwardIssue": {
+          "id": "10448",
+          "key": "PLAT-1745",
+          "fields": {
+            "summary": "BUG: WebSocket connections drop under load >50 users",
+            "status": {"name": "Investigating"},
+            "priority": {"name": "Critical"}
+          }
+        }
+      }
+    ],
+    "subtasks": [
+      {
+        "id": "10390",
+        "key": "PLAT-1688",
+        "fields": {
+          "summary": "QR code generation service",
+          "status": {"name": "Done"}
+        }
+      },
+      {
+        "id": "10391",
+        "key": "PLAT-1689",
+        "fields": {
+          "summary": "QR scan API endpoints",
+          "status": {"name": "Done"}
+        }
+      },
+      {
+        "id": "10392",
+        "key": "PLAT-1690",
+        "fields": {
+          "summary": "WebSocket real-time sync",
+          "status": {"name": "Done"}
+        }
+      },
+      {
+        "id": "10393",
+        "key": "PLAT-1691",
+        "fields": {
+          "summary": "React Native mobile app",
+          "status": {"name": "In Progress"}
+        }
+      },
+      {
+        "id": "10394",
+        "key": "PLAT-1692",
+        "fields": {
+          "summary": "Offline mode with sync queue",
+          "status": {"name": "To Do"}
+        }
+      }
+    ],
+    "fixVersions": [
+      {
+        "id": "10046",
+        "name": "2025-Q4 Release (Deferred)",
+        "released": false,
+        "releaseDate": "2025-11-30"
+      }
+    ]
+  }
+}

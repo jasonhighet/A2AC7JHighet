@@ -1,0 +1,419 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "number": 342,
+        "reviewThreads": {
+          "totalCount": 12,
+          "nodes": [
+            {
+              "id": "RT_001",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_001",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Should we add rate limiting to alert generation? I'm concerned about potential abuse if someone creates thousands of maintenance schedules.",
+                    "createdAt": "2025-10-09T11:22:14Z",
+                    "path": "src/jobs/maintenance-checker.js",
+                    "position": 45,
+                    "diffHunk": "@@ -42,6 +42,15 @@ async function checkMaintenanceDueDates() {\n   const dueSchedules = await findDueSchedules();\n   \n+  for (const schedule of dueSchedules) {\n+    await generateAlert(schedule);\n+  }\n+",
+                    "reactionGroups": [
+                      {
+                        "content": "THUMBS_UP",
+                        "users": {
+                          "totalCount": 2
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "RC_002",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Good point. Added rate limiting with 100 req/min per user in commit d4f7a21. Also added a check to prevent duplicate alerts within 24 hours for the same schedule.",
+                    "createdAt": "2025-10-09T14:11:33Z",
+                    "reactionGroups": [
+                      {
+                        "content": "THUMBS_UP",
+                        "users": {
+                          "totalCount": 1
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_002",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 3,
+                "nodes": [
+                  {
+                    "id": "RC_003",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "The timezone handling looks a bit fragile here. What happens when DST changes?",
+                    "createdAt": "2025-10-09T11:28:42Z",
+                    "path": "src/utils/date-calculator.js",
+                    "position": 23,
+                    "diffHunk": "@@ -20,7 +20,10 @@ function calculateNextDueDate(schedule) {\n   const now = new Date();\n-  const nextDue = addDays(now, schedule.frequency_days);\n+  const nextDue = moment(now)\n+    .add(schedule.frequency_days, 'days')\n+    .toDate();"
+                  },
+                  {
+                    "id": "RC_004",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Good catch! Switching to use moment-timezone and storing schedules in UTC. Will calculate display times in user's local timezone on the frontend.",
+                    "createdAt": "2025-10-09T15:22:18Z"
+                  },
+                  {
+                    "id": "RC_005",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Perfect, that's the right approach. Thanks!",
+                    "createdAt": "2025-10-09T15:45:09Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_003",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_006",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Nice work on the test coverage! 87% is excellent. The edge cases for duplicate alert prevention are well-tested.",
+                    "createdAt": "2025-10-10T14:15:22Z",
+                    "path": "tests/unit/maintenance-checker.test.js",
+                    "position": 10
+                  },
+                  {
+                    "id": "RC_007",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Thanks! I wanted to make sure the notification deduplication logic was solid.",
+                    "createdAt": "2025-10-10T14:18:55Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_004",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_008",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Should we add pagination to the maintenance logs endpoint? Could get large over time.",
+                    "createdAt": "2025-10-09T16:33:12Z",
+                    "path": "src/routes/maintenance-logs.js",
+                    "position": 18
+                  },
+                  {
+                    "id": "RC_009",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Already implemented! Default page size is 50, max is 200. Added in commit b3e8c45.",
+                    "createdAt": "2025-10-09T16:55:44Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_005",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_010",
+                    "author": {
+                      "login": "emma-rodriguez",
+                      "name": "Emma Rodriguez"
+                    },
+                    "body": "The calendar UI looks great! One suggestion: could we add a color coding by maintenance type?",
+                    "createdAt": "2025-10-09T17:22:09Z",
+                    "path": "src/components/MaintenanceCalendar.tsx",
+                    "position": 67
+                  },
+                  {
+                    "id": "RC_011",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Great idea! Added color coding: green for routine, yellow for preventive, red for urgent. Also added a legend.",
+                    "createdAt": "2025-10-09T18:44:33Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_006",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_012",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Nit: This error message could be more specific about which validation failed.",
+                    "createdAt": "2025-10-10T10:15:44Z",
+                    "path": "src/validators/schedule-validator.js",
+                    "position": 34
+                  },
+                  {
+                    "id": "RC_013",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Fixed! Now returns specific field-level validation errors.",
+                    "createdAt": "2025-10-10T11:22:18Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_007",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_014",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "The database indexes are well-chosen. Should handle our expected load efficiently.",
+                    "createdAt": "2025-10-10T14:20:33Z",
+                    "path": "migrations/20250915_001_maintenance_tables.sql",
+                    "position": 28
+                  },
+                  {
+                    "id": "RC_015",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Thanks! I made sure to index on resource_id and next_due_date since those will be our most common queries.",
+                    "createdAt": "2025-10-10T14:25:11Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_008",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_016",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Good job handling the case where notification service is down. Retry logic looks solid.",
+                    "createdAt": "2025-10-10T14:38:55Z",
+                    "path": "src/services/notification-dispatcher.js",
+                    "position": 52
+                  },
+                  {
+                    "id": "RC_017",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Thanks! Exponential backoff with max 3 retries. Also logs failures for monitoring.",
+                    "createdAt": "2025-10-10T14:42:19Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_009",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 1,
+                "nodes": [
+                  {
+                    "id": "RC_018",
+                    "author": {
+                      "login": "alex-thompson",
+                      "name": "Alex Thompson"
+                    },
+                    "body": "Rollback plan in DEPLOYMENT_PLAN.md looks comprehensive. Feature flag approach is the right call.",
+                    "createdAt": "2025-10-10T15:12:44Z",
+                    "path": "docs/DEPLOYMENT_PLAN.md",
+                    "position": 15
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_010",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_019",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Performance benchmarks look good. All endpoints under 200ms at p95.",
+                    "createdAt": "2025-10-10T16:22:09Z",
+                    "path": "metrics/performance_benchmarks.json",
+                    "position": 5
+                  },
+                  {
+                    "id": "RC_020",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Yeah, the query optimizations really helped. The composite index on (resource_id, next_due_date) made a big difference.",
+                    "createdAt": "2025-10-10T16:28:44Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_011",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 2,
+                "nodes": [
+                  {
+                    "id": "RC_021",
+                    "author": {
+                      "login": "emma-rodriguez",
+                      "name": "Emma Rodriguez"
+                    },
+                    "body": "Mobile responsive design works well. Tested on iPhone and Android.",
+                    "createdAt": "2025-10-10T16:35:22Z",
+                    "path": "src/components/MaintenanceCalendar.tsx",
+                    "position": 89
+                  },
+                  {
+                    "id": "RC_022",
+                    "author": {
+                      "login": "sarah-chen",
+                      "name": "Sarah Chen"
+                    },
+                    "body": "Great to hear! FullCalendar handles mobile pretty well out of the box, just had to tweak some breakpoints.",
+                    "createdAt": "2025-10-10T16:40:15Z"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RT_012",
+              "isResolved": true,
+              "isCollapsed": false,
+              "resolvedBy": {
+                "login": "sarah-chen"
+              },
+              "comments": {
+                "totalCount": 1,
+                "nodes": [
+                  {
+                    "id": "RC_023",
+                    "author": {
+                      "login": "james-wilson",
+                      "name": "James Wilson"
+                    },
+                    "body": "Security scan is clean. The two accepted medium risks are reasonable.",
+                    "createdAt": "2025-10-10T16:42:33Z",
+                    "path": "metrics/security_scan_results.json",
+                    "position": 3
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

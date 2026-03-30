@@ -1,0 +1,192 @@
+{
+  "pr_id": 401,
+  "title": "Feature: Advanced Resource Reservation System",
+  "state": "open",
+  "created_at": "2025-09-23T14:30:00Z",
+  "updated_at": "2025-10-14T18:42:17Z",
+  "author": {
+    "username": "sarah-chen",
+    "name": "Sarah Chen",
+    "email": "sarah.chen@communityshare.io",
+    "role": "Senior Backend Engineer"
+  },
+  "base_branch": "main",
+  "head_branch": "feature/reservation-system",
+  "description": "## Summary\n\nImplements a calendar-based reservation system for community resources with conflict detection, waitlist management, and timezone-aware scheduling.\n\n### Key Features\n- 📅 Calendar UI with month/week/day views\n- 🔍 Automatic conflict detection using PostgreSQL interval overlap\n- ⏰ Waitlist queue with FIFO ordering and priority overrides\n- 🌍 Timezone-aware datetime handling (UTC storage, local display)\n- 📧 Email notifications for confirmations and waitlist availability\n- 📱 Mobile-responsive design\n\n### Implementation Details\n\n**Database Layer** (commit 001)\n- New tables: `reservations`, `reservation_waitlist`\n- Optimized indexes for conflict detection and availability queries\n- PostgreSQL range types for efficient interval overlap checks\n- Constraints ensuring data validity\n\n**Business Logic** (commits 002, 005)\n- ReservationService with state machine (PENDING → CONFIRMED → ACTIVE → COMPLETED)\n- ConflictDetector using PostgreSQL OVERLAPS operator\n- WaitlistService with FIFO queue management\n- Auto-cancellation for no-shows (30min window)\n\n**API Layer** (commit 003)\n- RESTful endpoints for reservation CRUD operations\n- Authentication middleware\n- Request validation and error handling\n- Rate limiting to prevent abuse\n\n**Frontend** (commits 004, 005)\n- React calendar component using FullCalendar.js\n- Booking modal with form validation\n- Waitlist UI with queue position display\n- Timezone conversion utilities using Luxon.js\n\n**Edge Cases** (commit 006)\n- DST transition handling (spring forward/fall back)\n- ⚠️ **PARTIAL FIX**: 3 integration tests still failing for complex DST scenarios\n\n## Testing\n\n### Test Coverage\n- Overall: 87.3% coverage\n- Unit tests: 156 passed\n- Integration tests: 42 passed, **3 failing** (DST edge cases)\n- E2E tests: 28 passed\n\n### UAT Status\n- 6 testers completed UAT (Oct 11-16)\n- 3 approved, 3 approved with non-blocking concerns\n- 98.6% test case pass rate\n- 1 minor bug found (race condition in rapid bookings)\n- UX feedback: waitlist clarity, mobile optimization\n\n## Performance\n- ⚠️ **NOT YET TESTED**: Performance benchmarks pending\n- Calendar load time: Target <2s (not yet validated)\n- Conflict detection: O(log n) with index usage\n\n## Security\n- ✅ Security scan passed (no critical/high vulnerabilities)\n- Authentication required for all endpoints\n- Input sanitization and SQL injection prevention\n- Rate limiting configured\n\n## Breaking Changes\nNone - this is a new feature addition\n\n## Migration Required\nYes - database migration `2025-09-23_reservation_schema.sql` must be run\n\n## Rollout Plan\n- Feature flag: `enable_reservation_system`\n- Gradual rollout: 10% → 25% → 50% → 100%\n- Rollback procedure documented in deployment plan\n\n## Known Issues\n\n### Blocking (must fix before merge)\nNone identified\n\n### Non-Blocking (can address post-launch)\n1. **DST Edge Cases** (3 failing tests)\n   - Impact: Affects bookings during DST transitions (2x per year)\n   - Workaround: Manual admin override available\n   - Fix planned for sprint N+1\n\n2. **Race Condition Bug** (BUG-RES-501)\n   - Impact: Rapid double-clicks can create overlapping bookings\n   - Likelihood: Very low (requires <1s double-click)\n   - Mitigation: Client-side debouncing recommended\n\n3. **Waitlist UX Clarity**\n   - Impact: Users find waitlist feature confusing\n   - Recommendation: Add tooltips and onboarding\n\n4. **Mobile Small Screen**\n   - Impact: Cramped on phones <5 inches\n   - Recommendation: Mobile-specific optimizations\n\n## Sign-offs Required\n\n### Technical Reviews\n- ✅ Code review: Michael Torres (approved Oct 12)\n- ✅ Design review: Lisa Park (approved Sep 5)\n- ✅ Security review: Kevin Wu (approved Oct 11)\n- ✅ QA review: Alex Thompson (approved Oct 15)\n\n### Business Approvals\n- ✅ Product Manager: Emma Rodriguez (approved Oct 15)\n- ⏳ Community Manager: Rachel Green (pending - decision expected Oct 18)\n\n## Documentation\n- ✅ API documentation updated\n- ✅ User help documentation created\n- ⚠️ User docs marked as OUTDATED (3 weeks old)\n- ✅ Deployment plan complete\n\n## Checklist\n- [x] Tests passing (except 3 known DST failures)\n- [x] Code reviewed and approved\n- [x] Security scan clean\n- [x] UAT completed\n- [ ] Performance testing (pending)\n- [ ] All approvals obtained (1 pending)\n- [ ] Documentation up to date (user docs outdated)\n- [ ] Migration tested in staging\n- [ ] Rollback procedure tested\n\n## Related Issues\n- Implements: JIRA-RS-003\n- Closes: #245, #312, #387\n- Related: #401 (DST handling improvements)\n\n## Reviewers\n@michael-torres @lisa-park @kevin-wu @alex-thompson @emma-rodriguez\n\n## Labels\n`feature` `high-priority` `needs-performance-testing` `uat-complete` `awaiting-approval`",
+  "commits": [
+    {
+      "sha": "8a7f3e2d1c9b5a4f6e8d2c1a9b7f5e3d1c9a7b5f",
+      "message": "Add database schema for reservation system",
+      "author": "Sarah Chen",
+      "date": "2025-09-23T14:22:33Z",
+      "files_changed": 1,
+      "insertions": 145,
+      "deletions": 0
+    },
+    {
+      "sha": "7b6f2d3e8c4a9b5f1e7d3c2a8b6f4e2d0c8a6b4f",
+      "message": "Implement conflict detection algorithm",
+      "author": "Sarah Chen",
+      "date": "2025-09-25T16:15:22Z",
+      "files_changed": 3,
+      "insertions": 211,
+      "deletions": 0
+    },
+    {
+      "sha": "9c8f4e5d1a7b3f2e6d9c1a5b8f7e4d3c2a9b6f5e",
+      "message": "Add reservation REST API endpoints",
+      "author": "Sarah Chen",
+      "date": "2025-09-28T11:33:47Z",
+      "files_changed": 8,
+      "insertions": 480,
+      "deletions": 12
+    },
+    {
+      "sha": "6d5f3e7c2a9b4f1e8d6c3a7b5f9e2d4c1a8b7f6e",
+      "message": "Build calendar UI component",
+      "author": "James Park",
+      "date": "2025-10-02T14:28:11Z",
+      "files_changed": 12,
+      "insertions": 577,
+      "deletions": 8
+    },
+    {
+      "sha": "4e3f8d6c1a5b9f7e2d4c8a6b3f5e1d9c7a4b2f8e",
+      "message": "Implement waitlist feature with FIFO queue",
+      "author": "Sarah Chen",
+      "date": "2025-10-06T09:42:55Z",
+      "files_changed": 9,
+      "insertions": 622,
+      "deletions": 15
+    },
+    {
+      "sha": "3d2f7e5c9a4b8f6e1d3c7a5b2f4e8d6c9a3b1f7e",
+      "message": "Fix DST edge cases in datetime handling",
+      "author": "Sarah Chen",
+      "date": "2025-10-10T17:19:33Z",
+      "files_changed": 7,
+      "insertions": 282,
+      "deletions": 6
+    }
+  ],
+  "stats": {
+    "total_commits": 6,
+    "files_changed": 40,
+    "total_insertions": 2317,
+    "total_deletions": 41,
+    "net_lines": 2276
+  },
+  "reviewers": [
+    {
+      "username": "michael-torres",
+      "name": "Michael Torres",
+      "status": "APPROVED",
+      "approved_at": "2025-10-12T15:22:00Z",
+      "comments": 8
+    },
+    {
+      "username": "lisa-park",
+      "name": "Lisa Park",
+      "status": "APPROVED",
+      "approved_at": "2025-09-05T10:15:00Z",
+      "comments": 3
+    },
+    {
+      "username": "kevin-wu",
+      "name": "Kevin Wu",
+      "status": "APPROVED",
+      "approved_at": "2025-10-11T14:30:00Z",
+      "comments": 5
+    }
+  ],
+  "ci_status": {
+    "status": "PARTIAL_SUCCESS",
+    "checks": [
+      {
+        "name": "Unit Tests",
+        "status": "PASSED",
+        "duration_seconds": 42
+      },
+      {
+        "name": "Integration Tests",
+        "status": "FAILED",
+        "duration_seconds": 156,
+        "failures": 3,
+        "failure_details": "3 DST edge case tests failing"
+      },
+      {
+        "name": "E2E Tests",
+        "status": "PASSED",
+        "duration_seconds": 318
+      },
+      {
+        "name": "Linting",
+        "status": "PASSED",
+        "duration_seconds": 8
+      },
+      {
+        "name": "Security Scan",
+        "status": "PASSED",
+        "duration_seconds": 95
+      },
+      {
+        "name": "Build",
+        "status": "PASSED",
+        "duration_seconds": 124
+      }
+    ],
+    "last_run": "2025-10-14T18:42:17Z"
+  },
+  "labels": [
+    "feature",
+    "high-priority",
+    "needs-performance-testing",
+    "uat-complete",
+    "awaiting-approval"
+  ],
+  "milest": "Q4 2025 - Resource Management",
+  "linked_issues": [
+    {
+      "type": "implements",
+      "reference": "JIRA-RS-003",
+      "title": "Advanced Resource Reservation System"
+    },
+    {
+      "type": "closes",
+      "reference": "#245",
+      "title": "Add calendar view for resources"
+    },
+    {
+      "type": "closes",
+      "reference": "#312",
+      "title": "Implement waitlist for fully booked resources"
+    },
+    {
+      "type": "closes",
+      "reference": "#387",
+      "title": "Timezone-aware reservation scheduling"
+    }
+  ],
+  "merge_status": {
+    "mergeable": true,
+    "conflicts": false,
+    "behind_base": 0,
+    "checks_passing": false,
+    "approvals_obtained": false,
+    "blockers": [
+      "3 integration tests failing",
+      "Performance testing not complete",
+      "Awaiting Community Manager approval",
+      "User documentation outdated"
+    ]
+  },
+  "deployment_readiness": "NOT_READY",
+  "deployment_blockers": [
+    "Performance testing required",
+    "Rachel Green (Community Manager) approval pending",
+    "Consider addressing DST test failures",
+    "Update user documentation"
+  ],
+  "discussion_threads": 17,
+  "total_comments": 43
+}

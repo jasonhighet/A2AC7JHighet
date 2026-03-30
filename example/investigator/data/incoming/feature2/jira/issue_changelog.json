@@ -1,0 +1,165 @@
+{
+  "id": "10389",
+  "key": "PLAT-1687",
+  "changelog": {
+    "startAt": 0,
+    "maxResults": 100,
+    "total": 5,
+    "histories": [
+      {
+        "id": "100921",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0001234567",
+          "displayName": "Emma Rodriguez",
+          "emailAddress": "emma.rodriguez@communityshare.io"
+        },
+        "created": "2025-08-05T09:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": null,
+            "fromString": null,
+            "to": "10001",
+            "toString": "Planning"
+          }
+        ]
+      },
+      {
+        "id": "102567",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0033333333",
+          "displayName": "Michael Torres",
+          "emailAddress": "michael.torres@communityshare.io"
+        },
+        "created": "2025-08-30T10:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10001",
+            "fromString": "Planning",
+            "to": "10002",
+            "toString": "Development"
+          },
+          {
+            "field": "customfield_10020",
+            "fieldtype": "custom",
+            "fieldId": "customfield_10020",
+            "from": null,
+            "fromString": null,
+            "to": null,
+            "toString": "https://github.com/communityshare/platform/pull/389"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "152890",
+            "toString": "Planning complete. Mobile and backend teams aligned on architecture. Starting development."
+          }
+        ]
+      },
+      {
+        "id": "105234",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0098765432",
+          "displayName": "Sarah Chen",
+          "emailAddress": "sarah.chen@communityshare.io"
+        },
+        "created": "2025-10-05T14:00:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10002",
+            "fromString": "Development",
+            "to": "10003",
+            "toString": "UAT"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "153401",
+            "toString": "Initial development complete. Backend and mobile app functional. Moving to UAT for testing."
+          }
+        ]
+      },
+      {
+        "id": "105456",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0022222222",
+          "displayName": "Alex Thompson",
+          "emailAddress": "alex.thompson@communityshare.io"
+        },
+        "created": "2025-10-06T11:30:00.000+0000",
+        "items": [
+          {
+            "field": "status",
+            "fieldtype": "jira",
+            "fieldId": "status",
+            "from": "10003",
+            "fromString": "UAT",
+            "to": "10002",
+            "toString": "Development"
+          },
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "",
+            "to": null,
+            "toString": "blocked"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "153567",
+            "toString": "ROLLED BACK TO DEVELOPMENT. Integration tests failing - WebSocket cannot handle >50 concurrent connections. Critical issues discovered in QA validation. UAT blocked until issues resolved."
+          }
+        ]
+      },
+      {
+        "id": "105892",
+        "author": {
+          "accountId": "5d5e8c7f8e4b3a0044444444",
+          "displayName": "David Kim",
+          "emailAddress": "david.kim@communityshare.io"
+        },
+        "created": "2025-10-10T16:33:22.000+0000",
+        "items": [
+          {
+            "field": "labels",
+            "fieldtype": "jira",
+            "fieldId": "labels",
+            "from": null,
+            "fromString": "blocked",
+            "to": null,
+            "toString": "blocked security-review-required"
+          },
+          {
+            "field": "comment",
+            "fieldtype": "jira",
+            "fieldId": "comment",
+            "from": null,
+            "fromString": null,
+            "to": "153789",
+            "toString": "Security review identified 1 CRITICAL and 3 HIGH severity findings. QR token race condition vulnerability (SEC-QR-001), QR spoofing attack vector (SEC-QR-002), WebSocket auth issues (SEC-WS-001), vulnerable dependency (DEP-7821). Cannot approve for production until all critical/high findings resolved."
+          }
+        ]
+      }
+    ]
+  }
+}

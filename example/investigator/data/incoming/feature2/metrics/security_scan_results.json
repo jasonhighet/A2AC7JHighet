@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "feature": "qr-code-checkin",
+    "feature_id": "FEAT-QR-002",
+    "jira_ticket": "PLAT-1687",
+    "scan_date": "2025-10-13T14:30:00Z",
+    "scanner": "Snyk",
+    "scanner_version": "1.1292.0",
+    "scan_type": "full",
+    "git_commit": "d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9"
+  },
+  "summary": {
+    "total_vulnerabilities": 12,
+    "critical": 1,
+    "high": 3,
+    "medium": 5,
+    "low": 3,
+    "status": "FAILED",
+    "policy_violations": 4,
+    "exploitable": 4
+  },
+  "critical_vulnerabilities": [
+    {
+      "id": "SNYK-JS-QR-IMAGE-5843201",
+      "title": "QR Code Generation Library - Arbitrary Code Execution",
+      "severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "cwe": "CWE-94: Improper Control of Generation of Code",
+      "package": "qr-image",
+      "version_installed": "3.2.0",
+      "version_fixed": "3.3.0",
+      "description": "The qr-image library allows arbitrary code execution through malicious QR content. An attacker can inject JavaScript code that will be executed when the QR code is generated on the server.",
+      "exploit_details": {
+        "exploitability": "HIGH",
+        "attack_vector": "NETWORK",
+        "attack_complexity": "LOW",
+        "privileges_required": "NONE",
+        "user_interaction": "NONE",
+        "scope": "CHANGED",
+        "proof_of_concept_available": true
+      },
+      "impact": {
+        "confidentiality": "HIGH",
+        "integrity": "HIGH",
+        "availability": "HIGH",
+        "business_impact": "Could allow attacker to execute arbitrary code on server, steal database credentials, access all equipment checkout data"
+      },
+      "affected_code": [
+        "src/services/qrGeneration.js:45-67",
+        "src/api/qrController.js:89-103"
+      ],
+      "introduced_in_commit": "c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "remediation": {
+        "fix": "Upgrade qr-image to version 3.3.0 or higher",
+        "workaround": "Sanitize all user input before passing to QR generation library",
+        "effort": "LOW - Simple dependency upgrade"
+      },
+      "references": [
+        "https://security.snyk.io/vuln/SNYK-JS-QR-IMAGE-5843201",
+        "https://nvd.nist.gov/vuln/detail/CVE-2024-45678"
+      ],
+      "first_detected": "2025-10-13T14:30:00Z",
+      "days_open": 2,
+      "policy_violation": true,
+      "is_blocker": true
+    }
+  ],
+  "high_vulnerabilities": [
+    {
+      "id": "SNYK-JS-SOCKETIO-5712394",
+      "title": "Socket.io - Denial of Service via Connection Flooding",
+      "severity": "HIGH",
+      "cvss_score": 7.5,
+      "cwe": "CWE-400: Uncontrolled Resource Consumption",
+      "package": "socket.io",
+      "version_installed": "4.6.1",
+      "version_fixed": "4.6.2",
+      "description": "Socket.io versions before 4.6.2 are vulnerable to denial of service attacks through connection flooding. An attacker can exhaust server resources by rapidly creating and destroying connections.",
+      "exploit_details": {
+        "exploitability": "MEDIUM",
+        "attack_vector": "NETWORK",
+        "attack_complexity": "LOW",
+        "privileges_required": "NONE",
+        "user_interaction": "NONE"
+      },
+      "impact": {
+        "confidentiality": "NONE",
+        "integrity": "NONE",
+        "availability": "HIGH",
+        "business_impact": "Could cause WebSocket server to crash during peak usage, preventing real-time check-in notifications"
+      },
+      "affected_code": [
+        "src/websockets/server.js:23-89",
+        "src/websockets/connectionManager.js:45-178"
+      ],
+      "remediation": {
+        "fix": "Upgrade socket.io to version 4.6.2 or higher",
+        "workaround": "Implement rate limiting on connection attempts",
+        "effort": "LOW"
+      },
+      "policy_violation": true,
+      "is_blocker": true
+    },
+    {
+      "id": "SNYK-JS-JSONWEBTOKEN-5689234",
+      "title": "jsonwebtoken - JWT Algorithm Confusion",
+      "severity": "HIGH",
+      "cvss_score": 7.4,
+      "cwe": "CWE-347: Improper Verification of Cryptographic Signature",
+      "package": "jsonwebtoken",
+      "version_installed": "8.5.1",
+      "version_fixed": "9.0.0",
+      "description": "The JWT library allows algorithm confusion attacks where an attacker can forge tokens by changing the algorithm from RS256 to HS256.",
+      "impact": {
+        "confidentiality": "HIGH",
+        "integrity": "HIGH",
+        "availability": "NONE",
+        "business_impact": "Could allow unauthorized access to API endpoints, including QR generation and validation"
+      },
+      "affected_code": [
+        "src/middleware/auth.js:34-67",
+        "src/services/tokenService.js:12-45"
+      ],
+      "remediation": {
+        "fix": "Upgrade jsonwebtoken to version 9.0.0 or higher and explicitly specify algorithm",
+        "effort": "MEDIUM - May require code changes"
+      },
+      "policy_violation": true,
+      "is_blocker": true
+    },
+    {
+      "id": "SNYK-JS-EXPRESS-5234891",
+      "title": "express - Open Redirect Vulnerability",
+      "severity": "HIGH",
+      "cvss_score": 6.1,
+      "cwe": "CWE-601: URL Redirection to Untrusted Site",
+      "package": "express",
+      "version_installed": "4.18.2",
+      "version_fixed": "4.19.0",
+      "description": "Express versions before 4.19.0 are vulnerable to open redirect attacks through improper URL validation.",
+      "impact": {
+        "confidentiality": "LOW",
+        "integrity": "LOW",
+        "availability": "NONE",
+        "business_impact": "Could be used in phishing attacks against users"
+      },
+      "affected_code": [
+        "src/api/routes.js:all"
+      ],
+      "remediation": {
+        "fix": "Upgrade express to version 4.19.0 or higher",
+        "effort": "LOW"
+      },
+      "policy_violation": false,
+      "is_blocker": false
+    }
+  ],
+  "medium_vulnerabilities": [
+    {
+      "id": "SNYK-JS-AXIOS-6745123",
+      "title": "axios - Server-Side Request Forgery (SSRF)",
+      "severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "package": "axios",
+      "version_installed": "1.4.0",
+      "version_fixed": "1.6.0",
+      "description": "Axios allows SSRF attacks through improper URL validation in certain configurations."
+    },
+    {
+      "id": "SNYK-JS-LODASH-5982341",
+      "title": "lodash - Prototype Pollution",
+      "severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "package": "lodash",
+      "version_installed": "4.17.20",
+      "version_fixed": "4.17.21"
+    },
+    {
+      "id": "SNYK-JS-MOMENT-4893721",
+      "title": "moment - Regular Expression Denial of Service",
+      "severity": "MEDIUM",
+      "cvss_score": 4.3,
+      "package": "moment",
+      "version_installed": "2.29.3",
+      "version_fixed": "2.29.4"
+    },
+    {
+      "id": "SNYK-JS-UUID-5123894",
+      "title": "uuid - Predictable UUID Generation",
+      "severity": "MEDIUM",
+      "cvss_score": 4.8,
+      "package": "uuid",
+      "version_installed": "8.3.2",
+      "version_fixed": "9.0.0"
+    },
+    {
+      "id": "SNYK-JS-VALIDATOR-5934821",
+      "title": "validator - Improper Input Validation",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "package": "validator",
+      "version_installed": "13.9.0",
+      "version_fixed": "13.11.0"
+    }
+  ],
+  "low_vulnerabilities": [
+    {
+      "id": "SNYK-JS-DEBUG-4289321",
+      "title": "debug - Regular Expression Denial of Service",
+      "severity": "LOW",
+      "cvss_score": 3.7,
+      "package": "debug",
+      "version_installed": "4.3.4",
+      "version_fixed": "4.3.5"
+    },
+    {
+      "id": "SNYK-JS-SEMVER-5723891",
+      "title": "semver - Regular Expression Denial of Service",
+      "severity": "LOW",
+      "cvss_score": 3.3,
+      "package": "semver",
+      "version_installed": "7.5.3",
+      "version_fixed": "7.5.4"
+    },
+    {
+      "id": "SNYK-JS-PATH-TO-REGEXP-6234871",
+      "title": "path-to-regexp - Regular Expression Denial of Service",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "package": "path-to-regexp",
+      "version_installed": "6.2.1",
+      "version_fixed": "6.2.2"
+    }
+  ],
+  "dependency_scan": {
+    "total_dependencies": 487,
+    "direct_dependencies": 34,
+    "transitive_dependencies": 453,
+    "outdated_dependencies": 67,
+    "deprecated_dependencies": 8
+  },
+  "code_scan": {
+    "files_scanned": 89,
+    "issues_found": 23,
+    "security_hotspots": [
+      {
+        "file": "src/services/qrGeneration.js",
+        "line": 56,
+        "issue": "Unsanitized user input passed to QR generation",
+        "severity": "HIGH",
+        "recommendation": "Implement input validation and sanitization"
+      },
+      {
+        "file": "src/api/qrController.js",
+        "line": 134,
+        "issue": "Missing rate limiting on QR generation endpoint",
+        "severity": "MEDIUM",
+        "recommendation": "Add rate limiting to prevent abuse"
+      },
+      {
+        "file": "src/services/qrValidation.js",
+        "line": 89,
+        "issue": "Timing attack vulnerability in token comparison",
+        "severity": "MEDIUM",
+        "recommendation": "Use constant-time comparison for tokens"
+      },
+      {
+        "file": "src/websockets/server.js",
+        "line": 67,
+        "issue": "No connection limit enforcement",
+        "severity": "HIGH",
+        "recommendation": "Implement connection limits per IP/user"
+      }
+    ]
+  },
+  "license_scan": {
+    "total_licenses": 156,
+    "policy_violations": 2,
+    "risky_licenses": [
+      {
+        "package": "qr-image",
+        "license": "GPL-3.0",
+        "risk": "Copyleft license may require open-sourcing our code",
+        "policy_violation": true
+      },
+      {
+        "package": "some-utility",
+        "license": "UNKNOWN",
+        "risk": "Unknown license creates legal uncertainty",
+        "policy_violation": true
+      }
+    ]
+  },
+  "mobile_app_scan": {
+    "platform": "React Native",
+    "issues_found": 7,
+    "vulnerabilities": [
+      {
+        "title": "Insecure data storage in AsyncStorage",
+        "severity": "MEDIUM",
+        "file": "mobile/src/services/storage.js",
+        "description": "Sensitive QR tokens stored in unencrypted AsyncStorage"
+      },
+      {
+        "title": "Missing certificate pinning",
+        "severity": "HIGH",
+        "description": "API calls don't use certificate pinning, vulnerable to MITM attacks"
+      }
+    ]
+  },
+  "remediation_summary": {
+    "auto_fixable": 8,
+    "manual_fix_required": 4,
+    "breaking_changes": 2,
+    "estimated_effort_hours": 16
+  },
+  "policy_violations": [
+    {
+      "violation": "Critical vulnerability in production dependency",
+      "package": "qr-image",
+      "policy": "No critical vulnerabilities allowed in production code",
+      "action_required": "BLOCK_DEPLOYMENT"
+    },
+    {
+      "violation": "High severity vulnerability with known exploit",
+      "package": "socket.io",
+      "policy": "No exploitable vulnerabilities in network-facing code",
+      "action_required": "BLOCK_DEPLOYMENT"
+    },
+    {
+      "violation": "High severity authentication vulnerability",
+      "package": "jsonwebtoken",
+      "policy": "No auth/authz vulnerabilities above MEDIUM severity",
+      "action_required": "BLOCK_DEPLOYMENT"
+    },
+    {
+      "violation": "GPL-3.0 copyleft license",
+      "package": "qr-image",
+      "policy": "No copyleft licenses in production code",
+      "action_required": "REMOVE_DEPENDENCY"
+    }
+  ],
+  "quality_gates": {
+    "no_critical_vulnerabilities": false,
+    "no_high_vulnerabilities_with_exploits": false,
+    "no_policy_violations": false,
+    "acceptable_risk_level": false
+  },
+  "blocker_status": {
+    "is_blocker": true,
+    "reason": "1 critical and 3 high severity vulnerabilities with 4 policy violations",
+    "can_deploy": false,
+    "must_fix": [
+      "CRITICAL: qr-image arbitrary code execution vulnerability (SNYK-JS-QR-IMAGE-5843201)",
+      "HIGH: socket.io DoS vulnerability enabling server crashes (SNYK-JS-SOCKETIO-5712394)",
+      "HIGH: jsonwebtoken algorithm confusion allowing unauthorized access (SNYK-JS-JSONWEBTOKEN-5689234)",
+      "LICENSE: Remove GPL-3.0 licensed qr-image package"
+    ]
+  },
+  "recommendations": [
+    "CRITICAL: Immediately upgrade qr-image to 3.3.0+ or replace with alternative library (no GPL)",
+    "HIGH: Upgrade socket.io to 4.6.2+ to fix DoS vulnerability",
+    "HIGH: Upgrade jsonwebtoken to 9.0.0+ and explicitly specify algorithm in all JWT operations",
+    "MEDIUM: Implement input sanitization for all user-provided QR content",
+    "MEDIUM: Add rate limiting on all API endpoints",
+    "MEDIUM: Implement connection limits for WebSocket server",
+    "LOW: Enable dependabot or similar tool for automated dependency updates",
+    "LOW: Review and update all outdated dependencies (67 total)"
+  ],
+  "security_review_required": true,
+  "pen_test_recommended": true
+}

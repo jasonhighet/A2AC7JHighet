@@ -1,0 +1,55 @@
+{
+  "overall_coverage": 82,
+  "coverage_by_type": {
+    "lines": 83,
+    "functions": 85,
+    "branches": 78,
+    "statements": 82
+  },
+  "coverage_by_component": {
+    "backend": {
+      "reservation_service": 88,
+      "conflict_detector": 92,
+      "waitlist_service": 71,
+      "api_controllers": 85,
+      "database_layer": 89
+    },
+    "frontend": {
+      "calendar_component": 79,
+      "booking_modal": 82,
+      "waitlist_ui": 68,
+      "datetime_utils": 91
+    }
+  },
+  "uncovered_areas": [
+    {
+      "component": "waitlist_service",
+      "description": "Waitlist notification edge cases",
+      "coverage": 71,
+      "reason": "Complex notification timing scenarios not fully tested",
+      "risk_level": "medium"
+    },
+    {
+      "component": "waitlist_ui",
+      "description": "Waitlist UI error states",
+      "coverage": 68,
+      "reason": "Some error handling paths not covered",
+      "risk_level": "low"
+    }
+  ],
+  "threshold": 80,
+  "passed": true,
+  "report_metadata": {
+    "tool": "Jest + Istanbul",
+    "generated_at": "2025-10-11T09:33:17Z",
+    "branch": "feature/reservation-system",
+    "commit_sha": "a7f3e9c2d1b4",
+    "report_url": "https://codecov.io/gh/communityshare/platform/commit/a7f3e9c2d1b4"
+  },
+  "trends": {
+    "previous_coverage": 79,
+    "change": 3,
+    "direction": "improving"
+  },
+  "notes": "Coverage exceeds 80% threshold. Waitlist notification edge cases at 71% - acceptable given complexity. Overall quality gate: PASSED."
+}

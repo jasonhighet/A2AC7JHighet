@@ -1,0 +1,12 @@
+{
+  "feature_id": "FEAT-CT-004",
+  "feature_name": "Contribution Tracking & Community Credits",
+  "jira_issue": "COMM-445",
+  "approval_process_metadata": {
+    "approval_workflow": "Feature Production Approval",
+    "workflow_version": "2.1"
+  },
+  "overall_status": "PENDING",
+  "production_clearance": false,
+  "deployment_authorized": false
+}

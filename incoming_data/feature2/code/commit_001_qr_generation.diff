@@ -1,0 +1,238 @@
+diff --git a/backend/models/qrCode.js b/backend/models/qrCode.js
+new file mode 100644
+index 0000000..8f3a9c5
+--- /dev/null
++++ b/backend/models/qrCode.js
+@@ -0,0 +1,62 @@
++const mongoose = require('mongoose');
++const crypto = require('crypto');
++
++const qrCodeSchema = new mongoose.Schema({
++  equipmentId: {
++    type: mongoose.Schema.Types.ObjectId,
++    ref: 'Equipment',
++    required: true,
++    index: true
++  },
++  token: {
++    type: String,
++    required: true,
++    unique: true,
++    index: true
++  },
++  generatedBy: {
++    type: mongoose.Schema.Types.ObjectId,
++    ref: 'User',
++    required: true
++  },
++  generatedAt: {
++    type: Date,
++    default: Date.now,
++    index: true
++  },
++  expiresAt: {
++    type: Date,
++    required: true,
++    index: true
++  },
++  isActive: {
++    type: Boolean,
++    default: true,
++    index: true
++  },
++  invalidatedAt: {
++    type: Date,
++    default: null
++  },
++  invalidatedBy: {
++    type: mongoose.Schema.Types.ObjectId,
++    ref: 'User',
++    default: null
++  },
++  scanCount: {
++    type: Number,
++    default: 0
++  },
++  lastScannedAt: {
++    type: Date,
++    default: null
++  }
++}, {
++  timestamps: true
++});
++
++// Compound index for active code lookups
++qrCodeSchema.index({ token: 1, isActive: 1, expiresAt: 1 });
++qrCodeSchema.index({ equipmentId: 1, isActive: 1 });
++
++module.exports = mongoose.model('QRCode', qrCodeSchema);
+diff --git a/backend/services/qrCodeService.js b/backend/services/qrCodeService.js
+new file mode 100644
+index 0000000..7c4d2e5
+--- /dev/null
++++ b/backend/services/qrCodeService.js
+@@ -0,0 +1,145 @@
++const QRCode = require('../models/qrCode');
++const Equipment = require('../models/equipment');
++const crypto = require('crypto');
++const qrcode = require('qrcode');
++const logger = require('../utils/logger');
++
++const QR_CODE_EXPIRY_HOURS = 24;
++const QR_CODE_BASE_URL = process.env.QR_CODE_BASE_URL || 'https://app.equipment-tracker.com/scan';
++
++/**
++ * Generate a secure random token for QR code
++ * @returns {string} 32-character hexadecimal token
++ */
++function generateToken() {
++  return crypto.randomBytes(16).toString('hex');
++}
++
++/**
++ * Generate a new QR code for equipment
++ * @param {string} equipmentId - MongoDB ObjectId of equipment
++ * @param {string} userId - MongoDB ObjectId of user generating code
++ * @returns {Object} QR code data with image
++ */
++async function generateQRCode(equipmentId, userId) {
++  try {
++    // Validate equipment exists
++    const equipment = await Equipment.findById(equipmentId);
++    if (!equipment) {
++      throw new Error('Equipment not found');
++    }
++
++    // Invalidate any existing active QR codes for this equipment
++    await QRCode.updateMany(
++      { equipmentId, isActive: true },
++      { 
++        isActive: false, 
++        invalidatedAt: new Date(),
++        invalidatedBy: userId
++      }
++    );
++
++    // Generate new token
++    const token = generateToken();
++    const expiresAt = new Date();
++    expiresAt.setHours(expiresAt.getHours() + QR_CODE_EXPIRY_HOURS);
++
++    // Create QR code record
++    const qrCodeRecord = await QRCode.create({
++      equipmentId,
++      token,
++      generatedBy: userId,
++      expiresAt,
++      isActive: true
++    });
++
++    // Generate QR code image
++    const qrUrl = `${QR_CODE_BASE_URL}?token=${token}`;
++    const qrImageDataUrl = await qrcode.toDataURL(qrUrl, {
++      errorCorrectionLevel: 'H',
++      type: 'image/png',
++      margin: 2,
++      width: 300
++    });
++
++    logger.info('QR code generated', {
++      equipmentId,
++      token,
++      userId,
++      expiresAt
++    });
++
++    return {
++      id: qrCodeRecord._id,
++      token,
++      url: qrUrl,
++      image: qrImageDataUrl,
++      expiresAt,
++      equipmentId,
++      equipmentName: equipment.name
++    };
++  } catch (error) {
++    logger.error('Error generating QR code', { error: error.message, equipmentId, userId });
++    throw error;
++  }
++}
++
++/**
++ * Validate a QR code token
++ * @param {string} token - QR code token to validate
++ * @returns {Object|null} QR code record if valid, null otherwise
++ */
++async function validateToken(token) {
++  try {
++    const qrCodeRecord = await QRCode.findOne({
++      token,
++      isActive: true,
++      expiresAt: { $gt: new Date() }
++    }).populate('equipmentId');
++
++    if (!qrCodeRecord) {
++      logger.warn('Invalid or expired QR code token', { token });
++      return null;
++    }
++
++    // Update scan statistics
++    qrCodeRecord.scanCount += 1;
++    qrCodeRecord.lastScannedAt = new Date();
++    await qrCodeRecord.save();
++
++    logger.info('QR code validated', { 
++      token, 
++      equipmentId: qrCodeRecord.equipmentId._id,
++      scanCount: qrCodeRecord.scanCount 
++    });
++
++    return qrCodeRecord;
++  } catch (error) {
++    logger.error('Error validating token', { error: error.message, token });
++    throw error;
++  }
++}
++
++/**
++ * Invalidate a QR code
++ * @param {string} qrCodeId - MongoDB ObjectId of QR code
++ * @param {string} userId - MongoDB ObjectId of user invalidating code
++ */
++async function invalidateQRCode(qrCodeId, userId) {
++  try {
++    const qrCodeRecord = await QRCode.findByIdAndUpdate(
++      qrCodeId,
++      {
++        isActive: false,
++        invalidatedAt: new Date(),
++        invalidatedBy: userId
++      },
++      { new: true }
++    );
++
++    logger.info('QR code invalidated', { qrCodeId, userId });
++    return qrCodeRecord;
++  } catch (error) {
++    logger.error('Error invalidating QR code', { error: error.message, qrCodeId, userId });
++    throw error;
++  }
++}
++
++module.exports = {
++  generateQRCode,
++  validateToken,
++  invalidateQRCode
++};
+diff --git a/backend/package.json b/backend/package.json
+index 3f8a9c5..9d4e2c1 100644
+--- a/backend/package.json
++++ b/backend/package.json
+@@ -15,6 +15,7 @@
+     "jsonwebtoken": "^9.0.0",
+     "mongoose": "^7.0.3",
+     "morgan": "^1.10.0",
++    "qrcode": "^1.5.3",
+     "validator": "^13.9.0"
+   },
+   "devDependencies": {

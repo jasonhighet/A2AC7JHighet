@@ -1,0 +1,19 @@
+{
+  "issue_key": "COMM-445",
+  "changelog": [
+    {
+      "id": "TODO",
+      "created": "TODO: YYYY-MM-DDTHH:MM:SSZ",
+      "author": {
+        "displayName": "TODO"
+      },
+      "items": [
+        {
+          "field": "status",
+          "from": "TODO",
+          "to": "TODO"
+        }
+      ]
+    }
+  ]
+}

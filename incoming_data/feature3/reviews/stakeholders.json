@@ -1,0 +1,12 @@
+{
+  "feature_id": "FEAT-RS-003",
+  "feature_name": "Advanced Resource Reservation System",
+  "jira_issue": "PLAT-1677",
+  "approval_process_metadata": {
+    "approval_workflow": "Feature Production Approval",
+    "workflow_version": "2.1"
+  },
+  "overall_status": "PENDING",
+  "production_clearance": false,
+  "deployment_authorized": false
+}
