@@ -132,7 +132,8 @@ def run_conversation_mode() -> None:
 
     # Maintain conversation state across turns in this session
     # Load initial state (will be empty for new session ID)
-    state: dict = {"messages": persistence.load()}
+    messages, summary = persistence.load()
+    state: dict = {"messages": messages, "summary": summary}
 
     try:
         while True:
@@ -155,7 +156,8 @@ def run_conversation_mode() -> None:
                 
                 # Append this turn's user message and invoke the graph
                 input_state = {
-                    "messages": list(state["messages"]) + [HumanMessage(content=user_input)]
+                    "messages": list(state["messages"]) + [HumanMessage(content=user_input)],
+                    "summary": state.get("summary", "")
                 }
 
                 # Run the graph with OpenTelemetry callbacks
@@ -177,9 +179,13 @@ def run_conversation_mode() -> None:
                                 input_state["messages"] + list(node_output["messages"])
                             )
                             input_state["messages"] = state["messages"]
+                        
+                        if "summary" in node_output:
+                            state["summary"] = node_output["summary"]
+                            input_state["summary"] = state["summary"]
 
                 # Save session to disk after each turn
-                persistence.save(state["messages"])
+                persistence.save(state["messages"], state.get("summary", ""))
                 
                 # Step 4: Flush traces to disk after each turn
                 force_flush_traces()

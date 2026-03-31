@@ -138,6 +138,69 @@ def get_test_scenarios() -> list[dict[str, Any]]:
                 "description": "Phase-specific readiness query (Development -> UAT)",
             },
         },
+        # ===== MODULE 8: COMPREHENSIVE RETRIEVAL SCENARIOS =====
+        {
+            "inputs": {
+                "user_query": "Is the maintenance scheduling feature (FEAT-MS-001) ready for production? Please perform a full analysis including all metrics, reviews, and planning documentation."
+            },
+            "outputs": {
+                "expected_decision": "ready",
+                "expected_feature_id": "FEAT-MS-001",
+                "should_call_jira": True,
+                "should_call_analysis": True,
+                "analysis_types_required": [
+                    "metrics/unit_test_results",
+                    "metrics/test_coverage_report",
+                    "metrics/pipeline_results",
+                    "metrics/performance_benchmarks",
+                    "metrics/security_scan_results",
+                    "reviews/security",
+                    "reviews/uat",
+                    "reviews/stakeholders"
+                ],
+                "planning_docs_required": ["search_planning_docs"],
+            },
+            "metadata": {
+                "category": "module_8_comprehensive",
+                "difficulty": "hard",
+                "description": "Full retrieval of 5 metrics, 3 reviews, and planning search",
+            },
+        },
+        {
+            "inputs": {
+                "user_query": "What are the specific acceptance criteria for FEAT-MS-001?"
+            },
+            "outputs": {
+                "expected_feature_id": "FEAT-MS-001",
+                "should_call_planning": True,
+                "planning_docs_required": ["search_planning_docs"],
+            },
+            "metadata": {
+                "category": "module_8_planning",
+                "difficulty": "medium",
+                "description": "Verify agent uses search_planning_docs for specific questions",
+            },
+        },
+        {
+            "inputs": {
+                "user_query": "Is QR code check-in (FEAT-QR-002) ready for UAT?"
+            },
+            "outputs": {
+                "expected_decision": "not_ready",
+                "expected_feature_id": "FEAT-QR-002",
+                "should_call_analysis": True,
+                "analysis_types_required": [
+                    "metrics/unit_test_results",
+                    "reviews/security"
+                ],
+                "failure_reason": "failing_tests_or_security_risk",
+            },
+            "metadata": {
+                "category": "module_8_blocker",
+                "difficulty": "hard",
+                "description": "Feature with multiple blocker types (failing tests and security risk)",
+            },
+        },
     ]
 
     return scenarios

@@ -37,7 +37,8 @@ def run_evaluation(
     def run_agent(inputs: dict) -> dict:
         """Invokes the agent graph."""
         user_query = inputs["user_query"]
-        result = agent.invoke({"messages": [("user", user_query)]})
+        # Initialize state with empty summary for each fresh evaluation run
+        result = agent.invoke({"messages": [("user", user_query)], "summary": ""})
         final_message = result["messages"][-1]
         output_text = final_message.content if hasattr(final_message, "content") else str(final_message)
         return {"output": output_text}

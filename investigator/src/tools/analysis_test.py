@@ -203,3 +203,42 @@ def test_get_analysis_fails_gracefully_after_all_retries():
             assert mock_read.call_count >= 1
             assert "error" in result
             assert "Failed to retrieve analysis" in result["error"]
+
+
+def test_get_analysis_security_review(mock_security_review_json):
+    """get_analysis correctly retrieves security review."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_security_review_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "reviews/security"
+            })
+
+            assert result["status"] == "APPROVED"
+            assert result["risk_level"] == "LOW"
+
+
+def test_get_analysis_uat_review(mock_uat_review_json):
+    """get_analysis correctly retrieves UAT review."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_uat_review_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "reviews/uat"
+            })
+
+            assert result["status"] == "PASSED"
+            assert "feedback" in result
+
+
+def test_get_analysis_stakeholders_review(mock_stakeholders_review_json):
+    """get_analysis correctly retrieves stakeholders review."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_stakeholders_review_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "reviews/stakeholders"
+            })
+
+            assert result["approvals"]["product_manager"] == "APPROVED"
+            assert result["approvals"]["engineering_lead"] == "APPROVED"

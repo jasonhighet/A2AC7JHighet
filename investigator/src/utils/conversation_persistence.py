@@ -51,11 +51,12 @@ class ConversationPersistence:
         """Return the current conversation's file path."""
         return self.filepath
 
-    def save(self, messages: Sequence[BaseMessage]) -> None:
-        """Save message history to the conversation file.
-
+    def save(self, messages: Sequence[BaseMessage], summary: str = "") -> None:
+        """Save message history and summary to the conversation file.
+        
         Args:
             messages: Sequence of LangChain BaseMessage objects.
+            summary: Optional conversation summary string.
         """
         # Serialise messages to a list of dicts using LangChain's dumpd
         serialised = [dumpd(msg) for msg in messages]
@@ -69,6 +70,7 @@ class ConversationPersistence:
                             "updated_at": datetime.now().isoformat(),
                             "model": self.config.model_name,
                         },
+                        "summary": summary,
                         "messages": serialised,
                     },
                     f,
@@ -87,16 +89,17 @@ class ConversationPersistence:
                       If None, tries to load the current session's file.
 
         Returns:
-            List of BaseMessage objects.
+            Tuple of (List of BaseMessage objects, summary string).
         """
         target = filepath or self.filepath
         if not target.exists():
-            return []
+            return [], ""
 
         try:
             with open(target, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
+            summary = data.get("summary", "")
             messages = []
             for item in data.get("messages", []):
                 msg = load(item)
@@ -108,7 +111,7 @@ class ConversationPersistence:
                 self.conversation_id = data.get("conversation_id", self.conversation_id)
                 self.filepath = filepath
 
-            return messages
+            return messages, summary
         except (json.JSONDecodeError, OSError) as e:
             logger.error(f"Failed to load conversation from {target}: {e}")
-            return []
+            return [], ""

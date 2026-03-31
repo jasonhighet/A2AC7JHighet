@@ -58,6 +58,8 @@ def evaluate_tool_usage(run: Run, example: Example) -> dict[str, Any]:
     should_call_jira = expected_outputs.get("should_call_jira", False)
     should_call_analysis = expected_outputs.get("should_call_analysis", False)
     analysis_types_required = expected_outputs.get("analysis_types_required", [])
+    should_call_planning = expected_outputs.get("should_call_planning", False)
+    planning_docs_required = expected_outputs.get("planning_docs_required", [])
 
     tool_calls = _extract_tool_calls(run)
     called_jira = any(tc["name"] == "get_jira_data" for tc in tool_calls)
@@ -89,9 +91,27 @@ def evaluate_tool_usage(run: Run, example: Example) -> dict[str, Any]:
         score += 0.4 * (found / len(analysis_types_required))
         missing = [t for t in analysis_types_required if t not in analysis_types_called]
         if missing:
-            issues.append(f"Missing analysis types: {', '.join(missing)}")
+            issues.append(f"Missing analysis/review types: {', '.join(missing)}")
     else:
-        score += 0.4  # Bonus or default for no specific analysis requirements
+        score += 0.2
+
+    # Planning tool verification
+    if should_call_planning or planning_docs_required:
+        planning_tools = {"list_planning_docs", "read_planning_doc", "search_planning_docs"}
+        called_planning = [tc["name"] for tc in tool_calls if tc["name"] in planning_tools]
+        
+        if planning_docs_required:
+            found_planning = sum(1 for t in planning_docs_required if t in called_planning)
+            score += 0.2 * (found_planning / len(planning_docs_required))
+            missing_planning = [t for t in planning_docs_required if t not in called_planning]
+            if missing_planning:
+                issues.append(f"Missing planning tools: {', '.join(missing_planning)}")
+        elif called_planning:
+            score += 0.2
+        else:
+            issues.append("Missing planning documentation tools")
+    else:
+        score += 0.2
 
     comment = "; ".join(issues) if issues else "All required tools called correctly"
     return {"key": "tool_usage", "score": min(score, 1.0), "comment": comment}
@@ -191,5 +211,11 @@ def _contains_metrics(text: str) -> bool:
         r"coverage",
         r"passed",
         r"failed",
+        r"security",
+        r"pipeline",
+        r"benchmark",
+        r"latency",
+        r"approval",
+        r"risk",
     ]
     return any(re.search(p, text.lower()) for p in patterns)

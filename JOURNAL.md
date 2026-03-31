@@ -117,3 +117,11 @@ esults list inside evaluation_results was a bit of a debugging detour, but it ma
 - **Observability**: Integrating OpenTelemetry was a game-changer. Being able to see exactly why a tool failed or what the LLM was "thinking" by looking at a local JSON span file makes debugging non-deterministic agent behavior feel deterministic.
 - **Reliability**: Exponential back-off with jitter in the tool layer saved several runs when I accidentally had the analysis JSON file open in another editor (causing a transient permission error). The agent just waited a beat and successfully retried.
 - **Final Verdict**: uv + LangGraph + OpenTelemetry = A very powerful, lightweight stack for building production-ready agents without the "Docker tax."
+
+## Module 8: Agentic Knowledge Management
+
+- **What frustrated you?**: Managing the "summarisation lag." In the initial LangGraph implementation, the agent would once in a while lose the immediate context of a tool result if the `summarize` node triggered exactly at the wrong moment. I had to refine the logic to always keep the last two messages (the most recent turn) out of the summary to ensure continuity.
+- **What surprised you?**: The efficiency of `ripgrep` for "on the metal" searching. Even with multiple large markdown documents, `search_planning_docs` is nearly instantaneous and much simpler to maintain than a vector database for this scale of project.
+- **Aha! Moment**: Realising that the "System Prompt + Summary" pattern is essentially a dynamic "Executive Summary" for the agent. Instead of re-reading everything, it gets a high-level briefing of its own past work, which significantly reduces token usage during long investigations.
+- **Integration**: The 429 Rate Limit during the final evaluation was a practical reminder of the "agentic tax" on APIs. It forced me to think about more efficient tool-calling patterns—why call 5 metrics individually when the agent can be taught to batch its requirements or use a search tool to find just the failures?
+- **Final Verdict**: Scaling an agent isn't just about adding more tools; it's about adding **better filters**. Ripgrep and summarisation provide those filters, allowing the Investigator Agent to handle complex, information-heavy features without "drowning" in its own context window.

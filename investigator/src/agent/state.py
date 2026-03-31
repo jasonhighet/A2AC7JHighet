@@ -21,3 +21,4 @@ class AgentState(TypedDict):
     """
 
     messages: Annotated[Sequence[BaseMessage], add_messages]
+    summary: str
