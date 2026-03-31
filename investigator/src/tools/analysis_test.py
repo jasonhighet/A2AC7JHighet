@@ -24,6 +24,73 @@ def mock_unit_test_json() -> dict:
     }
 
 
+@pytest.fixture
+def mock_pipeline_json() -> dict:
+    """Mock pipeline results JSON."""
+    return {
+        "status": "success",
+        "build_number": 42,
+        "stages": [
+            {"name": "build", "status": "success"},
+            {"name": "lint", "status": "success"},
+        ],
+    }
+
+
+@pytest.fixture
+def mock_performance_json() -> dict:
+    """Mock performance benchmarks JSON."""
+    return {
+        "p95_latency_ms": 150,
+        "throughput_rps": 500,
+        "sla_met": True,
+    }
+
+
+@pytest.fixture
+def mock_security_json() -> dict:
+    """Mock security scan results JSON."""
+    return {
+        "overall_risk": "low",
+        "vulnerabilities": {
+            "high": 0,
+            "medium": 2,
+            "low": 5,
+        },
+    }
+
+
+@pytest.fixture
+def mock_security_review_json() -> dict:
+    """Mock security review JSON."""
+    return {
+        "status": "APPROVED",
+        "risk_level": "LOW",
+        "findings": [],
+    }
+
+
+@pytest.fixture
+def mock_uat_review_json() -> dict:
+    """Mock UAT review JSON."""
+    return {
+        "status": "PASSED",
+        "feedback": "User testing successful",
+        "critical_issues": [],
+    }
+
+
+@pytest.fixture
+def mock_stakeholders_review_json() -> dict:
+    """Mock stakeholders review JSON."""
+    return {
+        "approvals": {
+            "product_manager": "APPROVED",
+            "engineering_lead": "APPROVED",
+        },
+    }
+
+
 def test_get_analysis_returns_metrics(mock_unit_test_json):
     """get_analysis correctly retrieves and returns JSON metrics."""
     with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
@@ -35,6 +102,57 @@ def test_get_analysis_returns_metrics(mock_unit_test_json):
 
             assert result["summary"]["total"] == 100
             assert result["summary"]["failed"] == 0
+
+
+def test_get_analysis_pipeline_results(mock_pipeline_json):
+    """get_analysis correctly retrieves pipeline results."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_pipeline_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "metrics/pipeline_results"
+            })
+
+            assert result["status"] == "success"
+            assert result["build_number"] == 42
+
+
+def test_get_analysis_performance_benchmarks(mock_performance_json):
+    """get_analysis correctly retrieves performance benchmarks."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_performance_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "metrics/performance_benchmarks"
+            })
+
+            assert result["p95_latency_ms"] == 150
+            assert result["sla_met"] is True
+
+
+def test_get_analysis_security_scan_results(mock_security_json):
+    """get_analysis correctly retrieves security scan results."""
+    with patch("src.tools.analysis.get_feature_folder", return_value="feature1"):
+        with patch("src.tools.analysis.read_json_file", return_value=mock_security_json):
+            result = get_analysis.invoke({
+                "feature_id": "FEAT-123",
+                "analysis_type": "metrics/security_scan_results"
+            })
+
+            assert result["overall_risk"] == "low"
+            assert result["vulnerabilities"]["high"] == 0
+
+
+def test_get_analysis_invalid_metrics_type():
+    """get_analysis returns error for unsupported analysis type."""
+    result = get_analysis.invoke({
+        "feature_id": "FEAT-123",
+        "analysis_type": "metrics/invalid_type"
+    })
+
+    assert "error" in result
+    assert "Failed to retrieve analysis" in result["error"]
+    assert "Invalid analysis_type" in result["message"]
 
 
 def test_get_analysis_handles_non_existent_feature():

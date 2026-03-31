@@ -1,0 +1,76 @@
+services:
+  # Neo4j database for Graphiti knowledge graph
+  neo4j:
+    image: neo4j:5.26
+    container_name: investigator-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/password123
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    volumes:
+      - ./data/neo4j/data:/data
+      - ./data/neo4j/logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - investigator-network
+
+  # Graphiti MCP Server with SSE transport
+  graphiti-mcp:
+    image: zepai/knowledge-graph-mcp:latest
+    build:
+      context: ./graphiti
+      dockerfile: Dockerfile
+    container_name: investigator-graphiti-mcp
+    ports:
+      - "8000:8000"
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password123
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - MODEL_NAME=${OPENAI_MODEL_NAME}
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - investigator-network
+    restart: unless-stopped
+    command: ["uv", "run", "graphiti_mcp_server.py", "--transport", "sse"]
+
+  # ChromaDB MCP Server with SSE transport
+  chroma-mcp:
+    build:
+      context: ./chroma
+      dockerfile: Dockerfile
+    container_name: investigator-chroma-mcp
+    ports:
+      - "8001:8001"
+    environment:
+      - CHROMA_CLIENT_TYPE=persistent
+      - CHROMA_DATA_DIR=/data/chromadb
+      - CHROMA_MCP_HOST=0.0.0.0
+      - CHROMA_MCP_PORT=8001
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_EMBEDDING_MODEL=${EMBEDDING_MODEL}
+    volumes:
+      - ./data/chromadb:/data/chromadb
+    networks:
+      - investigator-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/sse || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  investigator-network:
+    driver: bridge

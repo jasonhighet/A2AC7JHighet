@@ -157,7 +157,7 @@ We've also provided `PLAN.md` which is an example starter file that a Python dev
 
 ## Test Data
 
-**Important:** The test data is already provided in the `incoming_data/` directory. You do NOT need to create it.
+**Important:** The test data is already provided in the `data/incoming/` directory. You do NOT need to create it.
 
 The test data includes **4 features** with different readiness scenarios:
 
@@ -168,7 +168,7 @@ The test data includes **4 features** with different readiness scenarios:
 | **Advanced Resource Reservation System** | High | UAT | 🔄 AMBIGUOUS | Mixed signals - incomplete data, requires judgment |
 | **Contribution Tracking & Community Credits** | Medium-High | UAT | 🔄 PARTIAL | Right stage but not ready for next - some gaps remain |
 
-Each feature in `incoming_data/featureN/` includes:
+Each feature in `data/incoming/featureN/` includes:
 - `jira/`: JIRA metadata (feature_issue.json, issue_changelog.json)
 - `metrics/`: 5 different JSON metric files
   - performance_benchmarks.json

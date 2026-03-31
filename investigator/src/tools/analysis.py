@@ -20,6 +20,21 @@ from src.utils.file_utils import (
 logger = logging.getLogger(__name__)
 
 
+VALID_METRICS = [
+    "metrics/unit_test_results",
+    "metrics/test_coverage_report",
+    "metrics/pipeline_results",
+    "metrics/performance_benchmarks",
+    "metrics/security_scan_results",
+]
+
+VALID_REVIEWS = [
+    "reviews/security",
+    "reviews/uat",
+    "reviews/stakeholders",
+]
+
+VALID_ANALYSIS_TYPES = VALID_METRICS + VALID_REVIEWS
 def _read_analysis_file(inputs: Dict[str, str]) -> Dict[str, Any]:
     """Internal function that reads an analysis JSON file.
 
@@ -38,6 +53,12 @@ def _read_analysis_file(inputs: Dict[str, str]) -> Dict[str, Any]:
 
     if not feature_id or not analysis_type:
         raise ValueError("Both feature_id and analysis_type must be provided.")
+
+    if analysis_type not in VALID_ANALYSIS_TYPES:
+        raise ValueError(
+            f"Invalid analysis_type: '{analysis_type}'. "
+            f"Supported types: {', '.join(VALID_ANALYSIS_TYPES)}"
+        )
 
     # Resolve feature_id to its local folder
     folder_name = get_feature_folder(feature_id)
@@ -60,9 +81,17 @@ def _read_analysis_file(inputs: Dict[str, str]) -> Dict[str, Any]:
 def get_analysis(feature_id: str, analysis_type: str) -> Dict[str, Any]:
     """Retrieves specific analysis data for a feature.
 
-    Supported analysis types:
+    Supported metrics types:
     - 'metrics/unit_test_results': Unit test results with pass/fail counts
     - 'metrics/test_coverage_report': Code coverage analysis
+    - 'metrics/pipeline_results': CI/CD pipeline execution results (Build, Lint, Test)
+    - 'metrics/performance_benchmarks': Performance test results (Latency, Throughput)
+    - 'metrics/security_scan_results': Automated security scan findings (SAST/DAST)
+
+    Supported review types:
+    - 'reviews/security': Security review results, vulnerabilities, and compliance
+    - 'reviews/uat': User acceptance testing feedback and approval status
+    - 'reviews/stakeholders': Stakeholder sign-offs and approvals (PM, Lead, etc.)
 
     This tool requires a feature_id (e.g., 'FEAT-MS-001') which you can
     retrieve using get_jira_data().

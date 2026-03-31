@@ -150,7 +150,7 @@ Recommendation: Feature meets all production criteria."
 The existing `get_analysis` tool already supports any `analysis_type` parameter. You just need to:
 1. Update the tool's docstring to document review types
 2. Update the system prompt to guide when to use reviews
-3. Verify the data files exist in `incoming_data/feature*/reviews/`
+3. Verify the data files exist in `data/incoming/feature*/reviews/`
 
 **Updated Tool Docstring:**
 ```python
@@ -326,7 +326,7 @@ import json
 def search_planning_docs(feature_id: str, query: str) -> List[Dict[str, str]]:
     # Map feature_id to folder
     folder = get_feature_folder(feature_id)
-    planning_path = f"incoming_data/{folder}/planning/"
+    planning_path = f"data/incoming/{folder}/planning/"
     
     # Call ripgrep with JSON output
     result = subprocess.run(
