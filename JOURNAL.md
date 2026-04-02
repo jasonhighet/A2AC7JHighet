@@ -120,8 +120,18 @@ esults list inside evaluation_results was a bit of a debugging detour, but it ma
 
 ## Module 8: Agentic Knowledge Management
 
-- **What frustrated you?**: Managing the "summarisation lag." In the initial LangGraph implementation, the agent would once in a while lose the immediate context of a tool result if the `summarize` node triggered exactly at the wrong moment. I had to refine the logic to always keep the last two messages (the most recent turn) out of the summary to ensure continuity.
-- **What surprised you?**: The efficiency of `ripgrep` for "on the metal" searching. Even with multiple large markdown documents, `search_planning_docs` is nearly instantaneous and much simpler to maintain than a vector database for this scale of project.
-- **Aha! Moment**: Realising that the "System Prompt + Summary" pattern is essentially a dynamic "Executive Summary" for the agent. Instead of re-reading everything, it gets a high-level briefing of its own past work, which significantly reduces token usage during long investigations.
-- **Integration**: The 429 Rate Limit during the final evaluation was a practical reminder of the "agentic tax" on APIs. It forced me to think about more efficient tool-calling patterns—why call 5 metrics individually when the agent can be taught to batch its requirements or use a search tool to find just the failures?
-- **Final Verdict**: Scaling an agent isn't just about adding more tools; it's about adding **better filters**. Ripgrep and summarisation provide those filters, allowing the Investigator Agent to handle complex, information-heavy features without "drowning" in its own context window.
+### The Holiday Shortcut and the Black Box
+
+I'll be completely honest: I didn't build this module step-by-step. With my holiday coming up, I decided to treat the entire thing as a pure experiment in delegation. I handed the full project context over to Antigravity, let it rip, and essentially one-shotted the requirements so I could get my homework finished in time to get away. On the surface, it was a massive success. The code looks professional, the expanded logic for the Investigator Agent is all there, and every single test is coming back green. As I reflected in my LinkedIn post (https://www.linkedin.com/feed/update/urn:li:activity:7440487263756582912/), the real "program" is the mental model in the builder’s head, not just the code residue on the disk. Right now, I have a high-quality pile of code that passes every test, but I haven't actually possessed the theory of the system yet.
+
+### Code as Residue vs. Theory Building
+
+The problem is that while the code exists, the "program" doesn't---at least not in the way Peter Naur described it. In his 1985 paper, he argued that the real program is the mental model held by the person who built it, and the code is just the residue left behind. Right now, I am staring at a very high-quality pile of residue. I've pushed my "lower bound" of trust so high for the sake of efficiency that the entire system has become a black box. It's a functional outcome for a Friday afternoon, but it means I'm currently operating as a systems designer who has traded understanding for speed.
+
+### The Post-Holiday Debt
+
+The reality is that I have no mental model of how this actually works. If this thing broke right now, I wouldn't have a clue how to debug it or even where to start looking. I've achieved the goal of getting the project finished, but I haven't done the actual work of software engineering yet, which is possessing the theory of the system. Once I'm back from holiday, I'm going to have to spend a lot of time descending back into these layers to initialise a proper map of the logic and actually work out what the AI has put together.
+
+### Risk, Sleep, and Future Research
+
+As I noted on LinkedIn, the depth of the mental model you need is really just a function of risk. For a holiday deadline, treating the module as magic was a gamble I was willing to take to get out the door. But I'm not comfortable leaving it as a permanent black box. The code is functional and passes the evaluations, but until I've done the research to understand the specific choices the agent is making, I'm just drifting. The next phase will be about reclaiming that theory so I'm not the one staring at a terminal in the dark later on.
